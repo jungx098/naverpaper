@@ -28,6 +28,18 @@ if __name__ == "__main__":
         print("캠페인 URL : " + link)
 ```
 
+## Dev branch test config
+
+`config.py` contains the Naver logon information, such as ID, PW, etc.
+
+## Dev branch test run
+
+Run `main.py`.
+
+```sh
+./main.py
+```
+
 ## References
 * https://help.naver.com/service/5640/contents/10219?lang=ko
 * https://help.naver.com/service/5640/contents/8584?lang=ko
