@@ -6,7 +6,7 @@ from naverpaper import naverpaper
 import time
 import config
 
-base_url = "https://www.clien.net/service/board/jirum"
+base_url = 'https://www.clien.net/service/search?q=%EB%84%A4%EC%9D%B4%EB%B2%84&sort=recency&boardCd=jirum&isBoard=true'
 
 try:
     s = naverpaper.naver_session(config.id, config.pw)
