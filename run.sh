@@ -4,23 +4,25 @@
 SHUF=""
 NOSLEEP=""
 
-# TODO: [ is not posix compatible, and failed on raspberry. Fix condition
-#       statement.
-if [ "$(uname)" == "Darwin" ]; then
+if [ "$(uname)" = "Darwin" ]; then
     # Mac OS X platform
+    echo Mac OS X platform
     SHUF="/opt/local/bin/gshuf"
     NOSLEEP="pmset noidle"
     :
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
     # GNU/Linux platform
+    echo GNU/Linux platform
     SHUF="shuf"
     :
-elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
+elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
     # Windows NT platform
+    echo Windows NT platform
     SHUF="shuf"
     :
-elif [ "$(expr substr $(uname -s) 1 9)" == "CYGWIN_NT" ]; then
+elif [ "$(expr substr $(uname -s) 1 9)" = "CYGWIN_NT" ]; then
     # Cygwin NT platform
+    echo Cygwin NT platform
     SHUF="shuf"
     NOSLEEP="/opt/local/bin/nosleep.sh"
 fi
