@@ -7,7 +7,8 @@ from naver import find as f
 import time
 import config
 
-base_url = "https://www.clien.net/service/board/jirum"
+search_urls = ['https://www.clien.net/service/search?q=%EB%84%A4%EC%9D%B4%EB%B2%84',
+               'https://www.clien.net/service/search?q=%EB%84%A4%EC%9D%B4%EB%B2%84&sort=recency&boardCd=jirum&isBoard=true']
 
 try:
     s = s.session(config.id, config.pw)
@@ -15,7 +16,10 @@ except:
     print("Session Creation Failed. Unknown ID or wrong PW?")
     exit(-1)
 
-campaign_links = f.find(base_url)
+campaign_links = []
+
+for url in search_urls:
+    campaign_links.extend(f.find(url))
 
 if(campaign_links == []):
     print("모든 링크를 방문했습니다.")
