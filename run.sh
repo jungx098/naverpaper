@@ -27,8 +27,8 @@ elif [ "$(expr substr $(uname -s) 1 9)" = "CYGWIN_NT" ]; then
     NOSLEEP="/opt/local/bin/nosleep.sh"
 fi
 
-# Random sleep duration in seconds between 0 and 1800 (30 mins)
-DURATION=$($SHUF -i 0-1800 -n 1)
+# Random sleep duration in seconds between 0 and 1200 (20 mins)
+DURATION=$($SHUF -i 0-1200 -n 1)
 
 if [ -n "$1" ]; then
     DURATION="$1"
