@@ -102,7 +102,9 @@ def find_naver_campaign_links(base_url, visited_urls_file='visited_urls.txt'):
 
         # Find all links that start with the campaign URL
         for a_tag in inner_soup.find_all('a', href=True):
-            if a_tag['href'].startswith("https://campaign2-api.naver.com"):
+            if a_tag['href'].startswith("https://ofw.adison.co"):
+                campaign_links.append(a_tag['href'])
+            elif a_tag['href'].startswith("https://campaign2-api.naver.com"):
                 campaign_links.append(a_tag['href'])
 
         # Add the visited link to the set
