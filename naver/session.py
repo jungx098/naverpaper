@@ -53,7 +53,7 @@ def session(user_id, user_password):
         )
         session.mount("https://", HTTPAdapter(max_retries=retries))
 
-        request_headers = {"User-agent": "Mozilla/5.0"}
+        request_headers = {"User-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1"}
         bvsd_uuid = uuid.uuid4()
         encData = (
             '{"a":"%s-4","b":"1.3.4","d":[{"i":"id","b":{"a":["0,%s"]},"d":"%s","e":false,"f":false},{"i":"%s","e":true,"f":false}],"h":"1f","i":{"a":"Mozilla/5.0"}}'
