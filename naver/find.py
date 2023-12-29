@@ -28,6 +28,8 @@ def find(base_url, visited_urls_file="visited_urls.txt"):
     # Check each Naver link
     for link in naver_links:
         full_link = urljoin(base_url, link)
+        full_link = full_link.split('?')[0]
+
         if full_link in visited_urls:
             continue  # Skip already visited links
 
