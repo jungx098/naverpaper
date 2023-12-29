@@ -58,6 +58,12 @@ cd $SCRIPT_PATH
 sleep $DURATION
 ./main.py
 
+# Run genmd.sh
+./genmd.sh
+# git add campaign.db campaign.md
+# git commit -m 'Campaign DB Update'
+# git push
+
 # Change back to old working directory
 cd $OLD_PATH
 
