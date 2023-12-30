@@ -27,6 +27,7 @@ cur = conn.cursor()
 cur.execute("""
 CREATE TABLE IF NOT EXISTS campaign (
   id INTEGER PRIMARY KEY,
+  date TEXT DEFAULT (datetime('now', 'localtime')),
   url TEXT UNIQ NOT NULL
 );
 """)
