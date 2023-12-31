@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+PATH=/usr/local/bin:$PATH
+
 # Platform specific commands
 SHUF=""
 NOSLEEP=""
