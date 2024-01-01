@@ -31,3 +31,4 @@
 | 29 | 2023-12-31 07:32:16 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010103_2401_1_1152   |
 | 30 | 2023-12-31 07:32:21 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010105_2401_1_1153   |
 | 31 | 2023-12-31 07:32:27 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010101_2401_1145     |
+| 32 | 2024-01-01 07:41:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010202_2401_1_1141   |
