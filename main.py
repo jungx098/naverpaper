@@ -3,13 +3,20 @@
 # https://www.clien.net/service/board/lecture/18488588
 
 from naver import session as s
-from naver import find as f
+from naver import find as clien
+from naver import ppomppu
 import time
 import config
 import sqlite3
 
-search_urls = ['https://www.clien.net/service/search?q=%EB%84%A4%EC%9D%B4%EB%B2%84',
-               'https://www.clien.net/service/search?q=%EB%84%A4%EC%9D%B4%EB%B2%84&sort=recency&boardCd=jirum&isBoard=true']
+search_urls = [
+    'https://www.clien.net/service/search?q=%EB%84%A4%EC%9D%B4%EB%B2%84',
+    'https://www.clien.net/service/search?q=%EB%84%A4%EC%9D%B4%EB%B2%84&sort=recency&boardCd=jirum&isBoard=true'
+]
+
+ppomppu_urls = [
+    'https://www.ppomppu.co.kr/zboard/zboard.php?id=coupon&keyword=%B3%D7%C0%CC%B9%F6'
+]
 
 try:
     s = s.session(config.id, config.pw)
@@ -35,7 +42,10 @@ CREATE TABLE IF NOT EXISTS campaign (
 campaign_links = []
 
 for url in search_urls:
-    campaign_links.extend(f.find(url))
+    campaign_links.extend(clien.find(url))
+
+for url in ppomppu_urls:
+    campaign_links.extend(ppomppu.find(url))
 
 if(campaign_links == []):
     print("모든 링크를 방문했습니다.")
