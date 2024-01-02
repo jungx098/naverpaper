@@ -78,3 +78,4 @@
 | 76 | 2024-01-02 06:44:09 | https://ofw.adison.co/u/naverpay/ads/568468                                      |
 | 77 | 2024-01-02 06:44:14 | https://ofw.adison.co/u/naverpay/ads/541448                                      |
 | 78 | 2024-01-02 06:44:21 | https://ofw.adison.co/u/naverpay/ads/504418                                      |
+| 79 | 2024-01-02 14:18:05 | https://ofw.adison.co/u/naverpay/ads/569348                                      |
