@@ -79,3 +79,4 @@
 | 77 | 2024-01-02 06:44:14 | https://ofw.adison.co/u/naverpay/ads/541448                                      |
 | 78 | 2024-01-02 06:44:21 | https://ofw.adison.co/u/naverpay/ads/504418                                      |
 | 79 | 2024-01-02 14:18:05 | https://ofw.adison.co/u/naverpay/ads/569348                                      |
+| 80 | 2024-01-03 19:09:41 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240104_1809 |
