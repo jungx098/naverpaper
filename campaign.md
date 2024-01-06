@@ -1,82 +1,89 @@
-| id | date                | url                                                                              |
-| -- | ------------------- | -------------------------------------------------------------------------------- |
-| 1  | 2023-12-30 14:36:14 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122301_2401_1_1048   |
-| 2  | 2023-12-30 14:36:19 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122502_2312_3_1600   |
-| 3  | 2023-12-30 14:36:24 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122503_2312_1750     |
-| 4  | 2023-12-30 14:36:30 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122501_2312_4_1100   |
-| 5  | 2023-12-30 14:36:35 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122601_2312_4_1040   |
-| 6  | 2023-12-30 14:36:40 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122701_2401_1_1140   |
-| 7  | 2023-12-30 14:36:45 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122702_2312_2_1555   |
-| 8  | 2023-12-30 14:36:51 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122802_2312_2_1047   |
-| 9  | 2023-12-30 14:36:56 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122901_2401_1_1817   |
-| 10 | 2023-12-30 14:37:01 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_231228_1807 |
-| 11 | 2023-12-30 14:37:06 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_231227_1037 |
-| 12 | 2023-12-30 14:37:12 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_231226_1513 |
-| 13 | 2023-12-30 14:37:17 | https://campaign2-api.naver.com/click-point/?eventId=cr_20231215_2312_1_1235     |
-| 14 | 2023-12-30 14:37:22 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121806_2312_1531     |
-| 15 | 2023-12-30 14:37:27 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121808_2312_1543     |
-| 16 | 2023-12-30 14:37:33 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121802_2312_2_1431   |
-| 17 | 2023-12-30 14:37:38 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121804_2312_3_1407   |
-| 18 | 2023-12-30 14:37:43 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121803_2312_2_1406   |
-| 19 | 2023-12-30 14:37:49 | https://campaign2-api.naver.com/click-point/?eventId=cr_npay_231218_1850         |
-| 20 | 2023-12-30 14:37:54 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121805_2312_2_1421   |
-| 21 | 2023-12-30 14:37:59 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121901_2312_3_1352   |
-| 22 | 2023-12-30 14:38:05 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121902_2312_1835     |
-| 23 | 2023-12-30 14:38:10 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122103_2312_1700     |
-| 24 | 2023-12-30 14:38:15 | https://campaign2-api.naver.com/click-point/?eventId=cr_npay_231220_1617         |
-| 25 | 2023-12-30 14:38:20 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122203_2312_1155     |
-| 26 | 2023-12-30 14:38:26 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122202_2312_4_1136   |
-| 27 | 2023-12-30 14:38:33 | https://ofw.adison.co/u/naverpay/ads/563381                                      |
-| 28 | 2023-12-30 14:38:39 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_231221_1607 |
-| 29 | 2023-12-31 07:32:16 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010103_2401_1_1152   |
-| 30 | 2023-12-31 07:32:21 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010105_2401_1_1153   |
-| 31 | 2023-12-31 07:32:27 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010101_2401_1145     |
-| 32 | 2024-01-01 07:41:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010202_2401_1_1141   |
-| 33 | 2024-01-02 06:40:21 | https://ofw.adison.co/u/naverpay/ads/569598                                      |
-| 34 | 2024-01-02 06:40:26 | https://ofw.adison.co/u/naverpay/ads/297009                                      |
-| 35 | 2024-01-02 06:40:31 | https://ofw.adison.co/u/naverpay/ads/569252                                      |
-| 36 | 2024-01-02 06:40:37 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240102_1108 |
-| 37 | 2024-01-02 06:40:43 | https://ofw.adison.co/u/naverpay/ads/401604                                      |
-| 38 | 2024-01-02 06:40:48 | https://ofw.adison.co/u/naverpay/ads/548556                                      |
-| 39 | 2024-01-02 06:40:53 | https://ofw.adison.co/u/naverpay/ads/511861                                      |
-| 40 | 2024-01-02 06:40:59 | https://ofw.adison.co/u/naverpay/ads/540946                                      |
-| 41 | 2024-01-02 06:41:04 | https://ofw.adison.co/u/naverpay/ads/230108                                      |
-| 42 | 2024-01-02 06:41:09 | https://ofw.adison.co/u/naverpay/ads/55162                                       |
-| 43 | 2024-01-02 06:41:15 | https://ofw.adison.co/u/naverpay/ads/67823                                       |
-| 44 | 2024-01-02 06:41:20 | https://ofw.adison.co/u/naverpay/ads/509336                                      |
-| 45 | 2024-01-02 06:41:26 | https://ofw.adison.co/u/naverpay/ads/446319                                      |
-| 46 | 2024-01-02 06:41:31 | https://ofw.adison.co/u/naverpay/ads/563984                                      |
-| 47 | 2024-01-02 06:41:37 | https://ofw.adison.co/u/naverpay/ads/304251                                      |
-| 48 | 2024-01-02 06:41:42 | https://ofw.adison.co/u/naverpay/ads/304247                                      |
-| 49 | 2024-01-02 06:41:48 | https://ofw.adison.co/u/naverpay/ads/288223                                      |
-| 50 | 2024-01-02 06:41:53 | https://ofw.adison.co/u/naverpay/ads/546558                                      |
-| 51 | 2024-01-02 06:41:58 | https://ofw.adison.co/u/naverpay/ads/546569                                      |
-| 52 | 2024-01-02 06:42:03 | https://ofw.adison.co/u/naverpay/ads/549505                                      |
-| 53 | 2024-01-02 06:42:08 | https://ofw.adison.co/u/naverpay/ads/427803                                      |
-| 54 | 2024-01-02 06:42:14 | https://ofw.adison.co/u/naverpay/ads/382778                                      |
-| 55 | 2024-01-02 06:42:19 | https://ofw.adison.co/u/naverpay/ads/370052                                      |
-| 56 | 2024-01-02 06:42:24 | https://ofw.adison.co/u/naverpay/ads/370348                                      |
-| 57 | 2024-01-02 06:42:29 | https://ofw.adison.co/u/naverpay/ads/295435                                      |
-| 58 | 2024-01-02 06:42:35 | https://ofw.adison.co/u/naverpay/ads/568416                                      |
-| 59 | 2024-01-02 06:42:40 | https://ofw.adison.co/u/naverpay/ads/541879                                      |
-| 60 | 2024-01-02 06:42:45 | https://ofw.adison.co/u/naverpay/ads/541854                                      |
-| 61 | 2024-01-02 06:42:51 | https://ofw.adison.co/u/naverpay/ads/282134                                      |
-| 62 | 2024-01-02 06:42:56 | https://ofw.adison.co/u/naverpay/ads/411849                                      |
-| 63 | 2024-01-02 06:43:01 | https://ofw.adison.co/u/naverpay/ads/535648                                      |
-| 64 | 2024-01-02 06:43:06 | https://ofw.adison.co/u/naverpay/ads/527967                                      |
-| 65 | 2024-01-02 06:43:12 | https://ofw.adison.co/u/naverpay/ads/537616                                      |
-| 66 | 2024-01-02 06:43:17 | https://ofw.adison.co/u/naverpay/ads/401086                                      |
-| 67 | 2024-01-02 06:43:22 | https://ofw.adison.co/u/naverpay/ads/523735                                      |
-| 68 | 2024-01-02 06:43:27 | https://ofw.adison.co/u/naverpay/ads/564183                                      |
-| 69 | 2024-01-02 06:43:32 | https://ofw.adison.co/u/naverpay/ads/518770                                      |
-| 70 | 2024-01-02 06:43:38 | https://ofw.adison.co/u/naverpay/ads/457047                                      |
-| 71 | 2024-01-02 06:43:43 | https://ofw.adison.co/u/naverpay/ads/504000                                      |
-| 72 | 2024-01-02 06:43:48 | https://ofw.adison.co/u/naverpay/ads/519676                                      |
-| 73 | 2024-01-02 06:43:53 | https://ofw.adison.co/u/naverpay/ads/519679                                      |
-| 74 | 2024-01-02 06:43:59 | https://ofw.adison.co/u/naverpay/ads/519884                                      |
-| 75 | 2024-01-02 06:44:04 | https://ofw.adison.co/u/naverpay/ads/359615                                      |
-| 76 | 2024-01-02 06:44:09 | https://ofw.adison.co/u/naverpay/ads/568468                                      |
-| 77 | 2024-01-02 06:44:14 | https://ofw.adison.co/u/naverpay/ads/541448                                      |
-| 78 | 2024-01-02 06:44:21 | https://ofw.adison.co/u/naverpay/ads/504418                                      |
-| 79 | 2024-01-02 14:18:05 | https://ofw.adison.co/u/naverpay/ads/569348                                      |
-| 80 | 2024-01-03 19:09:41 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240104_1809 |
+| id | creation            | url                                                                              | visit |
+| -- | ------------------- | -------------------------------------------------------------------------------- | ----- |
+| 1  | 2023-12-30 14:36:14 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122301_2401_1_1048   |       |
+| 2  | 2023-12-30 14:36:19 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122502_2312_3_1600   |       |
+| 3  | 2023-12-30 14:36:24 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122503_2312_1750     |       |
+| 4  | 2023-12-30 14:36:30 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122501_2312_4_1100   |       |
+| 5  | 2023-12-30 14:36:35 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122601_2312_4_1040   |       |
+| 6  | 2023-12-30 14:36:40 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122701_2401_1_1140   |       |
+| 7  | 2023-12-30 14:36:45 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122702_2312_2_1555   |       |
+| 8  | 2023-12-30 14:36:51 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122802_2312_2_1047   |       |
+| 9  | 2023-12-30 14:36:56 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122901_2401_1_1817   |       |
+| 10 | 2023-12-30 14:37:01 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_231228_1807 |       |
+| 11 | 2023-12-30 14:37:06 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_231227_1037 |       |
+| 12 | 2023-12-30 14:37:12 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_231226_1513 |       |
+| 13 | 2023-12-30 14:37:17 | https://campaign2-api.naver.com/click-point/?eventId=cr_20231215_2312_1_1235     |       |
+| 14 | 2023-12-30 14:37:22 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121806_2312_1531     |       |
+| 15 | 2023-12-30 14:37:27 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121808_2312_1543     |       |
+| 16 | 2023-12-30 14:37:33 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121802_2312_2_1431   |       |
+| 17 | 2023-12-30 14:37:38 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121804_2312_3_1407   |       |
+| 18 | 2023-12-30 14:37:43 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121803_2312_2_1406   |       |
+| 19 | 2023-12-30 14:37:49 | https://campaign2-api.naver.com/click-point/?eventId=cr_npay_231218_1850         |       |
+| 20 | 2023-12-30 14:37:54 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121805_2312_2_1421   |       |
+| 21 | 2023-12-30 14:37:59 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121901_2312_3_1352   |       |
+| 22 | 2023-12-30 14:38:05 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023121902_2312_1835     |       |
+| 23 | 2023-12-30 14:38:10 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122103_2312_1700     |       |
+| 24 | 2023-12-30 14:38:15 | https://campaign2-api.naver.com/click-point/?eventId=cr_npay_231220_1617         |       |
+| 25 | 2023-12-30 14:38:20 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122203_2312_1155     |       |
+| 26 | 2023-12-30 14:38:26 | https://campaign2-api.naver.com/click-point/?eventId=cr_2023122202_2312_4_1136   |       |
+| 27 | 2023-12-30 14:38:33 | https://ofw.adison.co/u/naverpay/ads/563381                                      |       |
+| 28 | 2023-12-30 14:38:39 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_231221_1607 |       |
+| 29 | 2023-12-31 07:32:16 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010103_2401_1_1152   |       |
+| 30 | 2023-12-31 07:32:21 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010105_2401_1_1153   |       |
+| 31 | 2023-12-31 07:32:27 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010101_2401_1145     |       |
+| 32 | 2024-01-01 07:41:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010202_2401_1_1141   |       |
+| 33 | 2024-01-02 06:40:21 | https://ofw.adison.co/u/naverpay/ads/569598                                      |       |
+| 34 | 2024-01-02 06:40:26 | https://ofw.adison.co/u/naverpay/ads/297009                                      |       |
+| 35 | 2024-01-02 06:40:31 | https://ofw.adison.co/u/naverpay/ads/569252                                      |       |
+| 36 | 2024-01-02 06:40:37 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240102_1108 |       |
+| 37 | 2024-01-02 06:40:43 | https://ofw.adison.co/u/naverpay/ads/401604                                      |       |
+| 38 | 2024-01-02 06:40:48 | https://ofw.adison.co/u/naverpay/ads/548556                                      |       |
+| 39 | 2024-01-02 06:40:53 | https://ofw.adison.co/u/naverpay/ads/511861                                      |       |
+| 40 | 2024-01-02 06:40:59 | https://ofw.adison.co/u/naverpay/ads/540946                                      |       |
+| 41 | 2024-01-02 06:41:04 | https://ofw.adison.co/u/naverpay/ads/230108                                      |       |
+| 42 | 2024-01-02 06:41:09 | https://ofw.adison.co/u/naverpay/ads/55162                                       |       |
+| 43 | 2024-01-02 06:41:15 | https://ofw.adison.co/u/naverpay/ads/67823                                       |       |
+| 44 | 2024-01-02 06:41:20 | https://ofw.adison.co/u/naverpay/ads/509336                                      |       |
+| 45 | 2024-01-02 06:41:26 | https://ofw.adison.co/u/naverpay/ads/446319                                      |       |
+| 46 | 2024-01-02 06:41:31 | https://ofw.adison.co/u/naverpay/ads/563984                                      |       |
+| 47 | 2024-01-02 06:41:37 | https://ofw.adison.co/u/naverpay/ads/304251                                      |       |
+| 48 | 2024-01-02 06:41:42 | https://ofw.adison.co/u/naverpay/ads/304247                                      |       |
+| 49 | 2024-01-02 06:41:48 | https://ofw.adison.co/u/naverpay/ads/288223                                      |       |
+| 50 | 2024-01-02 06:41:53 | https://ofw.adison.co/u/naverpay/ads/546558                                      |       |
+| 51 | 2024-01-02 06:41:58 | https://ofw.adison.co/u/naverpay/ads/546569                                      |       |
+| 52 | 2024-01-02 06:42:03 | https://ofw.adison.co/u/naverpay/ads/549505                                      |       |
+| 53 | 2024-01-02 06:42:08 | https://ofw.adison.co/u/naverpay/ads/427803                                      |       |
+| 54 | 2024-01-02 06:42:14 | https://ofw.adison.co/u/naverpay/ads/382778                                      |       |
+| 55 | 2024-01-02 06:42:19 | https://ofw.adison.co/u/naverpay/ads/370052                                      |       |
+| 56 | 2024-01-02 06:42:24 | https://ofw.adison.co/u/naverpay/ads/370348                                      |       |
+| 57 | 2024-01-02 06:42:29 | https://ofw.adison.co/u/naverpay/ads/295435                                      |       |
+| 58 | 2024-01-02 06:42:35 | https://ofw.adison.co/u/naverpay/ads/568416                                      |       |
+| 59 | 2024-01-02 06:42:40 | https://ofw.adison.co/u/naverpay/ads/541879                                      |       |
+| 60 | 2024-01-02 06:42:45 | https://ofw.adison.co/u/naverpay/ads/541854                                      |       |
+| 61 | 2024-01-02 06:42:51 | https://ofw.adison.co/u/naverpay/ads/282134                                      |       |
+| 62 | 2024-01-02 06:42:56 | https://ofw.adison.co/u/naverpay/ads/411849                                      |       |
+| 63 | 2024-01-02 06:43:01 | https://ofw.adison.co/u/naverpay/ads/535648                                      |       |
+| 64 | 2024-01-02 06:43:06 | https://ofw.adison.co/u/naverpay/ads/527967                                      |       |
+| 65 | 2024-01-02 06:43:12 | https://ofw.adison.co/u/naverpay/ads/537616                                      |       |
+| 66 | 2024-01-02 06:43:17 | https://ofw.adison.co/u/naverpay/ads/401086                                      |       |
+| 67 | 2024-01-02 06:43:22 | https://ofw.adison.co/u/naverpay/ads/523735                                      |       |
+| 68 | 2024-01-02 06:43:27 | https://ofw.adison.co/u/naverpay/ads/564183                                      |       |
+| 69 | 2024-01-02 06:43:32 | https://ofw.adison.co/u/naverpay/ads/518770                                      |       |
+| 70 | 2024-01-02 06:43:38 | https://ofw.adison.co/u/naverpay/ads/457047                                      |       |
+| 71 | 2024-01-02 06:43:43 | https://ofw.adison.co/u/naverpay/ads/504000                                      |       |
+| 72 | 2024-01-02 06:43:48 | https://ofw.adison.co/u/naverpay/ads/519676                                      |       |
+| 73 | 2024-01-02 06:43:53 | https://ofw.adison.co/u/naverpay/ads/519679                                      |       |
+| 74 | 2024-01-02 06:43:59 | https://ofw.adison.co/u/naverpay/ads/519884                                      |       |
+| 75 | 2024-01-02 06:44:04 | https://ofw.adison.co/u/naverpay/ads/359615                                      |       |
+| 76 | 2024-01-02 06:44:09 | https://ofw.adison.co/u/naverpay/ads/568468                                      |       |
+| 77 | 2024-01-02 06:44:14 | https://ofw.adison.co/u/naverpay/ads/541448                                      |       |
+| 78 | 2024-01-02 06:44:21 | https://ofw.adison.co/u/naverpay/ads/504418                                      |       |
+| 79 | 2024-01-02 14:18:05 | https://ofw.adison.co/u/naverpay/ads/569348                                      |       |
+| 80 | 2024-01-03 19:09:41 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240104_1809 |       |
+| 81 | 2024-01-06 14:30:46 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010601_2401_2_1150   |       |
+| 82 | 2024-01-06 14:30:46 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024010501_2401_2_1056   |       |
+| 83 | 2024-01-06 14:30:46 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240104_1819 |       |
+| 84 | 2024-01-06 14:30:46 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240104_1032 |       |
+| 85 | 2024-01-06 14:30:46 | https://ofw.adison.co/u/naverpay/ads/441412                                      |       |
+| 86 | 2024-01-06 14:30:46 | https://ofw.adison.co/u/naverpay/ads/282925                                      |       |
+| 87 | 2024-01-06 14:30:46 | https://ofw.adison.co/u/naverpay/ads/392884                                      |       |
