@@ -63,3 +63,4 @@
 | 93 | 2024-01-08 21:10:46 | https://ofw.adison.co/u/naverpay/ads/569999                                      |       |
 | 94 | 2024-01-09 02:17:09 | https://ofw.adison.co/u/naverpay/ads/568464                                      |       |
 | 95 | 2024-01-09 02:17:09 | https://ofw.adison.co/u/naverpay/ads/577732                                      |       |
+| 96 | 2024-01-09 02:38:43 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240109_1742 |       |
