@@ -27,3 +27,4 @@
 | 116 | 2024-01-14 19:37:16 | https://ofw.adison.co/u/naverpay/ads/581306                                      |       |
 | 117 | 2024-01-14 19:37:16 | https://ofw.adison.co/u/naverpay/ads/581476                                      |       |
 | 118 | 2024-01-14 19:37:16 | https://ofw.adison.co/u/naverpay/ads/581496                                      |       |
+| 119 | 2024-01-15 07:01:19 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011601_2401_3_1232   |       |
