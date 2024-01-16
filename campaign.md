@@ -31,3 +31,4 @@
 | 121 | 2024-01-15 07:38:52 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240116_2401_1_1545     |       |
 | 122 | 2024-01-15 17:09:38 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240115_1729 |       |
 | 123 | 2024-01-15 18:14:21 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240116_1006 |       |
+| 124 | 2024-01-15 20:02:40 | https://ofw.adison.co/u/naverpay/ads/569119                                      |       |
