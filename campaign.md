@@ -32,3 +32,4 @@
 | 132 | 2024-01-17 03:03:00 | https://ofw.adison.co/u/naverpay/ads/581561                                      |       |
 | 133 | 2024-01-17 07:13:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011801_2401_1_1829   |       |
 | 134 | 2024-01-18 02:19:31 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240118_1817 |       |
+| 135 | 2024-01-18 02:47:56 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240118_1143 |       |
