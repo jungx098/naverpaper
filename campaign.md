@@ -31,3 +31,4 @@
 | 135 | 2024-01-18 02:47:56 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240118_1143 |       |
 | 136 | 2024-01-18 07:10:20 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011902_2401_2_1810   |       |
 | 137 | 2024-01-18 17:30:31 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011903_2401_1005     |       |
+| 138 | 2024-01-18 22:32:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011905_2401_4_1425   |       |
