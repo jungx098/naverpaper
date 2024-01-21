@@ -1,13 +1,5 @@
 | id  | creation            | url                                                                              | visit |
 | --- | ------------------- | -------------------------------------------------------------------------------- | ----- |
-| 108 | 2024-01-14 07:11:18 | https://campaign2-api.naver.com/click-point/?eventId=snc_20240115_weedv_1255     |       |
-| 109 | 2024-01-14 07:11:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011507_2401_1_1445   |       |
-| 110 | 2024-01-14 07:11:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011508_2401_2_1201   |       |
-| 111 | 2024-01-14 07:11:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011504_2401_3_1225   |       |
-| 112 | 2024-01-14 07:11:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011506_2401_3_1215   |       |
-| 113 | 2024-01-14 07:11:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011501_2401_1451     |       |
-| 114 | 2024-01-14 07:11:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011503_2401_1_1048   |       |
-| 115 | 2024-01-14 08:04:21 | https://ofw.adison.co/u/naverpay/ads/581454                                      |       |
 | 116 | 2024-01-14 19:37:16 | https://ofw.adison.co/u/naverpay/ads/581306                                      |       |
 | 117 | 2024-01-14 19:37:16 | https://ofw.adison.co/u/naverpay/ads/581476                                      |       |
 | 118 | 2024-01-14 19:37:16 | https://ofw.adison.co/u/naverpay/ads/581496                                      |       |
@@ -37,3 +29,4 @@
 | 142 | 2024-01-21 07:04:12 | https://campaign2-api.naver.com/click-point/?eventId=cr_npay_240122_1049         |       |
 | 143 | 2024-01-21 07:04:12 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024012201_2401_4_1605   |       |
 | 144 | 2024-01-21 07:04:12 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024012203_2401_4_1556   |       |
+| 145 | 2024-01-21 11:17:15 | https://ofw.adison.co/u/naverpay/ads/581534                                      |       |
