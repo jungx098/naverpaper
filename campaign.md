@@ -30,3 +30,6 @@
 | 143 | 2024-01-21 07:04:12 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024012201_2401_4_1605   |       |
 | 144 | 2024-01-21 07:04:12 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024012203_2401_4_1556   |       |
 | 145 | 2024-01-21 11:17:15 | https://ofw.adison.co/u/naverpay/ads/581534                                      |       |
+| 146 | 2024-01-21 17:06:20 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240122_1410 |       |
+| 147 | 2024-01-21 17:06:20 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240122_1445 |       |
+| 148 | 2024-01-21 17:06:20 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240122_1721 |       |
