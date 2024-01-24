@@ -1,6 +1,5 @@
 | id  | creation            | url                                                                                                                                                                                | visit |
 | --- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| 127 | 2024-01-16 16:19:53 | https://ofw.adison.co/u/naverpay/ads/570097                                                                                                                                        |       |
 | 128 | 2024-01-16 17:43:30 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240117_1552                                                                                                   |       |
 | 129 | 2024-01-16 22:31:34 | https://ofw.adison.co/u/naverpay/ads/582298                                                                                                                                        |       |
 | 130 | 2024-01-16 22:31:34 | https://ofw.adison.co/u/naverpay/ads/582313                                                                                                                                        |       |
@@ -36,3 +35,4 @@
 | 160 | 2024-01-22 07:35:15 | https://ofw.adison.co/u/naverpay/ads/586710                                                                                                                                        |       |
 | 161 | 2024-01-23 02:42:53 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240123_1150                                                                                                   |       |
 | 162 | 2024-01-23 07:31:21 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024012401_2401_3_1415                                                                                                     |       |
+| 163 | 2024-01-23 16:49:38 | https://ofw.adison.co/u/naverpay/ads/586992                                                                                                                                        |       |
