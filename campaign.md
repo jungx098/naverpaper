@@ -1,10 +1,5 @@
 | id  | creation            | url                                                                              | visit |
 | --- | ------------------- | -------------------------------------------------------------------------------- | ----- |
-| 162 | 2024-01-23 07:31:21 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024012401_2401_3_1415   |       |
-| 163 | 2024-01-23 16:49:38 | https://ofw.adison.co/u/naverpay/ads/586992                                      |       |
-| 164 | 2024-01-23 17:14:01 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240124_1436 |       |
-| 165 | 2024-01-23 23:45:43 | https://ofw.adison.co/u/naverpay/ads/587088                                      |       |
-| 166 | 2024-01-24 01:03:59 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240124_1019 |       |
 | 167 | 2024-01-24 09:03:25 | https://ofw.adison.co/u/naverpay/ads/587096                                      |       |
 | 168 | 2024-01-25 07:08:44 | https://campaign2-api.naver.com/click-point/?eventId=snc_20240126_wdtrdxr_1105   |       |
 | 169 | 2024-01-25 07:08:44 | https://ofw.adison.co/u/naverpay/ads/589121                                      |       |
@@ -29,3 +24,7 @@
 | 188 | 2024-01-30 02:37:37 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240130_1155 |       |
 | 189 | 2024-01-30 07:09:10 | https://campaign2-api.naver.com/click-point/?eventId=snc_20240131_wecqgffzw_1134 |       |
 | 190 | 2024-01-30 07:09:10 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024013101_2402_1_1117   |       |
+| 191 | 2024-01-31 07:13:34 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240201_2402_1451       |       |
+| 192 | 2024-01-31 07:13:34 | https://ofw.adison.co/u/naverpay/ads/589956                                      |       |
+| 193 | 2024-01-31 07:13:34 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240201_2402_1_1426     |       |
+| 194 | 2024-01-31 07:13:34 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240125_2402_1531       |       |
