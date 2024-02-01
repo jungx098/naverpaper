@@ -1,9 +1,5 @@
 | id  | creation            | url                                                                              | visit |
 | --- | ------------------- | -------------------------------------------------------------------------------- | ----- |
-| 167 | 2024-01-24 09:03:25 | https://ofw.adison.co/u/naverpay/ads/587096                                      |       |
-| 168 | 2024-01-25 07:08:44 | https://campaign2-api.naver.com/click-point/?eventId=snc_20240126_wdtrdxr_1105   |       |
-| 169 | 2024-01-25 07:08:44 | https://ofw.adison.co/u/naverpay/ads/589121                                      |       |
-| 170 | 2024-01-25 07:08:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024012601_2401_5_1819   |       |
 | 171 | 2024-01-26 02:42:41 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024012601_2401_1750     |       |
 | 172 | 2024-01-26 04:08:59 | https://ofw.adison.co/u/naverpay/ads/392992                                      |       |
 | 173 | 2024-01-26 07:08:28 | https://ofw.adison.co/u/naverpay/ads/530116                                      |       |
@@ -28,3 +24,8 @@
 | 192 | 2024-01-31 07:13:34 | https://ofw.adison.co/u/naverpay/ads/589956                                      |       |
 | 193 | 2024-01-31 07:13:34 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240201_2402_1_1426     |       |
 | 194 | 2024-01-31 07:13:34 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240125_2402_1531       |       |
+| 195 | 2024-02-01 07:10:11 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240202_2402_1_1813     |       |
+| 196 | 2024-02-01 07:10:11 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024020201_2402_1222     |       |
+| 197 | 2024-02-01 07:10:11 | https://ofw.adison.co/u/naverpay/ads/589802                                      |       |
+| 198 | 2024-02-01 07:10:11 | https://ofw.adison.co/u/naverpay/ads/590297                                      |       |
+| 199 | 2024-02-01 07:10:11 | https://ofw.adison.co/u/naverpay/ads/590213                                      |       |
