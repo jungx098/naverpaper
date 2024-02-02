@@ -29,3 +29,4 @@
 | 197 | 2024-02-01 07:10:11 | https://ofw.adison.co/u/naverpay/ads/589802                                      |       |
 | 198 | 2024-02-01 07:10:11 | https://ofw.adison.co/u/naverpay/ads/590297                                      |       |
 | 199 | 2024-02-01 07:10:11 | https://ofw.adison.co/u/naverpay/ads/590213                                      |       |
+| 200 | 2024-02-02 01:16:58 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240202_1033 |       |
