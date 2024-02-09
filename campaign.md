@@ -1,7 +1,5 @@
 | id  | creation            | url                                                                              | visit |
 | --- | ------------------- | -------------------------------------------------------------------------------- | ----- |
-| 200 | 2024-02-02 01:16:58 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240202_1033 |       |
-| 201 | 2024-02-02 07:16:07 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024020301_2402_2_1132   |       |
 | 202 | 2024-02-04 07:11:41 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240205_2402_5_1143     |       |
 | 203 | 2024-02-04 07:11:41 | https://campaign2-api.naver.com/click-point/?eventId=snc_20240205_wdtrdxr_1621   |       |
 | 204 | 2024-02-04 07:11:41 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024013004_2402_1_1445   |       |
@@ -19,3 +17,4 @@
 | 216 | 2024-02-07 07:50:04 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240208_2402_2_1107     |       |
 | 217 | 2024-02-08 07:20:15 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024020901_2402_2_1107   |       |
 | 218 | 2024-02-08 07:20:15 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240209_2402_1_1415     |       |
+| 219 | 2024-02-09 07:18:10 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011005_2402_3_1450   |       |
