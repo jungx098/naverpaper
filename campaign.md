@@ -19,3 +19,6 @@
 | 218 | 2024-02-08 07:20:15 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240209_2402_1_1415     |       |
 | 219 | 2024-02-09 07:18:10 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024011005_2402_3_1450   |       |
 | 220 | 2024-02-11 02:10:10 | https://ofw.adison.co/u/naverpay/ads/594625                                      |       |
+| 221 | 2024-02-11 07:08:35 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024021201_2402_1_1028   |       |
+| 222 | 2024-02-11 07:08:35 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240212_2402_2_1459     |       |
+| 223 | 2024-02-11 07:08:35 | https://ofw.adison.co/u/naverpay/ads/594448                                      |       |
