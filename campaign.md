@@ -24,3 +24,5 @@
 | 237 | 2024-02-13 17:09:37 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240214_1845 |       |
 | 238 | 2024-02-14 01:11:28 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240214_1145 |       |
 | 239 | 2024-02-14 03:01:39 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240214_1512 |       |
+| 240 | 2024-02-14 07:13:47 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240215_2402_3_1103     |       |
+| 241 | 2024-02-14 07:13:47 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240215_2402_2_1057     |       |
