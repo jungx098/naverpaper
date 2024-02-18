@@ -31,3 +31,9 @@
 | 249 | 2024-02-16 07:14:19 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024021702_2402_1707     |       |
 | 250 | 2024-02-18 04:03:08 | https://ofw.adison.co/u/naverpay/ads/392836                                      |       |
 | 251 | 2024-02-18 05:06:11 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240218_1716 |       |
+| 252 | 2024-02-18 07:06:33 | https://ofw.adison.co/u/naverpay/ads/504829                                      |       |
+| 253 | 2024-02-18 07:06:33 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240219_2402_3_1615     |       |
+| 254 | 2024-02-18 07:06:33 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024021901_2402_1_1406   |       |
+| 255 | 2024-02-18 07:06:33 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024021902_2402_1_1505   |       |
+| 256 | 2024-02-18 07:06:33 | https://ofw.adison.co/u/naverpay/ads/599262                                      |       |
+| 257 | 2024-02-18 07:06:33 | https://ofw.adison.co/u/naverpay/ads/599362                                      |       |
