@@ -37,3 +37,4 @@
 | 258 | 2024-02-18 17:06:01 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240219_1523 |       |
 | 259 | 2024-02-18 17:06:01 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240219_1105 |       |
 | 260 | 2024-02-18 22:35:29 | https://ofw.adison.co/u/naverpay/ads/411432                                      |       |
+| 261 | 2024-02-19 00:04:36 | https://ofw.adison.co/u/naverpay/ads/467975                                      |       |
