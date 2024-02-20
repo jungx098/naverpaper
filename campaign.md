@@ -45,3 +45,4 @@
 | 277 | 2024-02-20 07:17:24 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024022102_2402_1525     |       |
 | 278 | 2024-02-20 07:17:24 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024022101_2402_4_1415   |       |
 | 279 | 2024-02-20 07:17:24 | https://ofw.adison.co/u/naverpay/ads/600186                                      |       |
+| 280 | 2024-02-20 07:40:42 | https://campaign2-api.naver.com/click-point/?eventId=snc_20240221_wecqgvtx_1618  |       |
