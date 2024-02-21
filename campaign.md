@@ -1,8 +1,5 @@
 | id  | creation            | url                                                                              | visit |
 | --- | ------------------- | -------------------------------------------------------------------------------- | ----- |
-| 235 | 2024-02-13 08:14:24 | https://campaign2-api.naver.com/click-point/?eventId=snc_20240214_wecqgdvx_1529  |       |
-| 236 | 2024-02-13 16:04:56 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240214_1853 |       |
-| 237 | 2024-02-13 17:09:37 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240214_1845 |       |
 | 238 | 2024-02-14 01:11:28 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240214_1145 |       |
 | 239 | 2024-02-14 03:01:39 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240214_1512 |       |
 | 240 | 2024-02-14 07:13:47 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240215_2402_3_1103     |       |
@@ -46,3 +43,4 @@
 | 278 | 2024-02-20 07:17:24 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024022101_2402_4_1415   |       |
 | 279 | 2024-02-20 07:17:24 | https://ofw.adison.co/u/naverpay/ads/600186                                      |       |
 | 280 | 2024-02-20 07:40:42 | https://campaign2-api.naver.com/click-point/?eventId=snc_20240221_wecqgvtx_1618  |       |
+| 281 | 2024-02-20 18:18:00 | https://ofw.adison.co/u/naverpay/ads/599316                                      |       |
