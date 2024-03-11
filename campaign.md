@@ -30,3 +30,4 @@
 | 347 | 2024-03-10 18:44:30 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240311_1006 |       |
 | 348 | 2024-03-10 20:16:32 | https://ofw.adison.co/u/naverpay/ads/611066                                      |       |
 | 349 | 2024-03-11 02:13:29 | https://ofw.adison.co/u/naverpay/ads/439202                                      |       |
+| 350 | 2024-03-11 04:44:04 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240311_1535 |       |
