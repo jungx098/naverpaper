@@ -32,3 +32,4 @@
 | 421 | 2024-03-26 08:32:08 | https://ofw.adison.co/u/naverpay/ads/623654                                      |       |
 | 422 | 2024-03-26 08:32:08 | https://ofw.adison.co/u/naverpay/ads/617139                                      |       |
 | 423 | 2024-03-26 19:05:39 | https://ofw.adison.co/u/naverpay/ads/623678                                      |       |
+| 424 | 2024-03-26 20:11:31 | https://ofw.adison.co/u/naverpay/ads/624083                                      |       |
