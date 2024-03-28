@@ -38,3 +38,4 @@
 | 431 | 2024-03-28 03:01:49 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240328_1116 |       |
 | 432 | 2024-03-28 03:01:49 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240328_1649 |       |
 | 433 | 2024-03-28 03:49:49 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240328_1502 |       |
+| 434 | 2024-03-28 04:10:08 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240328_1121 |       |
