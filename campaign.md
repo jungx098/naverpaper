@@ -41,3 +41,5 @@
 | 438 | 2024-03-28 08:17:31 | https://ofw.adison.co/u/naverpay/ads/628097                                      |       |
 | 439 | 2024-03-28 18:18:31 | https://ofw.adison.co/u/naverpay/ads/363859                                      |       |
 | 440 | 2024-03-29 03:05:03 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240329_1125 |       |
+| 441 | 2024-03-29 08:10:05 | https://ofw.adison.co/u/naverpay/ads/628822                                      |       |
+| 442 | 2024-03-29 08:10:05 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024033001_2404_1_1438   |       |
