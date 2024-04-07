@@ -1,9 +1,5 @@
 | id  | creation            | url                                                                              | visit |
 | --- | ------------------- | -------------------------------------------------------------------------------- | ----- |
-| 444 | 2024-03-30 03:02:17 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240330_1037 |       |
-| 445 | 2024-03-31 04:11:58 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240331_1130 |       |
-| 446 | 2024-03-31 08:06:20 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240401_2404_1_1232     |       |
-| 447 | 2024-03-31 08:06:20 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240401_2404_1_1226     |       |
 | 448 | 2024-03-31 08:42:17 | https://ofw.adison.co/u/naverpay/ads/629217                                      |       |
 | 449 | 2024-03-31 08:42:17 | https://ofw.adison.co/u/naverpay/ads/618693                                      |       |
 | 450 | 2024-03-31 19:12:55 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240401_1530 |       |
@@ -35,3 +31,8 @@
 | 476 | 2024-04-04 18:47:56 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240405_1756 |       |
 | 477 | 2024-04-05 08:19:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024040601_2404_2_1408   |       |
 | 478 | 2024-04-06 02:46:28 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240406_1526 |       |
+| 479 | 2024-04-07 08:14:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024040801_2404_1_1029   |       |
+| 480 | 2024-04-07 08:14:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240408_2404_1022       |       |
+| 481 | 2024-04-07 08:14:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240408_2404_2_1115     |       |
+| 482 | 2024-04-07 08:14:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240408_2404_2_1125     |       |
+| 483 | 2024-04-07 08:14:44 | https://ofw.adison.co/u/naverpay/ads/634867                                      |       |
