@@ -1,11 +1,5 @@
 | id  | creation            | url                                                                              | visit |
 | --- | ------------------- | -------------------------------------------------------------------------------- | ----- |
-| 455 | 2024-04-01 08:03:58 | https://ofw.adison.co/u/naverpay/ads/629917                                      |       |
-| 456 | 2024-04-01 08:03:58 | https://ofw.adison.co/u/naverpay/ads/628547                                      |       |
-| 457 | 2024-04-01 08:03:58 | https://ofw.adison.co/u/naverpay/ads/629896                                      |       |
-| 458 | 2024-04-01 08:03:58 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024040201_2404_1_1820   |       |
-| 459 | 2024-04-01 08:03:58 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024040202_2404_1_1512   |       |
-| 460 | 2024-04-01 08:03:58 | https://ofw.adison.co/u/naverpay/ads/618662                                      |       |
 | 461 | 2024-04-01 22:44:30 | https://ofw.adison.co/u/naverpay/ads/466532                                      |       |
 | 462 | 2024-04-02 08:10:21 | https://ofw.adison.co/u/naverpay/ads/630382                                      |       |
 | 463 | 2024-04-02 08:10:21 | https://ofw.adison.co/u/naverpay/ads/630429                                      |       |
@@ -30,3 +24,6 @@
 | 482 | 2024-04-07 08:14:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240408_2404_2_1125     |       |
 | 483 | 2024-04-07 08:14:44 | https://ofw.adison.co/u/naverpay/ads/634867                                      |       |
 | 484 | 2024-04-08 03:45:45 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240408_1055 |       |
+| 485 | 2024-04-08 08:44:06 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024040901_2404_2_1048   |       |
+| 486 | 2024-04-08 08:44:06 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240409_2404_1_1715     |       |
+| 487 | 2024-04-08 08:44:06 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240409_2404_2_1519     |       |
