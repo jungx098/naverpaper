@@ -1,11 +1,5 @@
 | id  | creation            | url                                                                              | visit |
 | --- | ------------------- | -------------------------------------------------------------------------------- | ----- |
-| 466 | 2024-04-03 08:08:19 | https://ofw.adison.co/u/naverpay/ads/632249                                      |       |
-| 467 | 2024-04-03 08:08:19 | https://ofw.adison.co/u/naverpay/ads/630689                                      |       |
-| 468 | 2024-04-03 08:08:19 | https://ofw.adison.co/u/naverpay/ads/630718                                      |       |
-| 469 | 2024-04-03 08:08:19 | https://ofw.adison.co/u/naverpay/ads/634302                                      |       |
-| 470 | 2024-04-03 17:02:11 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240404_1445 |       |
-| 471 | 2024-04-03 17:02:11 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240404_1441 |       |
 | 472 | 2024-04-04 04:11:31 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240404_1720 |       |
 | 473 | 2024-04-04 08:37:17 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024040501_2404_1_1055   |       |
 | 474 | 2024-04-04 08:37:17 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240405_2404_2_1601     |       |
@@ -23,3 +17,4 @@
 | 486 | 2024-04-08 08:44:06 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240409_2404_1_1715     |       |
 | 487 | 2024-04-08 08:44:06 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240409_2404_2_1519     |       |
 | 488 | 2024-04-09 08:49:28 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024041001_2404_3_1103   |       |
+| 489 | 2024-04-10 18:09:22 | https://ofw.adison.co/u/naverpay/ads/635928                                      |       |
