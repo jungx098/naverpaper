@@ -1,12 +1,5 @@
 | id  | creation            | url                                                                              | visit |
 | --- | ------------------- | -------------------------------------------------------------------------------- | ----- |
-| 477 | 2024-04-05 08:19:18 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024040601_2404_2_1408   |       |
-| 478 | 2024-04-06 02:46:28 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240406_1526 |       |
-| 479 | 2024-04-07 08:14:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024040801_2404_1_1029   |       |
-| 480 | 2024-04-07 08:14:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240408_2404_1022       |       |
-| 481 | 2024-04-07 08:14:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240408_2404_2_1115     |       |
-| 482 | 2024-04-07 08:14:44 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240408_2404_2_1125     |       |
-| 483 | 2024-04-07 08:14:44 | https://ofw.adison.co/u/naverpay/ads/634867                                      |       |
 | 484 | 2024-04-08 03:45:45 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240408_1055 |       |
 | 485 | 2024-04-08 08:44:06 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024040901_2404_2_1048   |       |
 | 486 | 2024-04-08 08:44:06 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240409_2404_1_1715     |       |
@@ -19,3 +12,14 @@
 | 493 | 2024-04-11 08:48:04 | https://ofw.adison.co/u/naverpay/ads/639808                                      |       |
 | 494 | 2024-04-11 08:48:04 | https://ofw.adison.co/u/naverpay/ads/639820                                      |       |
 | 495 | 2024-04-12 08:14:16 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024041301_2404_3_1556   |       |
+| 496 | 2024-04-14 08:42:23 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024041501_2404_1_1225   |       |
+| 497 | 2024-04-14 08:42:23 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024041502_2404_3_1648   |       |
+| 498 | 2024-04-14 08:42:23 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240415_2404_3_1606     |       |
+| 499 | 2024-04-14 08:42:23 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240415_2404_2_1056     |       |
+| 500 | 2024-04-14 08:42:23 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240415_2404_3_1615     |       |
+| 501 | 2024-04-14 08:42:23 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240415_2404_1_1735     |       |
+| 502 | 2024-04-14 08:42:23 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024041702_2404_1650     |       |
+| 503 | 2024-04-14 08:42:23 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240415_2404_1028       |       |
+| 504 | 2024-04-14 08:42:23 | https://ofw.adison.co/u/naverpay/ads/639812                                      |       |
+| 505 | 2024-04-14 08:42:23 | https://ofw.adison.co/u/naverpay/ads/639983                                      |       |
+| 506 | 2024-04-14 08:42:23 | https://ofw.adison.co/u/naverpay/ads/639975                                      |       |
