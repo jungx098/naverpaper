@@ -26,3 +26,6 @@
 | 508 | 2024-04-15 02:44:50 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240415_1751 |       |
 | 509 | 2024-04-15 03:41:42 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240415_1508 |       |
 | 510 | 2024-04-15 04:19:39 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240415_1756 |       |
+| 511 | 2024-04-15 08:17:48 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024041601_2404_3_1441   |       |
+| 512 | 2024-04-15 08:17:48 | https://campaign2-api.naver.com/click-point/?eventId=cr_20240416_2404_1_1129     |       |
+| 513 | 2024-04-15 08:17:48 | https://ofw.adison.co/u/naverpay/ads/640886                                      |       |
