@@ -23,3 +23,5 @@
 | 504 | 2024-04-14 08:42:23 | https://ofw.adison.co/u/naverpay/ads/639812                                      |       |
 | 505 | 2024-04-14 08:42:23 | https://ofw.adison.co/u/naverpay/ads/639983                                      |       |
 | 506 | 2024-04-14 08:42:23 | https://ofw.adison.co/u/naverpay/ads/639975                                      |       |
+| 507 | 2024-04-15 02:44:50 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240415_1746 |       |
+| 508 | 2024-04-15 02:44:50 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240415_1751 |       |
