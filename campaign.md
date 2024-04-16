@@ -31,3 +31,4 @@
 | 516 | 2024-04-16 02:32:49 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240416_1815 |       |
 | 517 | 2024-04-16 03:42:46 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240416_1128 |       |
 | 518 | 2024-04-16 03:42:46 | https://campaign2-api.naver.com/click-point/?eventId=cr_shoppinglive_240416_1819 |       |
+| 519 | 2024-04-16 08:38:30 | https://campaign2-api.naver.com/click-point/?eventId=cr_2024041701_2404_4_1105   |       |
