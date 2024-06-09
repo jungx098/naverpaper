@@ -1,6 +1,7 @@
 import requests
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 
 base_url = "https://www.damoang.net/economy"
 
@@ -12,8 +13,11 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_damoang.txt'):
     except FileNotFoundError:
         visited_urls = set()
 
+    # Http headers
+    headers = {'User-Agent': f'{UserAgent(platforms='pc').random}'}
+
     # Send a request to the base URL
-    response = requests.get(base_url)
+    response = requests.get(base_url, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find all span elements with class 'list_subject' and get 'a' tags
@@ -35,7 +39,7 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_damoang.txt'):
         if full_link in visited_urls:
             continue  # Skip already visited links
 
-        res = requests.get(full_link)
+        res = requests.get(full_link, headers=headers)
         inner_soup = BeautifulSoup(res.text, 'html.parser')
 
         # Find all links that start with the campaign URL
