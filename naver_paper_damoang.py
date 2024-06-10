@@ -14,7 +14,8 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_damoang.txt'):
         visited_urls = set()
 
     # Http headers
-    headers = {'User-Agent': f'{UserAgent(platforms='pc').random}'}
+    ua = UserAgent(platforms='pc').random
+    headers = {'User-Agent': f'{ua}'}
 
     # Send a request to the base URL
     response = requests.get(base_url, headers=headers)
