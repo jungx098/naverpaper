@@ -1,17 +1,21 @@
+import argparse
+import hashlib
+import json
+import logging
+import os
+import time
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-import time, os, argparse, json
-import hashlib
+from webdriver_manager.chrome import ChromeDriverManager
+
 import naver_paper_clien as clien
 import naver_paper_damoang as damoang
 import naver_paper_ppomppu as ppomppu
 
-import logging
-import sys
-
 logger = logging.getLogger("Naver-Paper")
+
 
 class CustomFormatter(logging.Formatter):
 
