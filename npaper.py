@@ -192,6 +192,15 @@ def init_logger(debug: bool = True):
 def main(campaign_links, id, pwd, ua, headless, newsave):
     driver = init(id, pwd, ua, headless, newsave)
     visit(campaign_links, driver)
+
+    # Balance Check
+    try:
+        driver.get("https://new-m.pay.naver.com/mydata/home")
+        balance = driver.find_element(By.CLASS_NAME, "AssetCommonItem_balance__mkiEz")
+        print(f"Balance: {balance.text}")
+    except Exception as e:
+        logging.warning("%s: Balance Not Available!", e)
+
     driver.quit()
 
 
