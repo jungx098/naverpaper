@@ -1,14 +1,10 @@
 import argparse
-import hashlib
 import json
 import logging
 import os
-import time
+import re
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 
 from run_new import grep_campaign_links
 from run_new import init
@@ -57,18 +53,25 @@ def init_logger(debug: bool = True):
         logger.setLevel(logging.CRITICAL + 1)
 
 
-def main(campaign_links, id, pwd, ua, headless, newsave):
-    driver = init(id, pwd, ua, headless, newsave)
-    visit(campaign_links, driver)
+def get_balance(driver):
+    """Function checking Naver balance."""
+    balance = -1
 
-    # Balance Check
     try:
         driver.get("https://new-m.pay.naver.com/mydata/home")
-        balance = driver.find_element(By.CLASS_NAME, "AssetCommonItem_balance__mkiEz")
-        print(f"Balance: {balance.text}")
+        balance = driver.find_element(By.CLASS_NAME,
+                                      "AssetCommonItem_balance__mkiEz")
+        balance = int(re.sub(r'[^0-9]', '', balance.text))
     except Exception as e:
         logging.warning("%s: Balance Not Available!", e)
 
+    return balance
+
+
+def main(campaign_links, id, pwd, ua, headless, newsave):
+    driver = init(id, pwd, ua, headless, newsave)
+    visit(campaign_links, driver)
+    print(f"Current Balance: {get_balance(driver):,}")
     driver.quit()
 
 
