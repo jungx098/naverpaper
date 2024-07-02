@@ -10,8 +10,6 @@ from run_new import grep_campaign_links
 from run_new import init
 from run_new import visit
 
-logger = logging.getLogger("Naver-Paper")
-
 
 class CustomFormatter(logging.Formatter):
 
@@ -21,14 +19,14 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31;20m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = "%(asctime)s [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
+    log = "%(asctime)s [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
 
     FORMATS = {
-        logging.DEBUG: grey + format + reset,
-        logging.INFO: blue + format + reset,
-        logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset
+        logging.DEBUG: grey + log + reset,
+        logging.INFO: blue + log + reset,
+        logging.WARNING: yellow + log + reset,
+        logging.ERROR: red + log + reset,
+        logging.CRITICAL: bold_red + log + reset
     }
 
     def format(self, record):
@@ -40,17 +38,13 @@ class CustomFormatter(logging.Formatter):
 def init_logger(debug: bool = True):
     """Function initializing logger."""
 
-    # create console handler with a higher log level.
     ch = logging.StreamHandler()
     ch.setFormatter(CustomFormatter())
 
-    logger.addHandler(ch)
-
-    # Set logger level.
-    if debug is True:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.CRITICAL + 1)
+    logging.basicConfig(
+        level=logging.DEBUG if debug is True else logging.CRITICAL + 1,
+        handlers=[ch],
+    )
 
 
 def get_balance(driver):
