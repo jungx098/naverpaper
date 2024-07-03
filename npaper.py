@@ -8,9 +8,12 @@ import re
 
 from selenium.webdriver.common.by import By
 
-from run_new import grep_campaign_links
 from run_new import init
 from run_new import visit
+
+import naver_paper_clien as clien
+import naver_paper_damoang as damoang
+import naver_paper_ppomppu as ppomppu
 
 
 class CustomFormatter(logging.Formatter):
@@ -64,6 +67,20 @@ def init_logger(verbose: int = 0):
         level=level,
         handlers=[ch],
     )
+
+
+def grep_campaign_links():
+    """Function making campaign link list"""
+
+    campaign_links = []
+    campaign_links += clien.find_naver_campaign_links()
+    campaign_links += damoang.find_naver_campaign_links()
+    campaign_links += ppomppu.find_naver_campaign_links()
+
+    campaign_links = list(set(campaign_links))
+    logging.info("Unvisited Campaign Link Count: %d", len(campaign_links))
+
+    return campaign_links
 
 
 def get_balance(driver):
@@ -163,20 +180,22 @@ if __name__ == "__main__":
         cd_obj = [{"id": args.id, "pw": args.pw}]
 
     campaign_links = grep_campaign_links()
-    for idx, account in enumerate(cd_obj):
-        id = account.get("id")
-        pw = account.get("pw")
-        ua = account.get("ua")
 
-        print(f">>> {idx+1}번째 계정")
+    if len(campaign_links) > 0:
+        for idx, account in enumerate(cd_obj):
+            id = account.get("id")
+            pw = account.get("pw")
+            ua = account.get("ua")
 
-        if id is None:
-            print("ID not found!")
-            continue
-        if pw is None:
-            print("PW not found!")
-            continue
+            print(f">>> {idx+1}번째 계정")
 
-        main(campaign_links, id, pw, ua, headless, newsave)
+            if id is None:
+                print("ID not found!")
+                continue
+            if pw is None:
+                print("PW not found!")
+                continue
+
+            main(campaign_links, id, pw, ua, headless, newsave)
 
     logging.info("Bye!")
