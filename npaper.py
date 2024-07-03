@@ -83,7 +83,8 @@ def get_balance(driver):
 def main(campaign_links, id, pwd, ua, headless, newsave):
     driver = init(id, pwd, ua, headless, newsave)
     visit(campaign_links, driver)
-    print(f"Current Balance: {get_balance(driver):,}")
+    balance = get_balance(driver)
+    print(f"Current Balance: {balance:,}")
     driver.quit()
 
 
@@ -123,6 +124,8 @@ if __name__ == "__main__":
     newsave = args.newsave
 
     init_logger(args.verbose)
+
+    logging.info("Verbose Level: %d", args.verbose)
 
     if (
         args.id is None
@@ -175,3 +178,5 @@ if __name__ == "__main__":
             continue
 
         main(campaign_links, id, pw, ua, headless, newsave)
+
+    logging.info("Bye!")
