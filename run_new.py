@@ -14,6 +14,8 @@ import naver_paper_clien as clien
 import naver_paper_damoang as damoang
 import naver_paper_ppomppu as ppomppu
 
+logger = logging.getLogger(__name__)
+
 
 def grep_campaign_links():
     campaign_links = []
@@ -48,6 +50,7 @@ def init(id, pwd, ua, headless, newsave):
     # ID page (successful logged-in) title for nid.naver.com
     #   <title>Naver ID</title>
     if driver.title == "Naver ID" or driver.title == "네이버ID":
+        logger.info("Existing log-in session used")
         return driver
 
     # 현재 열려 있는 창 가져오기
@@ -108,7 +111,7 @@ def init(id, pwd, ua, headless, newsave):
         time.sleep(1)
     except Exception as e:
         # Print warning and go to login page.
-        logging.warning("%s: new save or dontsave 오류", e)
+        logger.warning("%s: new save or dontsave 오류", e)
         driver.get("https://nid.naver.com")
 
     try_login_limit = os.getenv("TRY_LOGIN", 3)
@@ -150,6 +153,7 @@ def visit(campaign_links, driver2):
 
 
 def main(campaign_links, id, pwd, ua, headless, newsave):
+    logger.info("Init Driver for %s", id)
     driver = init(id, pwd, ua, headless, newsave)
     visit(campaign_links, driver)
     driver.quit()

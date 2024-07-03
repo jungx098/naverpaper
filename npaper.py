@@ -15,6 +15,8 @@ import naver_paper_clien as clien
 import naver_paper_damoang as damoang
 import naver_paper_ppomppu as ppomppu
 
+logger = logging.getLogger(__name__)
+
 
 class CustomFormatter(logging.Formatter):
     """Custom formatter for logging."""
@@ -26,8 +28,8 @@ class CustomFormatter(logging.Formatter):
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
 
-    format_simple = "%(asctime)s [%(levelname)s] %(message)s"
-    format_detail = "%(asctime)s [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
+    format_simple = "%(asctime)s [%(levelname)s] %(module)s: %(message)s"
+    format_detail = "%(asctime)s [%(levelname)s] %(module)s: %(message)s (%(filename)s:%(lineno)d)"
 
     FORMATS = {
         logging.DEBUG: grey + format_simple + reset,
@@ -78,7 +80,7 @@ def grep_campaign_links():
     campaign_links += ppomppu.find_naver_campaign_links()
 
     campaign_links = list(set(campaign_links))
-    logging.info("Unvisited Campaign Link Count: %d", len(campaign_links))
+    logger.info("Unvisited Campaign Link Count: %d", len(campaign_links))
 
     return campaign_links
 
@@ -142,7 +144,7 @@ if __name__ == "__main__":
 
     init_logger(args.verbose)
 
-    logging.info("Verbose Level: %d", args.verbose)
+    logger.info("Verbose Level: %d", args.verbose)
 
     if (
         args.id is None
@@ -160,7 +162,7 @@ if __name__ == "__main__":
         try:
             cd_obj = json.loads(args.cd)
         except Exception as e:
-            logging.critical("%s: json loading error", e)
+            logger.critical("%s: json loading error", e)
             print("use -c or --cd argument")
             print(
                 'credential json sample [{"id":"id1","pw":"pw1"},{"id":"id2","pw":"pw2"}]'
@@ -198,4 +200,4 @@ if __name__ == "__main__":
 
             main(campaign_links, id, pw, ua, headless, newsave)
 
-    logging.info("Bye!")
+    logger.info("Bye!")
