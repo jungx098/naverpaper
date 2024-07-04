@@ -40,7 +40,8 @@ def get_balance(driver):
 
     try:
         driver.get("https://new-m.pay.naver.com/mydata/home")
-        balance = driver.find_element(By.CLASS_NAME, "AssetCommonItem_balance__mkiEz")
+        balance = driver.find_element(By.CLASS_NAME,
+                                      "AssetCommonItem_balance__mkiEz")
         balance = int(re.sub(r"[^0-9]", "", balance.text))
     except Exception as e:
         logging.warning("%s: Balance Not Available!", e)
@@ -59,9 +60,12 @@ def main(campaign_links, id, pwd, ua, headless, newsave):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--id", type=str, required=False, help="naver id")
-    parser.add_argument("-p", "--pw", type=str, required=False, help="naver password")
-    parser.add_argument("-c", "--cd", type=str, required=False, help="credential json")
+    parser.add_argument("-i", "--id", type=str,
+                        required=False, help="naver id")
+    parser.add_argument("-p", "--pw", type=str,
+                        required=False, help="naver password")
+    parser.add_argument("-c", "--cd", type=str,
+                        required=False, help="credential json")
     parser.add_argument(
         "--headless",
         type=bool,
@@ -112,7 +116,7 @@ if __name__ == "__main__":
         try:
             cd_obj = json.loads(args.cd)
         except Exception as e:
-            logger.critical("%s: json loading error", e)
+            logger.critical("%s: json loading error!", e)
             print("use -c or --cd argument")
             print(
                 'credential json sample [{"id":"id1","pw":"pw1"},{"id":"id2","pw":"pw2"}]'
@@ -131,23 +135,26 @@ if __name__ == "__main__":
             exit()
         cd_obj = [{"id": args.id, "pw": args.pw}]
 
-    campaign_links = grep_campaign_links()
+    if cd_obj is None:
+        logger.warning("No Credential Provided!")
+    else:
+        campaign_links = grep_campaign_links()
 
-    if len(campaign_links) > 0:
-        for idx, account in enumerate(cd_obj):
-            id = account.get("id")
-            pw = account.get("pw")
-            ua = account.get("ua")
+        if len(campaign_links) > 0:
+            for idx, account in enumerate(cd_obj):
+                id = account.get("id")
+                pw = account.get("pw")
+                ua = account.get("ua")
 
-            print(f">>> {idx+1}번째 계정")
+                print(f">>> {idx+1}번째 계정")
 
-            if id is None:
-                print("ID not found!")
-                continue
-            if pw is None:
-                print("PW not found!")
-                continue
+                if id is None:
+                    print("ID not found!")
+                    continue
+                if pw is None:
+                    print("PW not found!")
+                    continue
 
-            main(campaign_links, id, pw, ua, headless, newsave)
+                main(campaign_links, id, pw, ua, headless, newsave)
 
     logger.info("Bye!")
