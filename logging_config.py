@@ -16,7 +16,8 @@ class CustomFormatter(logging.Formatter):
 
     format_simple = "%(asctime)s %(levelname)-8s %(message)s"
     format_detail = (
-        "%(asctime)s %(levelname)-8s %(name)-16s: %(message)s (%(filename)s:%(lineno)d)"
+        "%(asctime)s %(levelname)-8s %(name)-16s: %(message)s "
+        "(%(filename)s:%(lineno)d)"
     )
 
     FORMATS = {
@@ -85,7 +86,8 @@ def init_logger(verbose: int = 0):
 
 
 if __name__ == "__main__":
-    logging.critical("Initial Root Logger Level: %d", logging.root.getEffectiveLevel())
+    logging.critical("Initial Root Logger Level: %d",
+                     logging.root.getEffectiveLevel())
 
     logging.debug("DEBUG Message")
     logging.info("INFO Message")
@@ -93,7 +95,8 @@ if __name__ == "__main__":
     logging.error("ERROR Message")
     logging.critical("CRITICAL Message")
 
-    logging.critical("Initial Logger List: %d", len(logging.Logger.manager.loggerDict))
+    logging.critical("Initial Logger List: %d",
+                     len(logging.Logger.manager.loggerDict))
     for i, l in enumerate(logging.Logger.manager.loggerDict.values()):
         assert isinstance(l, logging.Logger)
         logging.critical("%d: %s", i, l.name)
@@ -104,12 +107,14 @@ if __name__ == "__main__":
     logger.critical("Initialize logger")
     init_logger(5)
 
-    logger.info("Logger List: %d", len(logging.Logger.manager.loggerDict.values()))
+    logger.info("Logger List: %d",
+                len(logging.Logger.manager.loggerDict.values()))
     for i, l in enumerate(logging.Logger.manager.loggerDict.values()):
         assert isinstance(l, logging.Logger)
         logger.info("%d: %s", i, l.name)
 
-    logger.critical("Initial Root Logger Level: %d", logger.getEffectiveLevel())
+    logger.critical("Initial Root Logger Level: %d",
+                    logger.getEffectiveLevel())
 
     logger.debug("DEBUG Message")
     logger.info("INFO Message")
