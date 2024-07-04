@@ -8,6 +8,7 @@ import re
 
 from selenium.webdriver.common.by import By
 
+from logging_config import init_logger
 from run_new import init
 from run_new import visit
 
@@ -15,60 +16,8 @@ import naver_paper_clien as clien
 import naver_paper_damoang as damoang
 import naver_paper_ppomppu as ppomppu
 
+
 logger = logging.getLogger(__name__)
-
-
-class CustomFormatter(logging.Formatter):
-    """Custom formatter for logging."""
-
-    grey = "\x1b[38;20m"
-    blue = "\x1b[38;5;39m"
-    yellow = "\x1b[33;20m"
-    red = "\x1b[31;20m"
-    bold_red = "\x1b[31;1m"
-    reset = "\x1b[0m"
-
-    format_simple = "%(asctime)s [%(levelname)s] %(module)s: %(message)s"
-    format_detail = "%(asctime)s [%(levelname)s] %(module)s: %(message)s (%(filename)s:%(lineno)d)"
-
-    FORMATS = {
-        logging.DEBUG: grey + format_simple + reset,
-        logging.INFO: blue + format_simple + reset,
-        logging.WARNING: yellow + format_simple + reset,
-        logging.ERROR: red + format_detail + reset,
-        logging.CRITICAL: bold_red + format_detail + reset,
-    }
-
-    def format(self, record):
-        log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt)
-        return formatter.format(record)
-
-
-def init_logger(verbose: int = 0):
-    """Function initializing logger."""
-
-    LEVEL = {
-        5: logging.DEBUG,
-        4: logging.INFO,
-        3: logging.WARNING,
-        2: logging.ERROR,
-        1: logging.CRITICAL,
-    }
-
-    level = logging.CRITICAL + 1
-    if verbose > 5:
-        level = logging.DEBUG
-    elif verbose > 0:
-        level = LEVEL[verbose]
-
-    ch = logging.StreamHandler()
-    ch.setFormatter(CustomFormatter())
-
-    logging.basicConfig(
-        level=level,
-        handlers=[ch],
-    )
 
 
 def grep_campaign_links():
@@ -104,6 +53,7 @@ def main(campaign_links, id, pwd, ua, headless, newsave):
     visit(campaign_links, driver)
     balance = get_balance(driver)
     print(f"Current Balance: {balance:,}")
+    logger.info("Current Balance: %d", balance)
     driver.quit()
 
 
@@ -144,7 +94,7 @@ if __name__ == "__main__":
 
     init_logger(args.verbose)
 
-    logger.info("Verbose Level: %d", args.verbose)
+    logger.info("Hello Verbose Level: %d", args.verbose)
 
     if (
         args.id is None
