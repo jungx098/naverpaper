@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     init_logger(args.verbose)
 
-    logger.info("Hello Verbose Level: %d", args.verbose)
+    logger.info("안녕 Verbose Level: %d", args.verbose)
 
     if (
         args.id is None

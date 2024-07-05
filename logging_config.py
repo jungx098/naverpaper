@@ -72,6 +72,7 @@ def init_logger(verbose: int = 0):
         "./log.txt",
         when="midnight",
         backupCount=7,
+        encoding="utf-8",
     )
     fh.setFormatter(CustomFormatter(file=True))
 
