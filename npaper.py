@@ -59,6 +59,13 @@ def main(campaign_links, id, pwd, ua, headless, newsave):
 
 
 if __name__ == "__main__":
+
+    print(" _  _")
+    print("| \\| |_ __  __ _ _ __  ___ _ _")
+    print("| .` | '_ \\/ _` | '_ \\/ -_) '_|")
+    print("|_|\\_| .__/\\__,_| .__/\\___|_|")
+    print("     |_|        |_|   @jungx098")
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--id", type=str,
                         required=False, help="naver id")
