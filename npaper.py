@@ -140,7 +140,10 @@ if __name__ == "__main__":
         required=False,
         help="credential json file",
     )
+
     parser.add_argument("-v", "--verbose", action="count", default=0)
+    parser.add_argument("--no-verbose", dest="verbose",
+                        action="store_const", const=0)
 
     args = parser.parse_args()
     cd_obj = None
