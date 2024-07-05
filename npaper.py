@@ -5,17 +5,17 @@ import json
 import logging
 import os
 import re
+import time
 
+from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.by import By
-
-from logging_config import init_logger
-from run_new import init
-from run_new import visit
+from tqdm import tqdm
 
 import naver_paper_clien as clien
 import naver_paper_damoang as damoang
 import naver_paper_ppomppu as ppomppu
-
+from logging_config import init_logger
+from run_new import init
 
 logger = logging.getLogger(__name__)
 
@@ -49,12 +49,56 @@ def get_balance(driver):
     return balance
 
 
+def maskUsername(username: str):
+    return (
+        username[0]
+        + "******"
+        + username[-1]
+    )
+
+
+def visit(account, campaign_links, driver2):
+    """Function visiting campaign links."""
+    idx = 0
+    pbar = tqdm(total=len(campaign_links), desc=maskUsername(account))
+    while idx < len(campaign_links):
+        link = campaign_links[idx]
+        driver2.get(link)
+
+        try:
+            result = driver2.switch_to.alert
+            logger.info("%s: %s", link, result.text)
+            result.accept()
+        except NoAlertPresentException:
+            logger.warning("%s: No Alert to Accept!", link)
+            time.sleep(3)
+        except Exception as e:
+            logger.error("%s: %s", link, e)
+            time.sleep(3)
+            # pageSource = driver2.page_source
+            # print(pageSource)
+
+        time.sleep(1)
+
+        idx += 1
+        pbar.update(1)
+    pbar.close()
+
+
 def main(campaign_links, id, pwd, ua, headless, newsave):
     driver = init(id, pwd, ua, headless, newsave)
-    visit(campaign_links, driver)
-    balance = get_balance(driver)
-    print(f"Current Balance: {balance:,}")
-    logger.info("Current Balance: %d", balance)
+    start_balance = get_balance(driver)
+    logger.info("Start Balance: %d", start_balance)
+
+    visit(id, campaign_links, driver)
+    end_balance = get_balance(driver)
+    logger.info("End Balance: %d Gain: %d", end_balance,
+                end_balance - start_balance)
+
+    print(f"{maskUsername(id)}: Start Balance: {start_balance:,} "
+          f"End Balance: {end_balance:,} "
+          f"Gain: {(end_balance - start_balance):,}")
+
     driver.quit()
 
 
@@ -146,14 +190,13 @@ if __name__ == "__main__":
         logger.warning("No Credential Provided!")
     else:
         campaign_links = grep_campaign_links()
+        print(f"Number of Links to Visit: {len(campaign_links)}")
 
         if len(campaign_links) > 0:
             for idx, account in enumerate(cd_obj):
                 id = account.get("id")
                 pw = account.get("pw")
                 ua = account.get("ua")
-
-                print(f">>> {idx+1}번째 계정")
 
                 if id is None:
                     print("ID not found!")
