@@ -7,6 +7,7 @@ import os
 import re
 import time
 
+import apprise
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.by import By
 from tqdm import tqdm
@@ -104,7 +105,19 @@ def visit(account, campaign_links, driver2):
     pbar.close()
 
 
-def main(campaign_links, id, pwd, ua, headless, newsave):
+def apprise_notify(title, body, urls: list = []):
+    """Function sending notification to Apprise URLs."""
+
+    if urls:
+        apobj = apprise.Apprise()
+        for url in urls:
+            apobj.add(url)
+        apobj.notify(body=body, title=title)
+
+
+def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
+    time_start = time.time()
+
     driver = init(id, pwd, ua, headless, newsave)
     start_balance = get_balance(driver)
     logger.info("Start Balance: %d", start_balance)
@@ -114,11 +127,26 @@ def main(campaign_links, id, pwd, ua, headless, newsave):
     logger.info("End Balance: %d Gain: %d", end_balance,
                 end_balance - start_balance)
 
+    gain = end_balance - start_balance
+
+    time_end = time.time()
+
+    duration = time_end - time_start
+
     print(f"{mask_username(id)}: Start Balance: {start_balance:,} "
           f"End Balance: {end_balance:,} "
-          f"Gain: {(end_balance - start_balance):,}")
+          f"Gain: {gain:,} "
+          f"Time: {duration:.3f} secs")
 
     driver.quit()
+
+    if apprise_urls and gain > 0:
+        apprise_notify(f"Npaper {mask_username(id)}",
+                       f"Start Balance: {start_balance:,}\n"
+                       f"End Balance: {end_balance:,}\n"
+                       f"Gain: {(end_balance - start_balance):,}\n"
+                       f"Time: {duration:.3f} secs",
+                       apprise_urls)
 
 
 if __name__ == "__main__":
@@ -230,6 +258,7 @@ if __name__ == "__main__":
                 id = account.get("id")
                 pw = account.get("pw")
                 ua = account.get("ua")
+                urls = account.get("apprise")
 
                 if id is None:
                     print("ID not found!")
@@ -238,6 +267,6 @@ if __name__ == "__main__":
                     print("PW not found!")
                     continue
 
-                main(campaign_links, id, pw, ua, headless, newsave)
+                main(campaign_links, id, pw, ua, headless, newsave, urls)
 
     logger.info("Bye!")

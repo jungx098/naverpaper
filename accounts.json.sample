@@ -2,7 +2,8 @@
     {
         "id": "ID 1",
         "pw": "Password 1",
-        "ua": "UA 1"
+        "ua": "UA 1",
+        "apprise": ["apprise URL"]
     },
     {
         "id": "ID 2",
