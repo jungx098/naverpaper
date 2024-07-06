@@ -110,9 +110,13 @@ def init(id, pwd, ua, headless, newsave):
             driver2.find_element(By.ID, "new.dontsave").click()
         time.sleep(1)
     except Exception as e:
-        # Print warning and go to login page.
-        logger.warning("%s: new save or dontsave 오류", e)
-        driver.get("https://nid.naver.com")
+        # Print warning.
+        logger.warning("new save or dontsave 오류: %s", type(e).__name__)
+
+        # Fallback to the login page only for headless mode, otherwise stay for
+        # the user to resolve any login issues on the current page.
+        if headless is True:
+            driver.get("https://nid.naver.com")
 
     try_login_limit = os.getenv("TRY_LOGIN", 3)
     try_login_count = 1
