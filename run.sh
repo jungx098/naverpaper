@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+SCRIPT=naper.py
+
 #==============================================================================
 # Config for different platforms
 #==============================================================================
@@ -61,12 +63,13 @@ sleep $DURATION
 #==============================================================================
 # Headless
 #==============================================================================
-$PYTHON npaper.py --headless -cf account.json -vvvv
+$PYTHON $SCRIPT --headless -cf account.json -vvvv
+# $PYTHON $SCRIPT --headless -cf account.json
 
 #==============================================================================
 # Non-Headless
 #==============================================================================
-# $PYTHON npaper.py --no-headless -cf account.json
+# $PYTHON $SCRIPT --no-headless -cf account.json
 
 # End time stamp
 echo "$(basename $0) End: $(date)"
