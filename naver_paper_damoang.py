@@ -1,9 +1,6 @@
 import requests
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
-import logging
-
-logger = logging.getLogger(__name__)
 
 base_url = "https://www.damoang.net/economy"
 
@@ -19,28 +16,25 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_damoang.txt'):
     request_headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
+    response = requests.get(base_url, headers=request_headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Initialize variables.
+    # Find all span elements with class 'list_subject' and get 'a' tags
+    list_subject_links = soup.find_all('li', class_='list-group-item')
+
     naver_links = []
+    for span in list_subject_links:
+        a_tag = span.find('a', href=True)
+        if a_tag and '네이버' in a_tag.text:
+            naver_links.append(a_tag['href'])
+
+    # Initialize a list to store campaign links
     campaign_links = []
-
-    try:
-        response = requests.get(base_url, headers=request_headers)
-        soup = BeautifulSoup(response.text, 'html.parser')
-
-        # Find all span elements with class 'list_subject' and get 'a' tags
-        list_subject_links = soup.find_all('li', class_='list-group-item')
-
-        for span in list_subject_links:
-            a_tag = span.find('a', href=True)
-            if a_tag and '네이버' in a_tag.text:
-                naver_links.append(a_tag['href'])
-    except Exception as e:
-        logger.error("URL Processing Error for %s: %s", base_url, e)
 
     # Check each Naver link
     for link in naver_links:
         full_link = urljoin(base_url, link)
+        print("damoang\tlinks : " + full_link)
         if full_link in visited_urls:
             continue  # Skip already visited links
 

@@ -24,9 +24,24 @@ def grep_campaign_links():
     """Function making campaign link list"""
 
     campaign_links = []
-    campaign_links += clien.find_naver_campaign_links()
-    campaign_links += damoang.find_naver_campaign_links()
-    campaign_links += ppomppu.find_naver_campaign_links()
+
+    try:
+        campaign_links += clien.find_naver_campaign_links()
+    except Exception as e:
+        logging.exception("clien.find_naver_campaign_links Failed: %s",
+                          type(e).__name__)
+
+    try:
+        campaign_links += damoang.find_naver_campaign_links()
+    except Exception as e:
+        logging.exception("damoang.find_naver_campaign_links Failed: %s",
+                          type(e).__name__)
+
+    try:
+        campaign_links += ppomppu.find_naver_campaign_links()
+    except Exception as e:
+        logging.exception("ppomppu.find_naver_campaign_links Failed: %s",
+                          type(e).__name__)
 
     campaign_links = list(set(campaign_links))
     logger.info("Unvisited Campaign Link Count: %d", len(campaign_links))
