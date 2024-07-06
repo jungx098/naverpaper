@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+"""Module configuring logging."""
 
 import logging
 import logging.handlers
+from logging import Handler
 
 
 class CustomFormatter(logging.Formatter):
@@ -48,41 +50,38 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-def init_logger(verbose: int = 0):
+def init_logger(console_logging_level: int = logging.WARNING,
+                file_logging_level: int = logging.WARNING,
+                filename: str | None = None):
     """Function initializing logger."""
 
-    LEVEL = {
-        5: logging.DEBUG,
-        4: logging.INFO,
-        3: logging.WARNING,
-        2: logging.ERROR,
-        1: logging.CRITICAL,
-    }
+    handlers = []
 
-    level = logging.CRITICAL + 1
-    if verbose > 5:
-        level = logging.DEBUG
-    elif verbose > 0:
-        level = LEVEL[verbose]
+    console_handler: Handler = logging.StreamHandler()
+    console_handler.setFormatter(CustomFormatter())
+    console_handler.setLevel(console_logging_level)
 
-    ch = logging.StreamHandler()
-    ch.setFormatter(CustomFormatter())
+    handlers.append(console_handler)
 
-    fh = logging.handlers.TimedRotatingFileHandler(
-        "./log.txt",
-        when="midnight",
-        backupCount=7,
-        encoding="utf-8",
-    )
-    fh.setFormatter(CustomFormatter(file=True))
+    if filename is not None:
+        file_handler: Handler = logging.handlers.TimedRotatingFileHandler(
+            filename,
+            when="midnight",
+            backupCount=7,
+            encoding="utf-8",
+        )
+        file_handler.setFormatter(CustomFormatter(file=True))
+        file_handler.setLevel(file_logging_level)
+
+        handlers.append(file_handler)
 
     # Remove all root logger handler.
     for h in logging.root.handlers[:]:
         logging.root.removeHandler(h)
 
     logging.basicConfig(
-        level=level,
-        handlers=[ch, fh],
+        level=min(console_logging_level, file_logging_level),
+        handlers=handlers,
     )
 
 
@@ -92,7 +91,7 @@ if __name__ == "__main__":
 
     logging.debug("DEBUG Message")
     logging.info("INFO Message")
-    logging.warning("WARNING Message")
+    logging.warning("WARNING Message")  # Default logging level
     logging.error("ERROR Message")
     logging.critical("CRITICAL Message")
 
@@ -106,7 +105,7 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
 
     logger.critical("Initialize logger")
-    init_logger(5)
+    init_logger(logging.INFO, logging.DEBUG, "./foo.txt")
 
     logger.info("Logger List: %d",
                 len(logging.Logger.manager.loggerDict.values()))

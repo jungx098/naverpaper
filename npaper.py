@@ -169,7 +169,18 @@ if __name__ == "__main__":
     headless = args.headless
     newsave = args.newsave
 
-    init_logger(args.verbose)
+    LEVEL = {
+        5: logging.DEBUG,
+        4: logging.INFO,
+        3: logging.WARNING,
+        2: logging.ERROR,
+        1: logging.CRITICAL,
+        0: logging.CRITICAL + 1,
+    }
+
+    init_logger(console_logging_level=LEVEL[args.verbose],
+                file_logging_level=LEVEL[args.verbose],
+                filename="./log.txt")
 
     logger.info("안녕 Verbose Level: %d", args.verbose)
 
