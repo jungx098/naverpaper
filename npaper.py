@@ -28,20 +28,20 @@ def grep_campaign_links():
     try:
         campaign_links += clien.find_naver_campaign_links()
     except Exception as e:
-        logging.exception("clien.find_naver_campaign_links Failed: %s",
-                          type(e).__name__)
+        logger.exception("clien.find_naver_campaign_links Failed: %s",
+                         type(e).__name__)
 
     try:
         campaign_links += damoang.find_naver_campaign_links()
     except Exception as e:
-        logging.exception("damoang.find_naver_campaign_links Failed: %s",
-                          type(e).__name__)
+        logger.exception("damoang.find_naver_campaign_links Failed: %s",
+                         type(e).__name__)
 
     try:
         campaign_links += ppomppu.find_naver_campaign_links()
     except Exception as e:
-        logging.exception("ppomppu.find_naver_campaign_links Failed: %s",
-                          type(e).__name__)
+        logger.exception("ppomppu.find_naver_campaign_links Failed: %s",
+                         type(e).__name__)
 
     campaign_links = list(set(campaign_links))
     logger.info("Unvisited Campaign Link Count: %d", len(campaign_links))
@@ -51,6 +51,7 @@ def grep_campaign_links():
 
 def get_balance(driver):
     """Function checking Naver balance."""
+
     balance = -1
 
     try:
@@ -59,12 +60,14 @@ def get_balance(driver):
                                       "AssetCommonItem_balance__mkiEz")
         balance = int(re.sub(r"[^0-9]", "", balance.text))
     except Exception as e:
-        logging.warning("%s: Balance Not Available!", e)
+        logger.exception("Balance Not Available: %s", type(e).__name__)
 
     return balance
 
 
-def maskUsername(username: str):
+def mask_username(username: str):
+    """Function masking username."""
+
     return (
         username[0]
         + "******"
@@ -74,8 +77,9 @@ def maskUsername(username: str):
 
 def visit(account, campaign_links, driver2):
     """Function visiting campaign links."""
+
     idx = 0
-    pbar = tqdm(total=len(campaign_links), desc=maskUsername(account))
+    pbar = tqdm(total=len(campaign_links), desc=mask_username(account))
     while idx < len(campaign_links):
         link = campaign_links[idx]
         driver2.get(link)
@@ -88,7 +92,7 @@ def visit(account, campaign_links, driver2):
             logger.warning("%s: No Alert to Accept!", link)
             time.sleep(3)
         except Exception as e:
-            logger.error("%s: %s", link, e)
+            logger.exception("%s: %s", link, type(e).__name__)
             time.sleep(3)
             # pageSource = driver2.page_source
             # print(pageSource)
@@ -110,7 +114,7 @@ def main(campaign_links, id, pwd, ua, headless, newsave):
     logger.info("End Balance: %d Gain: %d", end_balance,
                 end_balance - start_balance)
 
-    print(f"{maskUsername(id)}: Start Balance: {start_balance:,} "
+    print(f"{mask_username(id)}: Start Balance: {start_balance:,} "
           f"End Balance: {end_balance:,} "
           f"Gain: {(end_balance - start_balance):,}")
 
@@ -123,8 +127,8 @@ if __name__ == "__main__":
     print("| \\| |_ __  __ _ _ __  ___ _ _")
     print("| .` | '_ \\/ _` | '_ \\/ -_) '_|")
     print("|_|\\_| .__/\\__,_| .__/\\___|_|")
-    print("     |_|        |_|   @jungx098")
-
+    print("     |_|        |_|")
+    print("   @jungx098 fork of @stateofai")
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--id", type=str,
                         required=False, help="naver id")
@@ -185,7 +189,7 @@ if __name__ == "__main__":
         try:
             cd_obj = json.loads(args.cd)
         except Exception as e:
-            logger.critical("%s: json loading error!", e)
+            logger.exception("JSON Loading Error: %s", type(e).__name__)
             print("use -c or --cd argument")
             print(
                 'credential json sample [{"id":"id1","pw":"pw1"},{"id":"id2","pw":"pw2"}]'
