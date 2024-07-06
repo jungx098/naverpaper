@@ -132,6 +132,7 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     time_end = time.time()
 
     duration = time_end - time_start
+    logger.info("Duration: %.3f secs", duration)
 
     print(f"{mask_username(id)}: Start Balance: {start_balance:,} "
           f"End Balance: {end_balance:,} "
