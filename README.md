@@ -1,19 +1,20 @@
-[![Naver Paper Python GitHub Actions](https://github.com/stateofai/naver-paper/actions/workflows/action.yml/badge.svg)](https://github.com/stateofai/naver-paper/actions/workflows/action.yml)
+[![Npaper Python GitHub Actions](https://github.com/jungx098/naver-paper/actions/workflows/action.yml/badge.svg)](https://github.com/jungx098/naver-paper/actions/workflows/action.yml)
 
 ```ascii
  _  _
 | \| |_ __  __ _ _ __  ___ _ _
 | .` | '_ \/ _` | '_ \/ -_) '_|
 |_|\_| .__/\__,_| .__/\___|_|
-     |_|        |_|   @jungx098
+     |_|        |_|
+   @jungx098 fork of @stateofai
 ```
-
-- Original by @stateofai
 
 > 기존 requests 모듈을 이용한 로그인이 작동하지 않아 selenium을 사용하도록 변경되었습니다. (Thanks to @bagng)
 > chromedriver 설치 후 코드를 실행해주세요.
 > 리눅스(Ubuntu 22.04) 및 맥(macOS Sonoma)에서 작동 되는 것을 확인했습니다.
 > 윈도우는 확인해보지 못했으나, 혹시 실행되신 분이 있으면 알려주세요.
+>
+> \- @stateofai
 
 ### GitHub Actions 사용
 1. 이 repo를 fork
@@ -68,20 +69,20 @@ $ cd naver-paper
 $ pip install -r requirements.txt
 
 # 환경 변수로 USERNAME, PASSWORD 읽이서 실행
-$ python run_new.py
+$ python npaper.py
 
 # argument 로 id, pw 입력
-$ python run_new.py -i YOUR_ID -p YOUR_PW
+$ python npaper.py -i YOUR_ID -p YOUR_PW
 
 # argument 로 멀티 계정 입력
-$ python run_new.py -c '[{"id":"ID_1","pw":"PW_1"},{"id":"ID_2","pw":"PW_2"}]'
+$ python npaper.py -c '[{"id":"ID_1","pw":"PW_1"},{"id":"ID_2","pw":"PW_2"}]'
 
 # 브라우저 표시 --no-headless
-$ python run_new.py -c '[{"id":"ID_1","pw":"PW_1"}]' --no-headless
-```
+$ python npaper.py -c '[{"id":"ID_1","pw":"PW_1"}]' --no-headless
 
-## Contribution
-* 저는 전문개발자가 아니라 코드의 품질은 낮을 수 있습니다. 많은 능력자분들이 기여를 해주시면 좋겠어요
+# Using account.json
+$ python npaper.py -cf account.json
+```
 
 ## References
 * https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/120.0.6099.109/win64/chromedriver-win64.zip
