@@ -126,7 +126,11 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     visit(id, campaign_links, driver)
 
     # Wait for balance update.
-    time.sleep(random.uniform(30, 60))
+    wait_time = random.randint(30, 60)
+    for _ in tqdm(range(wait_time),
+                  desc=f"Wait for {wait_time} secs for Balance Update"):
+        time.sleep(1)
+
     end_balance = get_balance(driver)
     logger.info("End Balance: %d Gain: %d", end_balance,
                 end_balance - start_balance)
