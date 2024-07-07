@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 import os
+import random
 import re
 import time
 
@@ -123,6 +124,9 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     logger.info("Start Balance: %d", start_balance)
 
     visit(id, campaign_links, driver)
+
+    # Wait for balance update.
+    time.sleep(random.uniform(30, 60))
     end_balance = get_balance(driver)
     logger.info("End Balance: %d Gain: %d", end_balance,
                 end_balance - start_balance)
@@ -141,8 +145,9 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
 
     driver.quit()
 
-    if apprise_urls and gain > 0:
+    if apprise_urls and (campaign_links or gain > 0):
         apprise_notify(f"Npaper {mask_username(id)}",
+                       f"Link Count: {len(campaign_links)}\n"
                        f"Start Balance: {start_balance:,}\n"
                        f"End Balance: {end_balance:,}\n"
                        f"Gain: {(end_balance - start_balance):,}\n"
