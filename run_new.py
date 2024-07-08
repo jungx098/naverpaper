@@ -30,6 +30,19 @@ def grep_campaign_links():
     return set(campaign_links)
 
 
+def log_messages(driver, level):
+
+    error_messages = driver.find_elements(By.CLASS_NAME, "error_message")
+    for i, e in enumerate(error_messages):
+        if e.text:
+            logger.log(level, "error_messages %d: %s", i, e.text.lstrip().rstrip().replace("\n", " "))
+
+    message_text = driver.find_elements(By.CLASS_NAME, "message_text")
+    for i, e in enumerate(message_text):
+        if e.text:
+            logger.log(level, "message_text %d: %s", i, e.text.lstrip().rstrip().replace("\n", " "))
+
+
 def init(id, pwd, ua, headless, newsave):
     # 크롬 드라이버 옵션 설정
     chrome_options = webdriver.ChromeOptions()
@@ -111,7 +124,10 @@ def init(id, pwd, ua, headless, newsave):
         time.sleep(1)
     except Exception as e:
         # Print warning.
-        logger.warning("new save or dontsave 오류: %s", type(e).__name__)
+        logger.error("new save or dontsave 오류 at %s: %s",
+                       driver2.title, type(e).__name__)
+
+        log_messages(driver2, logging.ERROR)
 
         # Fallback to the login page only for headless mode, otherwise stay for
         # the user to resolve any login issues on the current page.
