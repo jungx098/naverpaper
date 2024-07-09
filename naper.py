@@ -135,7 +135,9 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     end_balance = get_balance(driver)
     driver.refresh()
     end_balance = get_balance(driver)
-    logger.info("End Balance: %d Gain: %d", end_balance,
+    logger.info("wait_time: %d End Balance: %d Gain: %d",
+                wait_time,
+                end_balance,
                 end_balance - start_balance)
 
     gain = end_balance - start_balance
