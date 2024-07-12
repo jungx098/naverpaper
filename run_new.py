@@ -56,6 +56,7 @@ def init(id, pwd, ua, headless, newsave):
 
     # 새로운 창 생성
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    driver.set_page_load_timeout(30)
     driver.get("https://nid.naver.com")
 
     # Login page (log-in required) title for nid.naver.com
