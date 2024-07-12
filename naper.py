@@ -10,6 +10,7 @@ import time
 
 import apprise
 from selenium.common.exceptions import NoAlertPresentException
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from tqdm import tqdm
 
@@ -81,10 +82,24 @@ def visit(account, campaign_links, driver2):
     """Function visiting campaign links."""
 
     idx = 0
+    retry = 0
     pbar = tqdm(total=len(campaign_links), desc=mask_username(account))
     while idx < len(campaign_links):
         link = campaign_links[idx]
-        driver2.get(link)
+
+        try:
+            driver2.get(link)
+        except TimeoutException:
+            logger.warning("%s: TimeoutException!", link)
+            retry += 1
+        except Exception as e:
+            logger.exception("%s: %s", link, type(e).__name__)
+            retry += 1
+
+        if 1 <= retry <= 3:
+            continue
+
+        retry = 0
 
         try:
             result = driver2.switch_to.alert
