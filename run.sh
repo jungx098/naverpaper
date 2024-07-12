@@ -57,6 +57,10 @@ SCRIPT_PATH=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 # Change to script directory
 cd $SCRIPT_PATH
 
+# Update src.
+git fetch
+git rebase
+
 # Run main script after random delay seconds.
 sleep $DURATION
 
