@@ -31,7 +31,7 @@ elif [ "$(expr substr $(uname -s) 1  9)" = "CYGWIN_NT"  ]; then
     SHUF="shuf"
     # Clear TZ for datetime of Windows Python in Cygwin environment
     unset TZ
-    PYTHON=/cygdrive/c/Python311/python
+    PYTHON=$LOCALAPPDATA/Programs/Python/Python312/python
 else
     PYTHON=python
 fi
