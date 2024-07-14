@@ -173,7 +173,6 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     visit(id, campaign_links, driver)
 
     # Test code for balance check
-    driver.refresh()
     end_balance = get_balance(driver)
     end_balance = get_balance2(driver)
     logger.info("End Balance: %d Gain: %d",
