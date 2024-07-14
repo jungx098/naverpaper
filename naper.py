@@ -141,12 +141,14 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     visit(id, campaign_links, driver)
 
     # Wait for balance update.
+    driver.get("https://new-m.pay.naver.com/mydata/home")
     wait_time = random.randint(30, 300)
     for _ in tqdm(range(wait_time),
                   desc=f"Wait for {wait_time} secs for Balance Update"):
         time.sleep(1)
 
     # Test code for balance check
+    driver.refresh()
     end_balance = get_balance(driver)
     logger.info("wait_time: %d End Balance: %d Gain: %d",
                 wait_time,
