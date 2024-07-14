@@ -61,6 +61,38 @@ def get_balance(driver):
         driver.get("https://new-m.pay.naver.com/mydata/home")
         balance = driver.find_element(By.CLASS_NAME,
                                       "AssetCommonItem_balance__mkiEz")
+        logger.info("get_balance: %s", balance.text)
+
+        time.sleep(10)
+
+        balance = driver.find_element(By.CLASS_NAME,
+                                      "AssetCommonItem_balance__mkiEz")
+        logger.info("get_balance: %s", balance.text)
+
+        balance = int(re.sub(r"[^0-9]", "", balance.text))
+    except Exception as e:
+        logger.exception("Balance Not Available: %s", type(e).__name__)
+
+    return balance
+
+
+def get_balance2(driver):
+    """Function checking Naver balance."""
+
+    balance = -1
+
+    try:
+        driver.get("https://new-m.pay.naver.com/pointshistory/list?category=all")
+
+        balance = driver.find_element(By.CLASS_NAME,
+                                      "PointsManage_price__w__Du")
+        logger.info("get_balance2: %s", balance.text)
+
+        time.sleep(10)
+        balance = driver.find_element(By.CLASS_NAME,
+                                      "PointsManage_price__w__Du")
+        logger.info("get_balance2: %s", balance.text)
+
         balance = int(re.sub(r"[^0-9]", "", balance.text))
     except Exception as e:
         logger.exception("Balance Not Available: %s", type(e).__name__)
@@ -140,18 +172,11 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
 
     visit(id, campaign_links, driver)
 
-    # Wait for balance update.
-    driver.get("https://new-m.pay.naver.com/mydata/home")
-    wait_time = random.randint(30, 300)
-    for _ in tqdm(range(wait_time),
-                  desc=f"Wait for {wait_time} secs for Balance Update"):
-        time.sleep(1)
-
     # Test code for balance check
     driver.refresh()
     end_balance = get_balance(driver)
-    logger.info("wait_time: %d End Balance: %d Gain: %d",
-                wait_time,
+    end_balance = get_balance2(driver)
+    logger.info("End Balance: %d Gain: %d",
                 end_balance,
                 end_balance - start_balance)
 
