@@ -9,9 +9,10 @@ import re
 import time
 
 import apprise
-from selenium.common.exceptions import NoAlertPresentException
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import (NoAlertPresentException,
+                                        TimeoutException)
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 from tqdm import tqdm
 
 import naver_paper_clien as clien
@@ -21,6 +22,16 @@ from logging_config import init_logger
 from run_new import init
 
 logger = logging.getLogger(__name__)
+
+
+class text_to_change(object):
+    def __init__(self, locator, text):
+        self.locator = locator
+        self.text = text
+
+    def __call__(self, driver):
+        actual_text = driver.find_element(*self.locator).text
+        return actual_text != self.text
 
 
 def grep_campaign_links():
@@ -59,17 +70,21 @@ def get_balance(driver):
 
     try:
         driver.get("https://new-m.pay.naver.com/mydata/home")
-        balance = driver.find_element(By.CLASS_NAME,
-                                      "AssetCommonItem_balance__mkiEz")
-        logger.info("get_balance: %s", balance.text)
+        class_name = "AssetCommonItem_balance__mkiEz"
+        element = driver.find_element(By.CLASS_NAME, class_name)
+        logger.info("get_balance: %s", element.text)
 
-        time.sleep(10)
+        try:
+            WebDriverWait(driver, 10).until(text_to_change(
+                (By.CLASS_NAME, class_name), element.text))
+            element = driver.find_element(By.CLASS_NAME, class_name)
+        except TimeoutException as e:
+            logger.warning("No Change in Balance Element: %s",
+                           type(e).__name__)
 
-        balance = driver.find_element(By.CLASS_NAME,
-                                      "AssetCommonItem_balance__mkiEz")
-        logger.info("get_balance: %s", balance.text)
+        logger.info("get_balance: %s", element.text)
 
-        balance = int(re.sub(r"[^0-9]", "", balance.text))
+        balance = int(re.sub(r"[^0-9]", "", element.text))
     except Exception as e:
         logger.exception("Balance Not Available: %s", type(e).__name__)
 
@@ -83,17 +98,21 @@ def get_balance2(driver):
 
     try:
         driver.get("https://new-m.pay.naver.com/pointshistory/list?category=all")
+        class_name = "PointsManage_price__w__Du"
+        element = driver.find_element(By.CLASS_NAME, class_name)
+        logger.info("get_balance2: %s", element.text)
 
-        balance = driver.find_element(By.CLASS_NAME,
-                                      "PointsManage_price__w__Du")
-        logger.info("get_balance2: %s", balance.text)
+        try:
+            WebDriverWait(driver, 10).until(text_to_change(
+                (By.CLASS_NAME, class_name), element.text))
+            element = driver.find_element(By.CLASS_NAME, class_name)
+        except TimeoutException as e:
+            logger.warning("No Change in Balance Element: %s",
+                           type(e).__name__)
 
-        time.sleep(10)
-        balance = driver.find_element(By.CLASS_NAME,
-                                      "PointsManage_price__w__Du")
-        logger.info("get_balance2: %s", balance.text)
+        logger.info("get_balance2: %s", element.text)
 
-        balance = int(re.sub(r"[^0-9]", "", balance.text))
+        balance = int(re.sub(r"[^0-9]", "", element.text))
     except Exception as e:
         logger.exception("Balance Not Available: %s", type(e).__name__)
 
@@ -168,6 +187,7 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
 
     driver = init(id, pwd, ua, headless, newsave)
     start_balance = get_balance(driver)
+    start_balance = get_balance2(driver)
     logger.info("Start Balance: %d", start_balance)
 
     visit(id, campaign_links, driver)
