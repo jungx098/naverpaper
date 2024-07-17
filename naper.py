@@ -10,7 +10,8 @@ import time
 
 import apprise
 from selenium.common.exceptions import (NoAlertPresentException,
-                                        TimeoutException)
+                                        TimeoutException,
+                                        UnexpectedAlertPresentException)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from tqdm import tqdm
@@ -143,6 +144,8 @@ def visit(account, campaign_links, driver2):
         except TimeoutException:
             logger.warning("%s: TimeoutException!", link)
             retry += 1
+        except UnexpectedAlertPresentException:
+            pass
         except Exception as e:
             logger.exception("%s: %s", link, type(e).__name__)
             retry += 1
