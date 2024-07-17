@@ -174,14 +174,14 @@ def visit(account, campaign_links, driver2):
             result.accept()
         except NoAlertPresentException:
             logger.warning("%s: No Alert to Accept!", link)
-            time.sleep(random.randint(5, 10))
+            time.sleep(random.uniform(3, 6))
         except Exception as e:
             logger.exception("%s: %s", link, type(e).__name__)
-            time.sleep(random.randint(5, 10))
+            time.sleep(random.uniform(3, 6))
             # pageSource = driver2.page_source
             # print(pageSource)
 
-        time.sleep(random.randint(3, 5))
+        time.sleep(random.uniform(1, 2))
 
         idx += 1
         pbar.update(1)
