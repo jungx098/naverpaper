@@ -64,7 +64,7 @@ def grep_campaign_links():
     return campaign_links
 
 
-def get_balance(driver):
+def get_balance1(driver):
     """Function checking Naver balance."""
 
     balance = -1
@@ -73,7 +73,7 @@ def get_balance(driver):
         driver.get("https://new-m.pay.naver.com/mydata/home")
         class_name = "AssetCommonItem_balance__mkiEz"
         element = driver.find_element(By.CLASS_NAME, class_name)
-        logger.info("get_balance: %s", element.text)
+        logger.info("get_balance1: %s", element.text)
 
         try:
             WebDriverWait(driver, 10).until(text_to_change(
@@ -83,7 +83,7 @@ def get_balance(driver):
             logger.warning("No Change in Balance Element: %s",
                            type(e).__name__)
 
-        logger.info("get_balance: %s", element.text)
+        logger.info("get_balance1: %s", element.text)
 
         balance = int(re.sub(r"[^0-9]", "", element.text))
     except Exception as e:
@@ -116,6 +116,19 @@ def get_balance2(driver):
         balance = int(re.sub(r"[^0-9]", "", element.text))
     except Exception as e:
         logger.exception("Balance Not Available: %s", type(e).__name__)
+
+    return balance
+
+
+def get_balance(driver):
+    """Function returning balance"""
+
+    # Check faster balance check method
+    balance = get_balance2(driver)
+
+    if balance == -1:
+        # Fall back to slower balance check method
+        balance = get_balance1(driver)
 
     return balance
 
@@ -161,14 +174,14 @@ def visit(account, campaign_links, driver2):
             result.accept()
         except NoAlertPresentException:
             logger.warning("%s: No Alert to Accept!", link)
-            time.sleep(3)
+            time.sleep(random.randint(5, 10))
         except Exception as e:
             logger.exception("%s: %s", link, type(e).__name__)
-            time.sleep(3)
+            time.sleep(random.randint(5, 10))
             # pageSource = driver2.page_source
             # print(pageSource)
 
-        time.sleep(1)
+        time.sleep(random.randint(3, 5))
 
         idx += 1
         pbar.update(1)
@@ -190,14 +203,12 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
 
     driver = init(id, pwd, ua, headless, newsave)
     start_balance = get_balance(driver)
-    start_balance = get_balance2(driver)
     logger.info("Start Balance: %d", start_balance)
 
     visit(id, campaign_links, driver)
 
     # Test code for balance check
     end_balance = get_balance(driver)
-    end_balance = get_balance2(driver)
     logger.info("End Balance: %d Gain: %d",
                 end_balance,
                 end_balance - start_balance)
