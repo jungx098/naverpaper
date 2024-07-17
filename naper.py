@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class text_to_change(object):
+    """Class checking element text change."""
     def __init__(self, locator, text):
         self.locator = locator
         self.text = text
@@ -36,7 +37,7 @@ class text_to_change(object):
 
 
 def grep_campaign_links():
-    """Function making campaign link list"""
+    """Function making campaign link list."""
 
     campaign_links = []
 
@@ -65,7 +66,7 @@ def grep_campaign_links():
 
 
 def get_balance1(driver):
-    """Function checking Naver balance."""
+    """Function checking slow Naver balance."""
 
     balance = -1
 
@@ -93,7 +94,7 @@ def get_balance1(driver):
 
 
 def get_balance2(driver):
-    """Function checking Naver balance."""
+    """Function checking fast Naver balance."""
 
     balance = -1
 
@@ -121,7 +122,7 @@ def get_balance2(driver):
 
 
 def get_balance(driver):
-    """Function returning balance"""
+    """Function returning balance."""
 
     # Check faster balance check method
     balance = get_balance2(driver)
