@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 class text_to_change(object):
     """Class checking element text change."""
+
     def __init__(self, locator, text):
         self.locator = locator
         self.text = text
@@ -229,7 +230,7 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     driver.quit()
 
     if apprise_urls and (campaign_links or gain > 0):
-        apprise_notify(f"Npaper {mask_username(id)}",
+        apprise_notify(f"Naper {mask_username(id)}",
                        f"Link Count: {len(campaign_links)}\n"
                        f"Start Balance: {start_balance:,}\n"
                        f"End Balance: {end_balance:,}\n"
