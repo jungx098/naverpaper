@@ -1,7 +1,10 @@
-import requests
+import logging
 from urllib.parse import urljoin
+
+import requests
 from bs4 import BeautifulSoup
 
+logger = logging.getLogger(__name__)
 base_url = "https://www.clien.net/service/board/jirum"
 
 def find_naver_campaign_links(visited_urls_file='visited_urls_clien.txt'):
@@ -31,7 +34,7 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_clien.txt'):
     # Check each Naver link
     for link in naver_links:
         full_link = urljoin(base_url, link)
-        print("clien\tlinks : " + full_link)
+        logger.info("clien\tlinks : %s", full_link)
         if full_link in visited_urls:
             continue  # Skip already visited links
 

@@ -1,7 +1,10 @@
-import requests
+import logging
 from urllib.parse import urljoin
+
+import requests
 from bs4 import BeautifulSoup
 
+logger = logging.getLogger(__name__)
 base_url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=coupon"
 page_url = "https://www.ppomppu.co.kr/zboard/zboard.php?"
 
@@ -30,7 +33,7 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_ppomppu.txt'):
     # Check each naver_links
     for link in naver_links:
         full_link = urljoin(page_url, link)
-        print("ppomppu\tlinks : " + full_link)
+        logger.info("ppomppu\tlinks : %s", full_link)
         if full_link in visited_urls:
             continue  # Skip already visited links
 
