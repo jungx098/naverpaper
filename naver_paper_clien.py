@@ -17,6 +17,7 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_clien.txt'):
 
     # Send a request to the base URL
     response = requests.get(base_url)
+    logger.info("clien\tlist get HTTP STATUS : %s", response.status_code)
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find all span elements with class 'list_subject' and get 'a' tags
@@ -57,3 +58,7 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_clien.txt'):
             file.write(url + '\n')
 
     return campaign_links
+
+
+if __name__ == "__main__":
+    find_naver_campaign_links()

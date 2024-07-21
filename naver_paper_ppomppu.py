@@ -16,6 +16,7 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_ppomppu.txt'):
         visited_urls = set()
 
     response = requests.get(base_url)
+    logger.info("ppomppu\tlist get HTTP STATUS : %s", response.status_code)
     soup = BeautifulSoup(response.text, 'html.parser')
 
     list_subject_links = soup.find_all('td', class_='baseList-space')
@@ -57,3 +58,7 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_ppomppu.txt'):
             file.write(url + '\n')
 
     return campaign_links
+
+
+if __name__ == "__main__":
+    find_naver_campaign_links()
