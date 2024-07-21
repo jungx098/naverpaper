@@ -67,7 +67,7 @@ def grep_campaign_links():
 
 
 def get_balance1(driver):
-    """Function checking slow Naver balance."""
+    """Function checking slow Naver balance (initial value of old balance)."""
 
     balance = -1
 
@@ -75,15 +75,15 @@ def get_balance1(driver):
         driver.get("https://new-m.pay.naver.com/mydata/home")
         class_name = "AssetCommonItem_balance__mkiEz"
         element = driver.find_element(By.CLASS_NAME, class_name)
-        logger.info("get_balance1: %s", element.text)
+        old_text = element.text
+        logger.info("get_balance1: %s", old_text)
 
         try:
-            WebDriverWait(driver, 10).until(text_to_change(
-                (By.CLASS_NAME, class_name), element.text))
+            WebDriverWait(driver, 5).until(text_to_change(
+                (By.CLASS_NAME, class_name), old_text))
             element = driver.find_element(By.CLASS_NAME, class_name)
         except TimeoutException as e:
-            logger.warning("No Change in Balance Element: %s",
-                           type(e).__name__)
+            logger.info("No Change in Balance Element: %s", type(e).__name__)
 
         logger.info("get_balance1: %s", element.text)
 
@@ -95,7 +95,7 @@ def get_balance1(driver):
 
 
 def get_balance2(driver):
-    """Function checking fast Naver balance."""
+    """Function checking fast Naver balance (initial value of 0)."""
 
     balance = -1
 
@@ -103,15 +103,15 @@ def get_balance2(driver):
         driver.get("https://new-m.pay.naver.com/pointshistory/list?category=all")
         class_name = "PointsManage_price__w__Du"
         element = driver.find_element(By.CLASS_NAME, class_name)
-        logger.info("get_balance2: %s", element.text)
+        old_text = element.text
+        logger.info("get_balance2: %s", old_text)
 
         try:
-            WebDriverWait(driver, 10).until(text_to_change(
-                (By.CLASS_NAME, class_name), element.text))
+            WebDriverWait(driver, 5).until(text_to_change(
+                (By.CLASS_NAME, class_name), old_text))
             element = driver.find_element(By.CLASS_NAME, class_name)
         except TimeoutException as e:
-            logger.warning("No Change in Balance Element: %s",
-                           type(e).__name__)
+            logger.info("No Change in Balance Element: %s", type(e).__name__)
 
         logger.info("get_balance2: %s", element.text)
 
