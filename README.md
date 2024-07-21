@@ -2,11 +2,11 @@
 
 ```ascii
  _  _
-| \| |_ __  __ _ _ __  ___ _ _
-| .` | '_ \/ _` | '_ \/ -_) '_|
-|_|\_| .__/\__,_| .__/\___|_|
-     |_|        |_|
-   @jungx098 fork of @stateofai
+| \| |__ _ _ __  ___ _ _
+| .` / _` | '_ \/ -_) '_|
+|_|\_\__,_| .__/\___|_|
+          |_|   @jungx098
+       Fork of @stateofai
 ```
 
 > 기존 requests 모듈을 이용한 로그인이 작동하지 않아 selenium을 사용하도록 변경되었습니다. (Thanks to @bagng)
@@ -69,19 +69,19 @@ $ cd naver-paper
 $ pip install -r requirements.txt
 
 # 환경 변수로 USERNAME, PASSWORD 읽이서 실행
-$ python npaper.py
+$ python naper.py
 
 # argument 로 id, pw 입력
-$ python npaper.py -i YOUR_ID -p YOUR_PW
+$ python naper.py -i YOUR_ID -p YOUR_PW
 
 # argument 로 멀티 계정 입력
-$ python npaper.py -c '[{"id":"ID_1","pw":"PW_1"},{"id":"ID_2","pw":"PW_2"}]'
+$ python naper.py -c '[{"id":"ID_1","pw":"PW_1"},{"id":"ID_2","pw":"PW_2"}]'
 
 # 브라우저 표시 --no-headless
-$ python npaper.py -c '[{"id":"ID_1","pw":"PW_1"}]' --no-headless
+$ python naper.py -c '[{"id":"ID_1","pw":"PW_1"}]' --no-headless
 
 # Using account.json
-$ python npaper.py -cf account.json
+$ python naper.py -cf account.json
 ```
 
 ## References
