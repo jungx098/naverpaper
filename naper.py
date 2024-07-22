@@ -229,7 +229,7 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
 
     driver.quit()
 
-    if apprise_urls and (campaign_links or gain > 0):
+    if apprise_urls and gain != 0:
         apprise_notify(f"Naper {mask_username(id)}",
                        f"Link Count: {len(campaign_links)}\n"
                        f"Start Balance: {start_balance:,}\n"
