@@ -156,17 +156,14 @@ def visit(account, campaign_links, driver2):
 
         try:
             driver2.get(link)
-        except TimeoutException:
-            logger.warning("%s: TimeoutException!", link)
-            retry += 1
         except UnexpectedAlertPresentException:
             pass
         except Exception as e:
-            logger.exception("%s: %s", link, type(e).__name__)
-            retry += 1
-
-        if 1 <= retry <= 3:
-            continue
+            logger.exception("%s (retry: %d): %s",
+                             link, retry, type(e).__name__)
+            if retry < 3:
+                retry += 1
+                continue
 
         retry = 0
 
