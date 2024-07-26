@@ -55,7 +55,14 @@ def init(id, pwd, ua, headless, newsave):
         chrome_options.add_argument(f"--user-agent={ua}")
 
     # 새로운 창 생성
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    try:
+        driver = webdriver.Chrome(service=Service(
+            ChromeDriverManager().install()), options=chrome_options)
+    except Exception as e:
+        # Fall back to driver creation without service object.
+        logger.exception("Driver Creation Failed: %s", type(e).__name__)
+        driver = webdriver.Chrome(options=chrome_options)
+
     driver.set_page_load_timeout(30)
     driver.get("https://nid.naver.com")
 
