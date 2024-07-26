@@ -7,6 +7,7 @@ import os
 import random
 import re
 import time
+from pprint import pformat
 
 import apprise
 from selenium.common.exceptions import (NoAlertPresentException,
@@ -165,6 +166,7 @@ def visit(account, campaign_links, driver2):
                 retry += 1
                 continue
 
+        # Reset retry.
         retry = 0
 
         try:
@@ -172,15 +174,23 @@ def visit(account, campaign_links, driver2):
             logger.info("%s: %s", link, result.text)
             result.accept()
         except NoAlertPresentException:
-            logger.warning("%s: No Alert to Accept!", link)
-            time.sleep(random.uniform(3, 6))
+            text = "?"
+            try:
+                text = driver2.find_element(By.CLASS_NAME, "dim").text
+                text = text.replace("\n", " ")
+            except Exception as e:
+                logger.exception("%s: %s", link, type(e).__name__)
+                logger.error(pformat(driver2.page_source))
+
+            logger.info("%s: %s (No Alert)", link, text)
+
         except Exception as e:
             logger.exception("%s: %s", link, type(e).__name__)
-            time.sleep(random.uniform(3, 6))
-            # pageSource = driver2.page_source
-            # print(pageSource)
+            logger.error(pformat(driver2.page_source))
 
-        time.sleep(random.uniform(1, 2))
+        # The transition time to the target page can be up to 2 seconds without
+        # alert, and 3 seconds may be required to stay.
+        time.sleep(random.uniform(6, 10))
 
         idx += 1
         pbar.update(1)
