@@ -1,7 +1,9 @@
+import logging
+
 import requests
-from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
+logger = logging.getLogger(__name__)
 base_url = "https://bbs.ruliweb.com/market/board/1020"
 key = 'ruliweb'
 
@@ -15,7 +17,7 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_'+ key +'.txt'):
 
     # Send a request to the base URL
     response = requests.get(base_url)
-    print(f"{key}\tlist get HTTP STATUS : {response.status_code}")
+    logger.info("%s\tlist get HTTP STATUS : %s", key, response.status_code)
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find all span elements with class 'list_subject' and get 'a' tags
@@ -32,8 +34,8 @@ def find_naver_campaign_links(visited_urls_file='visited_urls_'+ key +'.txt'):
 
     # Check each Naver link
     for link in naver_links:
-        full_link = link;
-        print(f"{key}\tlinks : " + full_link)
+        full_link = link
+        logger.info("%s\tlinks : %s", key, full_link)
         if full_link in visited_urls:
             continue  # Skip already visited links
 

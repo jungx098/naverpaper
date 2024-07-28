@@ -20,6 +20,7 @@ from tqdm import tqdm
 import naver_paper_clien as clien
 import naver_paper_damoang as damoang
 import naver_paper_ppomppu as ppomppu
+import naver_paper_ruliweb as ruliweb
 from logging_config import init_logger
 from run_new import init
 
@@ -59,6 +60,12 @@ def grep_campaign_links():
         campaign_links += ppomppu.find_naver_campaign_links()
     except Exception as e:
         logger.exception("ppomppu.find_naver_campaign_links Failed: %s",
+                         type(e).__name__)
+
+    try:
+        campaign_links += ruliweb.find_naver_campaign_links()
+    except Exception as e:
+        logger.exception("ruliweb.find_naver_campaign_links Failed: %s",
                          type(e).__name__)
 
     campaign_links = list(set(campaign_links))
@@ -181,12 +188,16 @@ def visit(account, campaign_links, driver2):
             except Exception as e:
                 logger.exception("%s: %s", link, type(e).__name__)
                 logger.error(pformat(driver2.page_source))
+                logger.error("Current URL: %s", driver2.current_url)
+                logger.error("Title: %s", driver2.title)
 
-            logger.info("%s: %s (No Alert)", link, text)
+            logger.info("%s: %s - %s (No Alert)", link, driver2.title, text)
 
         except Exception as e:
             logger.exception("%s: %s", link, type(e).__name__)
             logger.error(pformat(driver2.page_source))
+            logger.error("Current URL: %s", driver2.current_url)
+            logger.error("Title: %s", driver2.title)
 
         # The transition time to the target page can be up to 2 seconds without
         # alert, and 3 seconds may be required to stay.
