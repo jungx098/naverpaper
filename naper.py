@@ -27,7 +27,8 @@ from run_new import init
 
 logger = logging.getLogger(__name__)
 
-QUICK_REWARD_LINK="https://new-m.pay.naver.com/historybenefit/eventbenefit?category=quickreward"
+QUICK_REWARD_LINK = "https://new-m.pay.naver.com/historybenefit/eventbenefit?category=quickreward"
+
 
 class text_to_change(object):
     """Class checking element text change."""
@@ -160,8 +161,9 @@ def log_html(url, page):
     filename = filename.replace('/', '_')
     filename = filename.replace('?', '_')
     filename = filename + '.html'
-    with open(filename, "w") as fd:
+    with open(filename, "w", encoding="utf-8") as fd:
         fd.write(page)
+
 
 def visit(account, campaign_links, driver2):
     """Function visiting campaign links."""
@@ -226,6 +228,7 @@ def visit(account, campaign_links, driver2):
         pbar.update(1)
     pbar.close()
 
+
 def quick_reward(driver):
     logger.info("Process Quick Reward")
 
@@ -233,7 +236,8 @@ def quick_reward(driver):
         driver.get(QUICK_REWARD_LINK)
         time.sleep(3)
         handle = driver.current_window_handle
-        elements = driver.find_elements(By.CLASS_NAME, "ADRewardBannerSystem_title__3f6bG")
+        elements = driver.find_elements(
+            By.CLASS_NAME, "ADRewardBannerSystem_title__3f6bG")
         logger.info("Quick Reward Cnt: %d", len(elements))
         for e in elements:
             logger.info("Quick Reward: %s", e.text)
@@ -267,6 +271,7 @@ def quick_reward(driver):
 
     except Exception as e:
         logger.exception("Quick Reward Failed: %s", type(e).__name__)
+
 
 def apprise_notify(title, body, urls: list = []):
     """Function sending notification to Apprise URLs."""
