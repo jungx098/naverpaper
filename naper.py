@@ -11,6 +11,7 @@ from pprint import pformat
 
 import apprise
 from selenium.common.exceptions import (NoAlertPresentException,
+                                        NoSuchElementException,
                                         TimeoutException,
                                         UnexpectedAlertPresentException)
 from selenium.webdriver.common.by import By
@@ -26,6 +27,7 @@ from run_new import init
 
 logger = logging.getLogger(__name__)
 
+QUICK_REWARD_LINK="https://new-m.pay.naver.com/historybenefit/eventbenefit?category=quickreward"
 
 class text_to_change(object):
     """Class checking element text change."""
@@ -185,9 +187,20 @@ def visit(account, campaign_links, driver2):
             try:
                 text = driver2.find_element(By.CLASS_NAME, "dim").text
                 text = text.replace("\n", " ")
+            except NoSuchElementException as e:
+                if driver2.current_url == QUICK_REWARD_LINK:
+                    text = "Quick Reward Ignored"
+                else:
+                    logger.exception("%s: %s", link, type(e).__name__)
+                    # TODO: Save to file
+                    # logger.error(pformat(driver2.page_source))
+                    logger.error("Current URL: %s", driver2.current_url)
+                    logger.error("Title: %s", driver2.title)
+
             except Exception as e:
                 logger.exception("%s: %s", link, type(e).__name__)
-                logger.error(pformat(driver2.page_source))
+                # TODO: Save to file
+                # logger.error(pformat(driver2.page_source))
                 logger.error("Current URL: %s", driver2.current_url)
                 logger.error("Title: %s", driver2.title)
 
@@ -195,7 +208,8 @@ def visit(account, campaign_links, driver2):
 
         except Exception as e:
             logger.exception("%s: %s", link, type(e).__name__)
-            logger.error(pformat(driver2.page_source))
+            # TODO: Save to file
+            # logger.error(pformat(driver2.page_source))
             logger.error("Current URL: %s", driver2.current_url)
             logger.error("Title: %s", driver2.title)
 
@@ -207,6 +221,49 @@ def visit(account, campaign_links, driver2):
         pbar.update(1)
     pbar.close()
 
+def quick_reward(driver):
+    logger.info("Process Quick Reward")
+
+    try:
+        driver.get(QUICK_REWARD_LINK)
+        time.sleep(3)
+        handle = driver.current_window_handle
+        elements = driver.find_elements(By.CLASS_NAME, "ADRewardBannerSystem_title__3f6bG")
+        logger.info("Quick Reward Cnt: %d", len(elements))
+        for e in elements:
+            logger.info("Quick Reward: %s", e.text)
+
+            # Click element using Java Script.
+            driver.execute_script("arguments[0].click();", e)
+
+            # Switch to new handle if new tab is opened.
+            multi_window = driver.window_handles
+            for window in multi_window:
+                if window != handle:
+                    driver.switch_to.window(window)
+
+            try:
+                result = driver.switch_to.alert
+                logger.info("%s: %s", e.text, result.text)
+                result.accept()
+            except NoAlertPresentException:
+                try:
+                    text = driver.find_element(By.CLASS_NAME, "dim").text
+                    text = text.replace("\n", " ")
+                    logger.info("%s: %s", e.text, text)
+                except NoSuchElementException as e:
+                    logger.warning("Quick Reward Failed: %s", type(e).__name__)
+
+            time.sleep(random.uniform(6, 10))
+
+            if handle != driver.current_window_handle:
+                driver.close()
+                driver.switch_to.window(handle)
+            else:
+                driver.get(QUICK_REWARD_LINK)
+
+    except Exception as e:
+        logger.exception("Quick Reward Failed: %s", type(e).__name__)
 
 def apprise_notify(title, body, urls: list = []):
     """Function sending notification to Apprise URLs."""
@@ -225,6 +282,7 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     start_balance = get_balance(driver)
     logger.info("Start Balance: %d", start_balance)
 
+    quick_reward(driver)
     visit(id, campaign_links, driver)
 
     # Test code for balance check
