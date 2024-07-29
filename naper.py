@@ -155,6 +155,14 @@ def mask_username(username: str):
     )
 
 
+def log_html(url, page):
+    filename = url.replace('https://', '')
+    filename = filename.replace('/', '_')
+    filename = filename.replace('?', '_')
+    filename = filename + '.html'
+    with open(filename, "w") as fd:
+        fd.write(page)
+
 def visit(account, campaign_links, driver2):
     """Function visiting campaign links."""
 
@@ -192,15 +200,13 @@ def visit(account, campaign_links, driver2):
                     text = "Quick Reward Ignored"
                 else:
                     logger.exception("%s: %s", link, type(e).__name__)
-                    # TODO: Save to file
-                    # logger.error(pformat(driver2.page_source))
+                    log_html(driver2.current_url, driver2.page_source)
                     logger.error("Current URL: %s", driver2.current_url)
                     logger.error("Title: %s", driver2.title)
 
             except Exception as e:
                 logger.exception("%s: %s", link, type(e).__name__)
-                # TODO: Save to file
-                # logger.error(pformat(driver2.page_source))
+                log_html(driver2.current_url, driver2.page_source)
                 logger.error("Current URL: %s", driver2.current_url)
                 logger.error("Title: %s", driver2.title)
 
@@ -208,8 +214,7 @@ def visit(account, campaign_links, driver2):
 
         except Exception as e:
             logger.exception("%s: %s", link, type(e).__name__)
-            # TODO: Save to file
-            # logger.error(pformat(driver2.page_source))
+            log_html(driver2.current_url, driver2.page_source)
             logger.error("Current URL: %s", driver2.current_url)
             logger.error("Title: %s", driver2.title)
 
@@ -259,8 +264,6 @@ def quick_reward(driver):
             if handle != driver.current_window_handle:
                 driver.close()
                 driver.switch_to.window(handle)
-            else:
-                driver.get(QUICK_REWARD_LINK)
 
     except Exception as e:
         logger.exception("Quick Reward Failed: %s", type(e).__name__)
@@ -283,7 +286,9 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     logger.info("Start Balance: %d", start_balance)
 
     quick_reward(driver)
-    visit(id, campaign_links, driver)
+
+    if len(campaign_links) > 0:
+        visit(id, campaign_links, driver)
 
     # Test code for balance check
     end_balance = get_balance(driver)
@@ -415,20 +420,19 @@ if __name__ == "__main__":
         campaign_links = grep_campaign_links()
         print(f"Number of Links to Visit: {len(campaign_links)}")
 
-        if len(campaign_links) > 0:
-            for idx, account in enumerate(cd_obj):
-                id = account.get("id")
-                pw = account.get("pw")
-                ua = account.get("ua")
-                urls = account.get("apprise")
+        for idx, account in enumerate(cd_obj):
+            id = account.get("id")
+            pw = account.get("pw")
+            ua = account.get("ua")
+            urls = account.get("apprise")
 
-                if id is None:
-                    print("ID not found!")
-                    continue
-                if pw is None:
-                    print("PW not found!")
-                    continue
+            if id is None:
+                print("ID not found!")
+                continue
+            if pw is None:
+                print("PW not found!")
+                continue
 
-                main(campaign_links, id, pw, ua, headless, newsave, urls)
+            main(campaign_links, id, pw, ua, headless, newsave, urls)
 
     logger.info("Bye!")
