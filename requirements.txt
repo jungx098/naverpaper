@@ -9,4 +9,4 @@ selenium==4.22.0
 soupsieve==2.5
 tqdm
 urllib3==2.2.2
-webdriver-manager==4.0.1
+webdriver-manager==4.0.2
