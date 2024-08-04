@@ -165,6 +165,89 @@ def log_html(url, page):
         fd.write(page)
 
 
+def process_error(driver, link):
+    if link is None:
+        link = driver.current_url
+
+    log_html(driver.current_url, driver.page_source)
+    logger.error("Link: %s", link)
+    logger.error("Current URL: %s", driver.current_url)
+    logger.error("Title: %s", driver.title)
+
+
+def process_alert(driver, link):
+    if link is None:
+        link = driver.current_url
+
+    try:
+        result = driver.switch_to.alert
+        logger.info("%s: %s", link, result.text)
+        result.accept()
+        return True
+
+    except NoAlertPresentException:
+        pass
+
+    except Exception as e:
+        logger.exception("%s: %s", link, type(e).__name__)
+
+    return False
+
+
+def process_dim(driver, link):
+    if link is None:
+        link = driver.current_url
+
+    try:
+        text = driver.find_element(By.CLASS_NAME, "dim").text
+        text = text.replace("\n", " ")
+        logger.info("%s: %s - %s (No Alert)", link, driver.title, text)
+        return True
+
+    except NoSuchElementException as e:
+        pass
+
+    except Exception as e:
+        logger.exception("%s: %s", link, type(e).__name__)
+
+    return False
+
+
+def process_quickreward_link(driver, link):
+    if link is None:
+        link = driver.current_url
+
+    if driver.current_url == QUICK_REWARD_LINK:
+        text = "Quick Reward Ignored"
+        logger.info("%s: %s - %s (No Alert)", link, driver.title, text)
+        return True
+
+    return False
+
+
+def process_call_to_action(driver, link):
+    if link is None:
+        link = driver.current_url
+
+    try:
+        # Wait for the page update.
+        time.sleep(3)
+        element = driver.find_element(By.CLASS_NAME, "call_to_action")
+        logger.info("Click %s", element.text)
+        element.click()
+        time.sleep(3)
+        logger.info("%s: %s (call_to_action)", link, driver.title)
+        return True
+
+    except NoSuchElementException as e:
+        pass
+
+    except Exception as e:
+        logger.exception("%s", type(e).__name__)
+
+    return False
+
+
 def visit(account, campaign_links, driver2):
     """Function visiting campaign links."""
 
@@ -188,37 +271,16 @@ def visit(account, campaign_links, driver2):
         # Reset retry.
         retry = 0
 
-        try:
-            result = driver2.switch_to.alert
-            logger.info("%s: %s", link, result.text)
-            result.accept()
-        except NoAlertPresentException:
-            text = "?"
-            try:
-                text = driver2.find_element(By.CLASS_NAME, "dim").text
-                text = text.replace("\n", " ")
-            except NoSuchElementException as e:
-                if driver2.current_url == QUICK_REWARD_LINK:
-                    text = "Quick Reward Ignored"
-                else:
-                    logger.exception("%s: %s", link, type(e).__name__)
-                    log_html(driver2.current_url, driver2.page_source)
-                    logger.error("Current URL: %s", driver2.current_url)
-                    logger.error("Title: %s", driver2.title)
-
-            except Exception as e:
-                logger.exception("%s: %s", link, type(e).__name__)
-                log_html(driver2.current_url, driver2.page_source)
-                logger.error("Current URL: %s", driver2.current_url)
-                logger.error("Title: %s", driver2.title)
-
-            logger.info("%s: %s - %s (No Alert)", link, driver2.title, text)
-
-        except Exception as e:
-            logger.exception("%s: %s", link, type(e).__name__)
-            log_html(driver2.current_url, driver2.page_source)
-            logger.error("Current URL: %s", driver2.current_url)
-            logger.error("Title: %s", driver2.title)
+        if process_alert(driver2, link) is True:
+            pass
+        elif process_dim(driver2, link) is True:
+            pass
+        elif process_quickreward_link(driver2, link) is True:
+            pass
+        elif process_call_to_action(driver2, link) is True:
+            pass
+        else:
+            process_error(driver2, link)
 
         # The transition time to the target page can be up to 2 seconds without
         # alert, and 3 seconds may be required to stay.
@@ -251,17 +313,14 @@ def quick_reward(driver):
                 if window != handle:
                     driver.switch_to.window(window)
 
-            try:
-                result = driver.switch_to.alert
-                logger.info("%s: %s", e.text, result.text)
-                result.accept()
-            except NoAlertPresentException:
-                try:
-                    text = driver.find_element(By.CLASS_NAME, "dim").text
-                    text = text.replace("\n", " ")
-                    logger.info("%s: %s", e.text, text)
-                except NoSuchElementException as e:
-                    logger.warning("Quick Reward Failed: %s", type(e).__name__)
+            if process_alert(driver, None) is True:
+                pass
+            elif process_dim(driver, None) is True:
+                pass
+            elif process_call_to_action(driver, None) is True:
+                pass
+            else:
+                process_error(driver, None)
 
             time.sleep(random.uniform(6, 10))
 
