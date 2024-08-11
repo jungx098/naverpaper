@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import hashlib
 import json
 import logging
 import os
@@ -24,6 +25,8 @@ import naver_paper_ppomppu as ppomppu
 import naver_paper_ruliweb as ruliweb
 from logging_config import init_logger
 from run_new import init
+from scrape import Database, scrape
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -217,10 +220,14 @@ def process_quickreward_link(driver, link):
     if link is None:
         link = driver.current_url
 
-    if driver.current_url == QUICK_REWARD_LINK:
-        text = "Quick Reward Ignored"
-        logger.info("%s: %s - %s (No Alert)", link, driver.title, text)
-        return True
+    try:
+        if driver.current_url == QUICK_REWARD_LINK:
+            text = "Quick Reward Ignored"
+            logger.info("%s: %s - %s (No Alert)", link, driver.title, text)
+            return True
+
+    except Exception as e:
+        logger.exception("%s: %s", link, type(e).__name__)
 
     return False
 
@@ -248,7 +255,7 @@ def process_call_to_action(driver, link):
     return False
 
 
-def visit(account, campaign_links, driver2):
+def visit(account, campaign_links, driver2, db):
     """Function visiting campaign links."""
 
     idx = 0
@@ -268,6 +275,8 @@ def visit(account, campaign_links, driver2):
                 retry += 1
                 continue
 
+        time.sleep(random.uniform(1, 3))
+
         # Reset retry.
         retry = 0
 
@@ -286,12 +295,14 @@ def visit(account, campaign_links, driver2):
         # alert, and 3 seconds may be required to stay.
         time.sleep(random.uniform(6, 10))
 
+        db.stamp_campaign(campaign_links[idx])
+
         idx += 1
         pbar.update(1)
     pbar.close()
 
 
-def quick_reward(driver):
+def quick_reward(driver, progress=None):
     logger.info("Process Quick Reward")
 
     try:
@@ -303,6 +314,8 @@ def quick_reward(driver):
         logger.info("Quick Reward Cnt: %d", len(elements))
         for e in elements:
             logger.info("Quick Reward: %s", e.text)
+            if progress:
+                progress()
 
             # Click element using Java Script.
             driver.execute_script("arguments[0].click();", e)
@@ -342,17 +355,26 @@ def apprise_notify(title, body, urls: list = []):
         apobj.notify(body=body, title=title)
 
 
-def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
+def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
     time_start = time.time()
 
-    driver = init(id, pwd, ua, headless, newsave)
+    hash = hashlib.sha256(f"{id}_{pwd}_{ua}".encode('utf-8')).hexdigest()
+
+    db = Database(os.getcwd() + "/user_dir/" + hash + "/campaign.db")
+    db.update(campaigns)
+    campaigns = db.get_campaigns()
+
+    driver = init(id, pwd, ua, headless, newsave, hash)
     start_balance = get_balance(driver)
-    logger.info("Start Balance: %d", start_balance)
+    print(f"{mask_username(id)}: Start Balance: {start_balance}")
 
-    quick_reward(driver)
+    print(f"{mask_username(id)}: Quick Reward", end="", flush=True)
+    quick_reward(driver, lambda: [print(".", end="", flush=True)])
+    sys.stdout.write('\x1b[2K')
+    print(f"\r{mask_username(id)}: Quick Reward: Done", end="", flush=True)
 
-    if len(campaign_links) > 0:
-        visit(id, campaign_links, driver)
+    if len(campaigns) > 0:
+        visit(id, campaigns, driver, db)
 
     # Test code for balance check
     end_balance = get_balance(driver)
@@ -367,16 +389,16 @@ def main(campaign_links, id, pwd, ua, headless, newsave, apprise_urls):
     duration = time_end - time_start
     logger.info("Duration: %.3f secs", duration)
 
-    print(f"{mask_username(id)}: Start Balance: {start_balance:,} "
-          f"End Balance: {end_balance:,} "
-          f"Gain: {gain:,} "
-          f"Time: {duration:.3f} secs")
+    print(f"{mask_username(id)}: Summary {{ "
+          f"Balance: {end_balance:,}, "
+          f"Gain: {gain:,}, "
+          f"Time: {duration:.3f} secs }}")
 
     driver.quit()
 
     if apprise_urls and gain != 0:
         apprise_notify(f"Naper {mask_username(id)}",
-                       f"Link Count: {len(campaign_links)}\n"
+                       f"Link Count: {len(campaigns)}\n"
                        f"Start Balance: {start_balance:,}\n"
                        f"End Balance: {end_balance:,}\n"
                        f"Gain: {(end_balance - start_balance):,}\n"
@@ -481,8 +503,10 @@ if __name__ == "__main__":
     if cd_obj is None:
         logger.warning("No Credential Provided!")
     else:
-        campaign_links = grep_campaign_links()
-        print(f"Number of Links to Visit: {len(campaign_links)}")
+        print("Campaign Link Collection: ", end="", flush=True)
+        campaigns = scrape(lambda: [print(".", end="", flush=True)])
+        sys.stdout.write('\x1b[2K')
+        print(f"\rCampaign Link Collection: {len(campaigns)} Links")
 
         for idx, account in enumerate(cd_obj):
             id = account.get("id")
@@ -497,6 +521,6 @@ if __name__ == "__main__":
                 print("PW not found!")
                 continue
 
-            main(campaign_links, id, pw, ua, headless, newsave, urls)
+            main(campaigns, id, pw, ua, headless, newsave, urls)
 
     logger.info("Bye!")
