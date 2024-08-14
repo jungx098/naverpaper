@@ -260,7 +260,7 @@ def visit(account, campaign_links, driver2, db):
 
     idx = 0
     retry = 0
-    pbar = tqdm(total=len(campaign_links), desc=mask_username(account))
+    pbar = tqdm(total=len(campaign_links), desc=f"{mask_username(account)}: Visit")
     while idx < len(campaign_links):
         link = campaign_links[idx]
 
@@ -341,8 +341,12 @@ def quick_reward(driver, progress=None):
                 driver.close()
                 driver.switch_to.window(handle)
 
+        return len(elements)
+
     except Exception as e:
         logger.exception("Quick Reward Failed: %s", type(e).__name__)
+
+    return -1
 
 
 def apprise_notify(title, body, urls: list = []):
@@ -365,13 +369,14 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
     campaigns = db.get_campaigns()
 
     driver = init(id, pwd, ua, headless, newsave, hash)
+    print(f"{mask_username(id)}: Start Balance: ", end="")
     start_balance = get_balance(driver)
-    print(f"{mask_username(id)}: Start Balance: {start_balance}")
+    print(f"{start_balance}")
 
     print(f"{mask_username(id)}: Quick Reward", end="", flush=True)
-    quick_reward(driver, lambda: [print(".", end="", flush=True)])
+    cnt = quick_reward(driver, lambda: [print(".", end="", flush=True)])
     sys.stdout.write('\x1b[2K')
-    print(f"\r{mask_username(id)}: Quick Reward: Done", end="", flush=True)
+    print(f"\r{mask_username(id)}: Quick Reward: {cnt} Done", flush=True)
 
     if len(campaigns) > 0:
         visit(id, campaigns, driver, db)

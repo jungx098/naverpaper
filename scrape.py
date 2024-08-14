@@ -266,8 +266,6 @@ class Database:
         self.cur.execute(sql, (days,))
         rows = self.cur.fetchall()
 
-        logger.info(pformat(rows))
-
         campaigns = []
         for r in rows:
             campaigns.append(r["url"])
