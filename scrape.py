@@ -2,11 +2,12 @@
 
 import logging
 import sqlite3
-from pprint import pformat
-from urllib.parse import urljoin
+from pprint import pformat, pprint
+from urllib.parse import parse_qs, urljoin, urlsplit
 
 import requests
 from bs4 import BeautifulSoup
+
 from logging_config import init_logger
 
 logger = logging.getLogger(__name__)
@@ -208,7 +209,24 @@ def scrape(progress=None):
 
     for entry in scrapes:
         links = entry.find_naver_campaign_links(progress)
-        campaign_links += links
+
+        for i, link in enumerate(links):
+            # Parse link
+            parsed_link = urlsplit(link)
+
+            # Parse query param
+            query_params = parse_qs(parsed_link.query)
+
+            # Check if 'redirect_uri' is in the query parameters
+            if 'redirect_uri' in query_params:
+                # Extract 'redirect_uri'
+                logger.warning("redirect_uri Found: %s", link)
+                link = query_params.get("redirect_uri", [None])[0]
+
+                # Update links with redirect_uri
+                links[i] = link
+
+        campaign_links.extend(links)
         logger.info("Done for %s: %d", entry.base_url, len(links))
 
     campaign_links = list(set(campaign_links))
@@ -254,13 +272,18 @@ class Database:
         # Commit the changes to the database
         self.conn.commit()
 
-    def get_campaigns(self, days=-7):
+    def get_campaigns(self, days=-7, newvisitonly=True):
         logger.info("Get Campaigns")
 
         # Assuming days is an integer representing the number of days
         sql = """SELECT url, visit
                 FROM campaign
-                WHERE creation >= datetime('now', ? || ' days') AND visit IS NULL"""
+                WHERE creation >= datetime('now', ? || ' days')"""
+
+        sqlnewvisitonly = "visit IS NULL"
+
+        if newvisitonly:
+            sql = sql + " AND " + sqlnewvisitonly
 
         # Execute the query with parameter binding
         self.cur.execute(sql, (days,))
@@ -290,10 +313,13 @@ if __name__ == "__main__":
     )
 
     campaigns = scrape()
+    pprint(campaigns)
 
     db = Database("campaign.db")
     db.update(campaigns)
-    campaigns = db.get_campaigns()
 
     for c in campaigns:
         db.stamp_campaign(c)
+
+    campaigns = db.get_campaigns(days=-7, newvisitonly=True)
+    pprint(campaigns)
