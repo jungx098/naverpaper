@@ -232,6 +232,22 @@ def process_quickreward_link(driver, link):
     return False
 
 
+def process_modal(driver):
+    try:
+        modal = driver.find_element(By.CLASS_NAME, "modal")
+        logger.info("modal: %s", modal.text.replace("\n", " "))
+
+        try:
+            # <div class="buttons"><div class="submit-button btn-naver" onclick="CustomDialog.dismiss()">확인</div></div>
+            # buttons = driver.find_element(By.CLASS_NAME, "submit-button btn-naver")
+            buttons = driver.find_element(By.CLASS_NAME, "buttons")
+            buttons.click()
+        except:
+            logger.info("No buttons Found")
+    except:
+        logger.info("No modal Found")
+
+
 def process_call_to_action(driver, link):
     if link is None:
         link = driver.current_url
@@ -242,6 +258,11 @@ def process_call_to_action(driver, link):
         element = driver.find_element(By.CLASS_NAME, "call_to_action")
         logger.info("Click %s", element.text)
         element.click()
+
+        # TODO: Process 알림받기
+        time.sleep(1)
+        process_modal(driver)
+
         time.sleep(3)
         logger.info("%s: %s (call_to_action)", link, driver.title)
         return True
@@ -366,13 +387,14 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
 
     db = Database(os.getcwd() + "/user_dir/" + hash + "/campaign.db")
     db.update(campaigns)
-    campaigns = db.get_campaigns()
+    campaigns = db.get_campaigns(days=-7, newvisitonly=True)
 
     driver = init(id, pwd, ua, headless, newsave, hash)
     print(f"{mask_username(id)}: Start Balance: ", end="")
     start_balance = get_balance(driver)
     print(f"{start_balance}")
 
+    # Quick Reward
     print(f"{mask_username(id)}: Quick Reward", end="", flush=True)
     cnt = quick_reward(driver, lambda: [print(".", end="", flush=True)])
     sys.stdout.write('\x1b[2K')
@@ -465,7 +487,7 @@ if __name__ == "__main__":
     }
 
     init_logger(console_logging_level=LEVEL[args.verbose],
-                file_logging_level=LEVEL[args.verbose],
+                file_logging_level=max(LEVEL[args.verbose], logging.INFO),
                 filename="./log.txt")
 
     logger.info("안녕 Verbose Level: %d", args.verbose)
