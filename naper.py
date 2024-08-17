@@ -159,20 +159,22 @@ def mask_username(username: str):
     )
 
 
-def log_html(url, page):
+def dump_page(driver):
+    url = driver.current_url
+    page = driver.page_source
     filename = url.replace('https://', '')
     filename = filename.replace('/', '_')
     filename = filename.replace('?', '_')
-    filename = filename + '.html'
-    with open(filename, "w", encoding="utf-8") as fd:
+    with open(filename + ".html", "w", encoding="utf-8") as fd:
         fd.write(page)
+    driver.get_screenshot_as_file(filename + ".png")
 
 
 def process_error(driver, link):
     if link is None:
         link = driver.current_url
 
-    log_html(driver.current_url, driver.page_source)
+    dump_page(driver)
     logger.error("Link: %s", link)
     logger.error("Current URL: %s", driver.current_url)
     logger.error("Title: %s", driver.title)
