@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urljoin, urlsplit
 
 import requests
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 
 from logging_config import init_logger
 
@@ -116,11 +117,11 @@ class ScrapeDamoang(Scrape):
         self.base_url = "https://www.damoang.net/economy"
 
     def find_naver_campaign_links(self, progress=None):
+        # Http headers
+        headers = {"User-Agent": f"{UserAgent(platforms='pc').random}"}
+
         # Send a request to the base URL
-        request_headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        }
-        response = requests.get(self.base_url, headers=request_headers)
+        response = requests.get(self.base_url, headers=headers)
         soup = BeautifulSoup(response.text, "html.parser")
 
         # Find all span elements with class 'list_subject' and get 'a' tags
@@ -139,7 +140,7 @@ class ScrapeDamoang(Scrape):
         for link in naver_links:
             full_link = urljoin(self.base_url, link)
 
-            res = requests.get(full_link, headers=request_headers)
+            res = requests.get(full_link, headers=headers)
             inner_soup = BeautifulSoup(res.text, "html.parser")
 
             # Find all links that start with the campaign URL
@@ -208,7 +209,12 @@ def scrape(progress=None):
     campaign_links = []
 
     for entry in scrapes:
-        links = entry.find_naver_campaign_links(progress)
+        try:
+            links = entry.find_naver_campaign_links(progress)
+        except Exception as e:
+            logger.exception("find_naver_campaign_links Failed for %s: %s",
+                             entry.base_url, type(e).__name__)
+            continue
 
         for i, link in enumerate(links):
             # Parse link
@@ -266,8 +272,10 @@ class Database:
         """Update campaign db."""
 
         for link in campaign_links:
-            # Insert the record into the products table with the INSERT OR IGNORE statement
-            self.cur.execute("INSERT OR IGNORE INTO campaign (url) VALUES (?)", (link,))
+            # Insert the record into the products table with the INSERT OR
+            # IGNORE statement
+            self.cur.execute("INSERT OR IGNORE INTO campaign (url) VALUES (?)",
+                             (link,))
 
         # Commit the changes to the database
         self.conn.commit()
