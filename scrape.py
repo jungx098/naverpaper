@@ -217,6 +217,20 @@ def scrape(progress=None):
             continue
 
         for i, link in enumerate(links):
+
+            # Check link validness
+            if not link.startswith("http"):
+                logger.warning("Invalid Link: %s", link)
+                pos = link.find('http')
+                link = link[pos:]
+                links[i] = link
+
+            if "\r\n" in link:
+                logger.warning("Invalid Link: %s", link)
+                pos = link.find('\r\n')
+                link = link[:pos]
+                links[i] = link
+
             # Parse link
             parsed_link = urlsplit(link)
 
