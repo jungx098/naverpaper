@@ -1,5 +1,4 @@
 import argparse
-import hashlib
 import json
 import logging
 import os
@@ -45,13 +44,13 @@ def log_messages(driver, level):
             logger.log(level, "message_text %d: %s", i, e.text.lstrip().rstrip().replace("\n", " "))
 
 
-def init(id, pwd, ua, headless, newsave):
+def init(id, pwd, ua, headless, newsave, hash):
     # 크롬 드라이버 옵션 설정
     chrome_options = webdriver.ChromeOptions()
 
     if headless is True:
         chrome_options.add_argument("--headless=new")
-    user_dir = os.getcwd() + "/user_dir/" + hashlib.sha256(f"{id}_{pwd}_{ua}".encode('utf-8')).hexdigest()
+    user_dir = os.getcwd() + "/user_dir/" + hash
     chrome_options.add_argument(f"--user-data-dir={user_dir}")
     if ua is not None:
         chrome_options.add_argument(f"--user-agent={ua}")
@@ -101,11 +100,13 @@ def init(id, pwd, ua, headless, newsave):
     input_pw = pwd
 
     # ID input 클릭
+    print("Input ID")
     username.click()
     # js를 사용해서 붙여넣기 발동 <- 왜 일부러 이러냐면 pypyautogui랑 pyperclip를 사용해서 복붙 기능을 했는데 운영체제때문에 안되서 이렇게 한거다.
     driver2.execute_script("arguments[0].value = arguments[1]", username, input_id)
     time.sleep(1)
 
+    print("Input PW")
     pw.click()
     driver2.execute_script("arguments[0].value = arguments[1]", pw, input_pw)
     time.sleep(1)
