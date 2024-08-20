@@ -386,12 +386,17 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
     time_start = time.time()
 
     hash = hashlib.sha256(f"{id}_{pwd}_{ua}".encode('utf-8')).hexdigest()
+    user_dir = os.getcwd() + "/user_dir/" + hash
 
-    db = Database(os.getcwd() + "/user_dir/" + hash + "/campaign.db")
+    # If user_dir is not present then create it.
+    if not os.path.exists(user_dir):
+        os.makedirs(user_dir)
+
+    db = Database(user_dir + "/campaign.db")
     db.update(campaigns)
     campaigns = db.get_campaigns(days=-7, newvisitonly=True)
 
-    driver = init(id, pwd, ua, headless, newsave, hash)
+    driver = init(id, pwd, ua, headless, newsave, user_dir)
     print(f"{mask_username(id)}: Start Balance: ", end="")
     start_balance = get_balance(driver)
     print(f"{start_balance}")

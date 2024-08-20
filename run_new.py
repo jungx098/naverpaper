@@ -44,13 +44,12 @@ def log_messages(driver, level):
             logger.log(level, "message_text %d: %s", i, e.text.lstrip().rstrip().replace("\n", " "))
 
 
-def init(id, pwd, ua, headless, newsave, hash):
+def init(id, pwd, ua, headless, newsave, user_dir):
     # 크롬 드라이버 옵션 설정
     chrome_options = webdriver.ChromeOptions()
 
     if headless is True:
         chrome_options.add_argument("--headless=new")
-    user_dir = os.getcwd() + "/user_dir/" + hash
     chrome_options.add_argument(f"--user-data-dir={user_dir}")
     if ua is not None:
         chrome_options.add_argument(f"--user-agent={ua}")
