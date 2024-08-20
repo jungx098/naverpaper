@@ -24,6 +24,11 @@
 4. secrets TRY_LOGIN 항목에 로그인 재시도 횟수 입력, 기본값은 3번
 
 ## Prerequisites
+
+### Python
+
+Tested for Python 3.12.
+
 ### Install Google Chrome
 ```bash
 $ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
