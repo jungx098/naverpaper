@@ -67,7 +67,7 @@ sleep $DURATION
 #==============================================================================
 # Headless
 #==============================================================================
-$PYTHON $SCRIPT --headless -cf account.json -vvvv
+$PYTHON $SCRIPT --headless -cf account.json -v
 # $PYTHON $SCRIPT --headless -cf account.json
 
 #==============================================================================

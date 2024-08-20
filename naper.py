@@ -481,10 +481,10 @@ if __name__ == "__main__":
 
     LEVEL = {
         5: logging.DEBUG,
-        4: logging.INFO,
-        3: logging.WARNING,
-        2: logging.ERROR,
-        1: logging.CRITICAL,
+        4: logging.DEBUG,
+        3: logging.DEBUG,
+        2: logging.DEBUG,
+        1: logging.INFO,
         0: logging.CRITICAL + 1,
     }
 
