@@ -7,7 +7,9 @@ import logging
 import os
 import random
 import re
+import sys
 import time
+from enum import Enum
 from pprint import pformat
 
 import apprise
@@ -26,7 +28,6 @@ import naver_paper_ruliweb as ruliweb
 from logging_config import init_logger
 from run_new import init
 from scrape import Database, scrape
-import sys
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,12 @@ class text_to_change(object):
     def __call__(self, driver):
         actual_text = driver.find_element(*self.locator).text
         return actual_text != self.text
+
+
+class Status(Enum):
+    PASS = '1'
+    FAIL = '2'
+    UNDETERMINED = '3'
 
 
 def grep_campaign_links():
@@ -180,15 +187,18 @@ def process_error(driver, link):
     logger.error("Title: %s", driver.title)
 
 
-def process_alert(driver, link):
+def process_alert(driver, link) -> Status:
     if link is None:
         link = driver.current_url
 
     try:
         result = driver.switch_to.alert
         logger.info("%s: %s", link, result.text)
+        if "클릭적립은 캠페인당 1회만 적립됩니다." in result.text:
+            return Status.PASS
         result.accept()
-        return True
+
+        return Status.UNDETERMINED
 
     except NoAlertPresentException:
         pass
@@ -196,10 +206,10 @@ def process_alert(driver, link):
     except Exception as e:
         logger.exception("%s: %s", link, type(e).__name__)
 
-    return False
+    return Status.FAIL
 
 
-def process_dim(driver, link):
+def process_dim(driver, link) -> Status:
     if link is None:
         link = driver.current_url
 
@@ -207,7 +217,11 @@ def process_dim(driver, link):
         text = driver.find_element(By.CLASS_NAME, "dim").text
         text = text.replace("\n", " ")
         logger.info("%s: %s - %s (No Alert)", link, driver.title, text)
-        return True
+
+        if "클릭 적립은 캠페인당 1회만 적립 됩니다." in text:
+            return Status.PASS
+
+        return Status.UNDETERMINED
 
     except NoSuchElementException as e:
         pass
@@ -215,10 +229,10 @@ def process_dim(driver, link):
     except Exception as e:
         logger.exception("%s: %s", link, type(e).__name__)
 
-    return False
+    return Status.FAIL
 
 
-def process_quickreward_link(driver, link):
+def process_quickreward_link(driver, link) -> Status:
     if link is None:
         link = driver.current_url
 
@@ -226,12 +240,12 @@ def process_quickreward_link(driver, link):
         if driver.current_url == QUICK_REWARD_LINK:
             text = "Quick Reward Ignored"
             logger.info("%s: %s - %s (No Alert)", link, driver.title, text)
-            return True
+            return Status.UNDETERMINED
 
     except Exception as e:
         logger.exception("%s: %s", link, type(e).__name__)
 
-    return False
+    return Status.FAIL
 
 
 def process_modal(driver):
@@ -250,7 +264,7 @@ def process_modal(driver):
         logger.info("No modal Found")
 
 
-def process_call_to_action(driver, link):
+def process_call_to_action(driver, link) -> Status:
     if link is None:
         link = driver.current_url
 
@@ -267,7 +281,7 @@ def process_call_to_action(driver, link):
 
         time.sleep(3)
         logger.info("%s: %s (call_to_action)", link, driver.title)
-        return True
+        return Status.UNDETERMINED
 
     except NoSuchElementException as e:
         pass
@@ -275,7 +289,7 @@ def process_call_to_action(driver, link):
     except Exception as e:
         logger.exception("%s", type(e).__name__)
 
-    return False
+    return Status.FAIL
 
 
 def visit(account, campaign_links, driver2, db):
@@ -303,22 +317,29 @@ def visit(account, campaign_links, driver2, db):
         # Reset retry.
         retry = 0
 
-        if process_alert(driver2, link) is True:
-            pass
-        elif process_dim(driver2, link) is True:
-            pass
-        elif process_quickreward_link(driver2, link) is True:
-            pass
-        elif process_call_to_action(driver2, link) is True:
-            pass
-        else:
+        status = Status.FAIL
+
+        if status is Status.FAIL:
+            status = process_alert(driver2, link)
+
+        if status is Status.FAIL:
+            status = process_dim(driver2, link)
+
+        if status is Status.FAIL:
+            status = process_quickreward_link(driver2, link)
+
+        if status is Status.FAIL:
+            status = process_call_to_action(driver2, link)
+
+        if status is Status.FAIL:
             process_error(driver2, link)
 
         # The transition time to the target page can be up to 2 seconds without
         # alert, and 3 seconds may be required to stay.
         time.sleep(random.uniform(6, 10))
 
-        db.stamp_campaign(campaign_links[idx])
+        if status is Status.PASS:
+            db.stamp_campaign(campaign_links[idx])
 
         idx += 1
         pbar.update(1)
@@ -349,13 +370,18 @@ def quick_reward(driver, progress=None):
                 if window != handle:
                     driver.switch_to.window(window)
 
-            if process_alert(driver, None) is True:
-                pass
-            elif process_dim(driver, None) is True:
-                pass
-            elif process_call_to_action(driver, None) is True:
-                pass
-            else:
+            status = Status.FAIL
+
+            if status is Status.FAIL:
+                status = process_alert(driver, None)
+
+            if status is Status.FAIL:
+                status = process_dim(driver, None)
+
+            if status is Status.FAIL:
+                status = process_call_to_action(driver, None)
+
+            if status is Status.FAIL:
                 process_error(driver, None)
 
             time.sleep(random.uniform(6, 10))
@@ -394,7 +420,7 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
 
     db = Database(user_dir + "/campaign.db")
     db.update(campaigns)
-    campaigns = db.get_campaigns(days=-7, newvisitonly=True)
+    campaigns = db.get_campaigns(days=-3, newvisitonly=True)
 
     driver = init(id, pwd, ua, headless, newsave, user_dir)
     print(f"{mask_username(id)}: Start Balance: ", end="")
