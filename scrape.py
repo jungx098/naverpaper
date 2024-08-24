@@ -28,7 +28,7 @@ class ScrapeClien(Scrape):
 
     def find_naver_campaign_links(self, progress=None):
         # Send a request to the base URL
-        response = requests.get(self.base_url)
+        response = requests.get(self.base_url, timeout=7)
         soup = BeautifulSoup(response.text, "html.parser")
 
         # Find all span elements with class 'list_subject' and get 'a' tags
@@ -47,7 +47,7 @@ class ScrapeClien(Scrape):
         for link in naver_links:
             full_link = urljoin(self.base_url, link)
 
-            res = requests.get(full_link)
+            res = requests.get(full_link, timeout=7)
             inner_soup = BeautifulSoup(res.text, "html.parser")
 
             # Find all links that start with the campaign URL
@@ -73,7 +73,7 @@ class ScrapePpompu(Scrape):
     def find_naver_campaign_links(self, progress=None):
         page_url = "https://www.ppomppu.co.kr/zboard/zboard.php?"
 
-        response = requests.get(self.base_url)
+        response = requests.get(self.base_url, timeout=7)
         soup = BeautifulSoup(response.text, "html.parser")
 
         list_subject_links = soup.find_all("td", class_="baseList-space")
@@ -92,7 +92,7 @@ class ScrapePpompu(Scrape):
         for link in naver_links:
             full_link = urljoin(page_url, link)
 
-            res = requests.get(full_link)
+            res = requests.get(full_link, timeout=7)
             inner_soup = BeautifulSoup(res.text, "html.parser")
 
             campaign_a_tags = inner_soup.find_all("a", href=True)
@@ -121,7 +121,7 @@ class ScrapeDamoang(Scrape):
         headers = {"User-Agent": f"{UserAgent(platforms='pc').random}"}
 
         # Send a request to the base URL
-        response = requests.get(self.base_url, headers=headers)
+        response = requests.get(self.base_url, headers=headers, timeout=7)
         soup = BeautifulSoup(response.text, "html.parser")
 
         # Find all span elements with class 'list_subject' and get 'a' tags
@@ -140,7 +140,7 @@ class ScrapeDamoang(Scrape):
         for link in naver_links:
             full_link = urljoin(self.base_url, link)
 
-            res = requests.get(full_link, headers=headers)
+            res = requests.get(full_link, headers=headers, timeout=7)
             inner_soup = BeautifulSoup(res.text, "html.parser")
 
             # Find all links that start with the campaign URL
@@ -165,7 +165,7 @@ class ScrapeRuliweb(Scrape):
 
     def find_naver_campaign_links(self, progress=None):
         # Send a request to the base URL
-        response = requests.get(self.base_url)
+        response = requests.get(self.base_url, timeout=7)
         soup = BeautifulSoup(response.text, "html.parser")
 
         # Find all span elements with class 'list_subject' and get 'a' tags
@@ -184,7 +184,7 @@ class ScrapeRuliweb(Scrape):
         for link in naver_links:
             full_link = link
 
-            res = requests.get(full_link)
+            res = requests.get(full_link, timeout=7)
             inner_soup = BeautifulSoup(res.text, "html.parser")
 
             # Find all links that start with the campaign URL
