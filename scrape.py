@@ -114,7 +114,7 @@ class ScrapePpompu(Scrape):
 
 class ScrapeDamoang(Scrape):
     def __init__(self):
-        self.base_url = "https://www.damoang.net/economy"
+        self.base_url = "https://damoang.net/economy"
 
     def find_naver_campaign_links(self, progress=None):
         # Http headers

@@ -301,6 +301,8 @@ def visit(account, campaign_links, driver2, db):
     while idx < len(campaign_links):
         link = campaign_links[idx]
 
+        logger.info("Visit %d/%d: %s", idx, len(campaign_links), link)
+
         try:
             driver2.get(link)
         except UnexpectedAlertPresentException:
