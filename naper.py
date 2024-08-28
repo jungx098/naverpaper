@@ -167,14 +167,17 @@ def mask_username(username: str):
 
 
 def dump_page(driver):
-    url = driver.current_url
-    page = driver.page_source
-    filename = url.replace('https://', '')
-    filename = filename.replace('/', '_')
-    filename = filename.replace('?', '_')
-    with open(filename + ".html", "w", encoding="utf-8") as fd:
-        fd.write(page)
-    driver.get_screenshot_as_file(filename + ".png")
+    try:
+        url = driver.current_url
+        page = driver.page_source
+        filename = url.replace('https://', '')
+        filename = filename.replace('/', '_')
+        filename = filename.replace('?', '_')
+        with open(filename + ".html", "w", encoding="utf-8") as fd:
+            fd.write(page)
+        driver.get_screenshot_as_file(filename + ".png")
+    except Exception as e:
+        logger.exception("%s: %s", driver.current_url, type(e).__name__)
 
 
 def process_error(driver, link):
