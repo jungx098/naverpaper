@@ -31,9 +31,18 @@ elif [ "$(expr substr $(uname -s) 1  9)" = "CYGWIN_NT"  ]; then
     SHUF="shuf"
     # Clear TZ for datetime of Windows Python in Cygwin environment
     unset TZ
+
+    if [ -z "$LOCALAPPDATA" ]; then
+        LOCALAPPDATA='C:\Users\'$LOGNAME'\AppData\Local'
+    fi
     PYTHON=$LOCALAPPDATA/Programs/Python/Python312/python
 else
     PYTHON=python
+fi
+
+if ! command -v $PYTHON &> /dev/null; then
+    echo "Command not found: $PYTHON"
+    exit 1
 fi
 
 # Random sleep duration in seconds between 0 and 1200 (20 mins)
