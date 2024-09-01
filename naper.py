@@ -110,7 +110,8 @@ def get_balance1(driver):
 
         balance = int(re.sub(r"[^0-9]", "", element.text))
     except Exception as e:
-        logger.exception("Balance Not Available: %s", type(e).__name__)
+        logger.exception("Balance Not Available: %s (%s)",
+                         type(e).__name__, driver.current_url)
 
     return balance
 
@@ -138,7 +139,8 @@ def get_balance2(driver):
 
         balance = int(re.sub(r"[^0-9]", "", element.text))
     except Exception as e:
-        logger.exception("Balance Not Available: %s", type(e).__name__)
+        logger.exception("Balance Not Available: %s (%s)",
+                         type(e).__name__, driver.current_url)
 
     return balance
 
