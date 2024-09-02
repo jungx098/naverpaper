@@ -32,9 +32,16 @@ elif [ "$(expr substr $(uname -s) 1  9)" = "CYGWIN_NT"  ]; then
     # Clear TZ for datetime of Windows Python in Cygwin environment
     unset TZ
 
-    if [ -z "$LOCALAPPDATA" ]; then
-        LOCALAPPDATA='C:\Users\'$LOGNAME'\AppData\Local'
-    fi
+    # HOMEPATH is required for the python os module, and LOCALAPPDATA is needed
+    # for the Python executable path. These variables might be missing when
+    # this script is executed by cron.
+    for var in HOMEPATH LOCALAPPDATA; do
+        if [ -z "${!var}" ]; then
+            echo "$var Not Defined"
+            exit 1
+        fi
+    done
+
     PYTHON=$LOCALAPPDATA/Programs/Python/Python312/python
 else
     PYTHON=python
