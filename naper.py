@@ -94,15 +94,16 @@ def get_balance1(driver):
 
     try:
         driver.get("https://new-m.pay.naver.com/mydata/home")
-        class_name = "AssetCommonItem_balance__mkiEz"
-        element = driver.find_element(By.CLASS_NAME, class_name)
+        xpath = "//*[contains(@class, 'AssetCommonItem_balance__')]"
+        element = driver.find_element(By.XPATH, xpath)
+
         old_text = element.text
         logger.info("get_balance1: %s", old_text)
 
         try:
             WebDriverWait(driver, 5).until(text_to_change(
-                (By.CLASS_NAME, class_name), old_text))
-            element = driver.find_element(By.CLASS_NAME, class_name)
+                (By.XPATH, xpath), old_text))
+            element = driver.find_element(By.XPATH, xpath)
         except TimeoutException as e:
             logger.info("No Change in Balance Element: %s", type(e).__name__)
 
