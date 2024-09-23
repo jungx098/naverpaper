@@ -437,10 +437,13 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
 
     # Quick Reward
     print(f"{mask_username(id)}: Quick Reward", end="", flush=True)
-    cnt = quick_reward(driver, lambda: [print(".", end="", flush=True)])
-    sys.stdout.write('\x1b[2K')
-    print(f"\r{mask_username(id)}: Quick Reward: {cnt} Done", flush=True)
+    quick_reward_cnt = quick_reward(driver,
+                                    lambda: [print(".", end="", flush=True)])
+    sys.stdout.write("\x1b[2K")
+    print(f"\r{mask_username(id)}: Quick Reward: {quick_reward_cnt} Done",
+          flush=True)
 
+    # Campaign visit
     if len(campaigns) > 0:
         visit(id, campaigns, driver, db)
 
@@ -466,11 +469,11 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
 
     if apprise_urls and gain != 0:
         apprise_notify(f"Naper {mask_username(id)}",
-                       f"Link Count: {len(campaigns)}\n"
-                       f"Start Balance: {start_balance:,}\n"
-                       f"End Balance: {end_balance:,}\n"
-                       f"Gain: {(end_balance - start_balance):,}\n"
-                       f"Time: {duration:.3f} secs",
+                       f"- Quick Reward Count: {quick_reward_cnt}\n"
+                       f"- Link Count: {len(campaigns)}\n"
+                       f"- Gain: {(end_balance - start_balance):,} "
+                       f"({end_balance:,} - {start_balance:,})\n"
+                       f"- Time: {duration:.3f} secs",
                        apprise_urls)
 
 
