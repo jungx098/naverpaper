@@ -47,7 +47,7 @@ else
     PYTHON=python
 fi
 
-if ! command -v $PYTHON &> /dev/null; then
+if ! (command -v python &> /dev/null); then
     echo "Command not found: $PYTHON"
     exit 1
 fi
