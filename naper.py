@@ -124,7 +124,7 @@ def get_balance2(driver):
 
     try:
         driver.get("https://new-m.pay.naver.com/pointshistory/list?category=all")
-        class_name = "PointsManage_price__w__Du"
+        class_name = "PointsManage_point__T67hP"
         element = driver.find_element(By.CLASS_NAME, class_name)
         old_text = element.text
         logger.info("get_balance2: %s", old_text)
