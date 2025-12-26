@@ -17,6 +17,7 @@ from selenium.common.exceptions import (NoAlertPresentException,
                                         NoSuchElementException,
                                         TimeoutException,
                                         UnexpectedAlertPresentException)
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from tqdm import tqdm
@@ -269,6 +270,22 @@ def process_modal(driver):
     except:
         logger.info("No modal Found")
 
+def process_popup_link(driver):
+    try:
+        modal = driver.find_element(By.CLASS_NAME, "popup_link")
+        logger.info("modal: %s", modal.text.replace("\n", " "))
+
+        try:
+            # <a href="#" class="popup_link">
+            #     <span class="text">포인트 받기</span>
+            # </a>
+            buttons = driver.find_element(By.CLASS_NAME, "popup_link")
+            buttons.click()
+        except:
+            logger.info("No buttons Found")
+    except:
+        logger.info("No popup_link Found")
+
 
 def process_call_to_action(driver, link) -> Status:
     if link is None:
@@ -362,7 +379,7 @@ def quick_reward(driver, progress=None):
         time.sleep(3)
         handle = driver.current_window_handle
         elements = driver.find_elements(
-            By.CLASS_NAME, "ADRewardBannerSystem_title__3f6bG")
+            By.CLASS_NAME, "mission_item-mission__wcILO")
         logger.info("Quick Reward Cnt: %d", len(elements))
         for e in elements:
             logger.info("Quick Reward: %s", e.text)
@@ -370,7 +387,7 @@ def quick_reward(driver, progress=None):
                 progress()
 
             # Click element using Java Script.
-            driver.execute_script("arguments[0].click();", e)
+            ActionChains(driver).move_to_element(e).pause(0.8).click().perform()
 
             # Switch to new handle if new tab is opened.
             multi_window = driver.window_handles
