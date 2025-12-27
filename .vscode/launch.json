@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Naver Debug",
+            "type": "python",
+            "request": "launch",
+            "program": "naper.py",
+            "args": [
+                "--headless",
+                "-cf", "accounts.json"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Naper Debug (visible browser)",
+            "type": "python",
+            "request": "launch",
+            "program": "naper.py",
+            "args": [
+                "--no-headless",
+                "-cf", "accounts.json",
+                "-v"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
