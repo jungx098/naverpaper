@@ -16,19 +16,31 @@ logger = logging.getLogger(__name__)
 
 class Scrape:
     def __init__(self):
-        pass
+        self.headers = {"User-Agent": f"{UserAgent(platforms='pc').random}"}
 
     def find_naver_campaign_links(self, progress=None):
         return []
 
+    def is_campaign_link(self, link):
+        """Check if the link is a valid campaign link."""
+        if (
+            "campaign2-api.naver.com" in link
+            or "campaign2.naver.com" in link
+            or "ofw.adison.co" in link
+        ):
+            return True
+
+        return False
+
 
 class ScrapeClien(Scrape):
     def __init__(self):
+        super().__init__()
         self.base_url = "https://www.clien.net/service/board/jirum"
 
     def find_naver_campaign_links(self, progress=None):
         # Send a request to the base URL
-        response = requests.get(self.base_url, timeout=7)
+        response = requests.get(self.base_url, headers=self.headers, timeout=7)
         soup = BeautifulSoup(response.text, "html.parser")
 
         # Find all span elements with class 'list_subject' and get 'a' tags
@@ -47,17 +59,14 @@ class ScrapeClien(Scrape):
         for link in naver_links:
             full_link = urljoin(self.base_url, link)
 
-            res = requests.get(full_link, timeout=7)
+            res = requests.get(full_link, headers=self.headers, timeout=7)
             inner_soup = BeautifulSoup(res.text, "html.parser")
 
             # Find all links that start with the campaign URL
             for a_tag in inner_soup.find_all("a", href=True):
                 campaign_link = a_tag["href"]
 
-                if (
-                    "campaign2-api.naver.com" in campaign_link
-                    or "ofw.adison.co" in campaign_link
-                ):
+                if self.is_campaign_link(campaign_link):
                     campaign_links.append(campaign_link)
 
                     if progress:
@@ -68,12 +77,13 @@ class ScrapeClien(Scrape):
 
 class ScrapePpompu(Scrape):
     def __init__(self):
+        super().__init__()
         self.base_url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=coupon"
 
     def find_naver_campaign_links(self, progress=None):
         page_url = "https://www.ppomppu.co.kr/zboard/zboard.php?"
 
-        response = requests.get(self.base_url, timeout=7)
+        response = requests.get(self.base_url, headers=self.headers, timeout=7)
         soup = BeautifulSoup(response.text, "html.parser")
 
         list_subject_links = soup.find_all("td", class_="baseList-space")
@@ -92,7 +102,7 @@ class ScrapePpompu(Scrape):
         for link in naver_links:
             full_link = urljoin(page_url, link)
 
-            res = requests.get(full_link, timeout=7)
+            res = requests.get(full_link, headers=self.headers, timeout=7)
             inner_soup = BeautifulSoup(res.text, "html.parser")
 
             campaign_a_tags = inner_soup.find_all("a", href=True)
@@ -100,10 +110,7 @@ class ScrapePpompu(Scrape):
             for a_tag in campaign_a_tags:
                 campaign_link = a_tag.get_text().strip()
 
-                if (
-                    "campaign2-api.naver.com" in campaign_link
-                    or "ofw.adison.co" in campaign_link
-                ):
+                if self.is_campaign_link(campaign_link):
                     campaign_links.append(campaign_link)
 
                     if progress:
@@ -114,14 +121,12 @@ class ScrapePpompu(Scrape):
 
 class ScrapeDamoang(Scrape):
     def __init__(self):
+        super().__init__()
         self.base_url = "https://damoang.net/economy"
 
     def find_naver_campaign_links(self, progress=None):
-        # Http headers
-        headers = {"User-Agent": f"{UserAgent(platforms='pc').random}"}
-
         # Send a request to the base URL
-        response = requests.get(self.base_url, headers=headers, timeout=7)
+        response = requests.get(self.base_url, headers=self.headers, timeout=7)
         soup = BeautifulSoup(response.text, "html.parser")
 
         # Find all span elements with class 'list_subject' and get 'a' tags
@@ -140,17 +145,14 @@ class ScrapeDamoang(Scrape):
         for link in naver_links:
             full_link = urljoin(self.base_url, link)
 
-            res = requests.get(full_link, headers=headers, timeout=7)
+            res = requests.get(full_link, headers=self.headers, timeout=7)
             inner_soup = BeautifulSoup(res.text, "html.parser")
 
             # Find all links that start with the campaign URL
             for a_tag in inner_soup.find_all("a", href=True):
                 campaign_link = a_tag["href"]
 
-                if (
-                    "campaign2-api.naver.com" in campaign_link or
-                    "ofw.adison.co" in campaign_link
-                ):
+                if self.is_campaign_link(campaign_link):
                     campaign_links.append(campaign_link)
 
                     if progress:
@@ -161,11 +163,12 @@ class ScrapeDamoang(Scrape):
 
 class ScrapeRuliweb(Scrape):
     def __init__(self):
+        super().__init__()
         self.base_url = "https://bbs.ruliweb.com/market/board/1020"
 
     def find_naver_campaign_links(self, progress=None):
         # Send a request to the base URL
-        response = requests.get(self.base_url, timeout=7)
+        response = requests.get(self.base_url, headers=self.headers, timeout=7)
         soup = BeautifulSoup(response.text, "html.parser")
 
         # Find all span elements with class 'list_subject' and get 'a' tags
@@ -184,17 +187,14 @@ class ScrapeRuliweb(Scrape):
         for link in naver_links:
             full_link = link
 
-            res = requests.get(full_link, timeout=7)
+            res = requests.get(full_link, headers=self.headers, timeout=7)
             inner_soup = BeautifulSoup(res.text, "html.parser")
 
             # Find all links that start with the campaign URL
             for a_tag in inner_soup.find_all("a", href=True):
                 campaign_link = a_tag["href"]
 
-                if (
-                    "campaign2-api.naver.com" in campaign_link or
-                    "ofw.adison.co" in campaign_link
-                ):
+                if self.is_campaign_link(campaign_link):
                     campaign_links.append(campaign_link)
 
                     if progress:
@@ -212,8 +212,11 @@ def scrape(progress=None):
         try:
             links = entry.find_naver_campaign_links(progress)
         except Exception as e:
-            logger.exception("find_naver_campaign_links Failed for %s: %s",
-                             entry.base_url, type(e).__name__)
+            logger.exception(
+                "find_naver_campaign_links Failed for %s: %s",
+                entry.base_url,
+                type(e).__name__,
+            )
             continue
 
         for i, link in enumerate(links):
@@ -221,13 +224,13 @@ def scrape(progress=None):
             # Check link validness
             if not link.startswith("http"):
                 logger.warning("Invalid Link: %s", link)
-                pos = link.find('http')
+                pos = link.find("http")
                 link = link[pos:]
                 links[i] = link
 
             if "\r\n" in link:
                 logger.warning("Invalid Link: %s", link)
-                pos = link.find('\r\n')
+                pos = link.find("\r\n")
                 link = link[:pos]
                 links[i] = link
 
@@ -238,7 +241,7 @@ def scrape(progress=None):
             query_params = parse_qs(parsed_link.query)
 
             # Check if 'redirect_uri' is in the query parameters
-            if 'redirect_uri' in query_params:
+            if "redirect_uri" in query_params:
                 # Extract 'redirect_uri'
                 logger.warning("redirect_uri Found: %s", link)
                 link = query_params.get("redirect_uri", [None])[0]
@@ -288,8 +291,7 @@ class Database:
         for link in campaign_links:
             # Insert the record into the products table with the INSERT OR
             # IGNORE statement
-            self.cur.execute("INSERT OR IGNORE INTO campaign (url) VALUES (?)",
-                             (link,))
+            self.cur.execute("INSERT OR IGNORE INTO campaign (url) VALUES (?)", (link,))
 
         # Commit the changes to the database
         self.conn.commit()
