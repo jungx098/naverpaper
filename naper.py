@@ -13,10 +13,12 @@ from enum import Enum
 from pprint import pformat
 
 import apprise
-from selenium.common.exceptions import (NoAlertPresentException,
-                                        NoSuchElementException,
-                                        TimeoutException,
-                                        UnexpectedAlertPresentException)
+from selenium.common.exceptions import (
+    NoAlertPresentException,
+    NoSuchElementException,
+    TimeoutException,
+    UnexpectedAlertPresentException,
+)
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -32,7 +34,9 @@ from scrape import Database, scrape
 
 logger = logging.getLogger(__name__)
 
-QUICK_REWARD_LINK = "https://new-m.pay.naver.com/historybenefit/eventbenefit?category=quickreward"
+QUICK_REWARD_LINK = (
+    "https://new-m.pay.naver.com/historybenefit/eventbenefit?category=quickreward"
+)
 
 
 class text_to_change(object):
@@ -48,9 +52,9 @@ class text_to_change(object):
 
 
 class Status(Enum):
-    PASS = '1'
-    FAIL = '2'
-    UNDETERMINED = '3'
+    PASS = "1"
+    FAIL = "2"
+    UNDETERMINED = "3"
 
 
 def grep_campaign_links():
@@ -61,26 +65,28 @@ def grep_campaign_links():
     try:
         campaign_links += clien.find_naver_campaign_links()
     except Exception as e:
-        logger.exception("clien.find_naver_campaign_links Failed: %s",
-                         type(e).__name__)
+        logger.exception("clien.find_naver_campaign_links Failed: %s", type(e).__name__)
 
     try:
         campaign_links += damoang.find_naver_campaign_links()
     except Exception as e:
-        logger.exception("damoang.find_naver_campaign_links Failed: %s",
-                         type(e).__name__)
+        logger.exception(
+            "damoang.find_naver_campaign_links Failed: %s", type(e).__name__
+        )
 
     try:
         campaign_links += ppomppu.find_naver_campaign_links()
     except Exception as e:
-        logger.exception("ppomppu.find_naver_campaign_links Failed: %s",
-                         type(e).__name__)
+        logger.exception(
+            "ppomppu.find_naver_campaign_links Failed: %s", type(e).__name__
+        )
 
     try:
         campaign_links += ruliweb.find_naver_campaign_links()
     except Exception as e:
-        logger.exception("ruliweb.find_naver_campaign_links Failed: %s",
-                         type(e).__name__)
+        logger.exception(
+            "ruliweb.find_naver_campaign_links Failed: %s", type(e).__name__
+        )
 
     campaign_links = list(set(campaign_links))
     logger.info("Unvisited Campaign Link Count: %d", len(campaign_links))
@@ -102,8 +108,7 @@ def get_balance1(driver):
         logger.info("get_balance1: %s", old_text)
 
         try:
-            WebDriverWait(driver, 5).until(text_to_change(
-                (By.XPATH, xpath), old_text))
+            WebDriverWait(driver, 5).until(text_to_change((By.XPATH, xpath), old_text))
             element = driver.find_element(By.XPATH, xpath)
         except TimeoutException as e:
             logger.info("No Change in Balance Element: %s", type(e).__name__)
@@ -112,8 +117,9 @@ def get_balance1(driver):
 
         balance = int(re.sub(r"[^0-9]", "", element.text))
     except Exception as e:
-        logger.exception("Balance Not Available: %s (%s)",
-                         type(e).__name__, driver.current_url)
+        logger.exception(
+            "Balance Not Available: %s (%s)", type(e).__name__, driver.current_url
+        )
 
     return balance
 
@@ -131,8 +137,9 @@ def get_balance2(driver):
         logger.info("get_balance2: %s", old_text)
 
         try:
-            WebDriverWait(driver, 5).until(text_to_change(
-                (By.CLASS_NAME, class_name), old_text))
+            WebDriverWait(driver, 5).until(
+                text_to_change((By.CLASS_NAME, class_name), old_text)
+            )
             element = driver.find_element(By.CLASS_NAME, class_name)
         except TimeoutException as e:
             logger.info("No Change in Balance Element: %s", type(e).__name__)
@@ -141,8 +148,9 @@ def get_balance2(driver):
 
         balance = int(re.sub(r"[^0-9]", "", element.text))
     except Exception as e:
-        logger.exception("Balance Not Available: %s (%s)",
-                         type(e).__name__, driver.current_url)
+        logger.exception(
+            "Balance Not Available: %s (%s)", type(e).__name__, driver.current_url
+        )
 
     return balance
 
@@ -163,20 +171,16 @@ def get_balance(driver):
 def mask_username(username: str):
     """Function masking username."""
 
-    return (
-        username[0]
-        + "******"
-        + username[-1]
-    )
+    return username[0] + "******" + username[-1]
 
 
 def dump_page(driver):
     try:
         url = driver.current_url
         page = driver.page_source
-        filename = url.replace('https://', '')
-        filename = filename.replace('/', '_')
-        filename = filename.replace('?', '_')
+        filename = url.replace("https://", "")
+        filename = filename.replace("/", "_")
+        filename = filename.replace("?", "_")
         with open(filename + ".html", "w", encoding="utf-8") as fd:
             fd.write(page)
         driver.get_screenshot_as_file(filename + ".png")
@@ -270,21 +274,61 @@ def process_modal(driver):
     except:
         logger.info("No modal Found")
 
-def process_popup_link(driver):
+
+def process_popup_link(driver) -> Status:
+    """
+    Function processing popup link elements.
+
+    Sample HTML:
+
+    <a href="#" class="popup_link">
+        <span class="text">포인트 받기</span>
+    </a>
+    """
     try:
         modal = driver.find_element(By.CLASS_NAME, "popup_link")
-        logger.info("modal: %s", modal.text.replace("\n", " "))
+        logger.info("popup_link: %s", modal.text.replace("\n", " "))
 
         try:
-            # <a href="#" class="popup_link">
-            #     <span class="text">포인트 받기</span>
-            # </a>
+
             buttons = driver.find_element(By.CLASS_NAME, "popup_link")
             buttons.click()
-        except:
-            logger.info("No buttons Found")
-    except:
-        logger.info("No popup_link Found")
+            time.sleep(5)
+        except Exception as e:
+            logger.info("No buttons Found: %s", type(e).__name__)
+            return Status.FAIL
+    except Exception as e:
+        logger.info("No popup_link Found: %s", type(e).__name__)
+        return Status.FAIL
+
+    return Status.PASS
+
+
+def process_confirm(driver) -> Status:
+    """
+    Function processing popup link elements.
+
+    Sample HTML:
+
+    <div class="popup_box">
+        <strong class="popup_tit">
+            클릭 적립은 캠페인 당<br>
+            1회만 적립됩니다.
+        </strong>
+        <div class="bg_area"></div>
+        <a href="https://loan.pay.naver.com/n/credit?from=pointppopgi" class="popup_link">
+            <span class="text">확인</span>
+        </a>
+    </div>
+    """
+    try:
+        driver.find_element(By.LINK_TEXT, "확인").click()
+        time.sleep(5)
+    except Exception as e:
+        logger.info("No Link Found: %s", type(e).__name__)
+        return Status.FAIL
+
+    return Status.PASS
 
 
 def process_call_to_action(driver, link) -> Status:
@@ -331,8 +375,7 @@ def visit(account, campaign_links, driver2, db):
         except UnexpectedAlertPresentException:
             pass
         except Exception as e:
-            logger.exception("%s (retry: %d): %s",
-                             link, retry, type(e).__name__)
+            logger.exception("%s (retry: %d): %s", link, retry, type(e).__name__)
             if retry < 3:
                 retry += 1
                 continue
@@ -357,6 +400,12 @@ def visit(account, campaign_links, driver2, db):
             status = process_call_to_action(driver2, link)
 
         if status is Status.FAIL:
+            status = process_popup_link(driver2)
+
+        if status is Status.FAIL:
+            status = process_confirm(driver2)
+
+        if status is Status.FAIL:
             process_error(driver2, link)
 
         # The transition time to the target page can be up to 2 seconds without
@@ -378,8 +427,7 @@ def quick_reward(driver, progress=None):
         driver.get(QUICK_REWARD_LINK)
         time.sleep(3)
         handle = driver.current_window_handle
-        elements = driver.find_elements(
-            By.CLASS_NAME, "mission_item-mission__wcILO")
+        elements = driver.find_elements(By.CLASS_NAME, "mission_item-mission__wcILO")
         logger.info("Quick Reward Cnt: %d", len(elements))
         for e in elements:
             logger.info("Quick Reward: %s", e.text)
@@ -436,7 +484,7 @@ def apprise_notify(title, body, urls: list = []):
 def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
     time_start = time.time()
 
-    hash = hashlib.sha256(f"{id}_{pwd}_{ua}".encode('utf-8')).hexdigest()
+    hash = hashlib.sha256(f"{id}_{pwd}_{ua}".encode("utf-8")).hexdigest()
     user_dir = os.getcwd() + "/user_dir/" + hash
 
     # If user_dir is not present then create it.
@@ -453,12 +501,11 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
     print(f"{start_balance}")
 
     # Quick Reward
+    quick_reward_cnt = 0
     print(f"{mask_username(id)}: Quick Reward", end="", flush=True)
-    quick_reward_cnt = quick_reward(driver,
-                                    lambda: [print(".", end="", flush=True)])
+    quick_reward_cnt = quick_reward(driver, lambda: [print(".", end="", flush=True)])
     sys.stdout.write("\x1b[2K")
-    print(f"\r{mask_username(id)}: Quick Reward: {quick_reward_cnt} Done",
-          flush=True)
+    print(f"\r{mask_username(id)}: Quick Reward: {quick_reward_cnt} Done", flush=True)
 
     # Campaign visit
     if len(campaigns) > 0:
@@ -466,9 +513,7 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
 
     # Test code for balance check
     end_balance = get_balance(driver)
-    logger.info("End Balance: %d Gain: %d",
-                end_balance,
-                end_balance - start_balance)
+    logger.info("End Balance: %d Gain: %d", end_balance, end_balance - start_balance)
 
     gain = end_balance - start_balance
 
@@ -477,21 +522,25 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
     duration = time_end - time_start
     logger.info("Duration: %.3f secs", duration)
 
-    print(f"{mask_username(id)}: Summary {{ "
-          f"Balance: {end_balance:,}, "
-          f"Gain: {gain:,}, "
-          f"Time: {duration:.3f} secs }}")
+    print(
+        f"{mask_username(id)}: Summary {{ "
+        f"Balance: {end_balance:,}, "
+        f"Gain: {gain:,}, "
+        f"Time: {duration:.3f} secs }}"
+    )
 
     driver.quit()
 
     if apprise_urls and gain != 0:
-        apprise_notify(f"Naper {mask_username(id)}",
-                       f"- Quick Reward Count: {quick_reward_cnt}\n"
-                       f"- Link Count: {len(campaigns)}\n"
-                       f"- Gain: {(end_balance - start_balance):,} "
-                       f"({end_balance:,} - {start_balance:,})\n"
-                       f"- Time: {duration:.3f} secs",
-                       apprise_urls)
+        apprise_notify(
+            f"Naper {mask_username(id)}",
+            f"- Quick Reward Count: {quick_reward_cnt}\n"
+            f"- Link Count: {len(campaigns)}\n"
+            f"- Gain: {(end_balance - start_balance):,} "
+            f"({end_balance:,} - {start_balance:,})\n"
+            f"- Time: {duration:.3f} secs",
+            apprise_urls,
+        )
 
 
 if __name__ == "__main__":
@@ -499,12 +548,9 @@ if __name__ == "__main__":
     print("Naper @jungx098 fork of @stateofai")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--id", type=str,
-                        required=False, help="naver id")
-    parser.add_argument("-p", "--pw", type=str,
-                        required=False, help="naver password")
-    parser.add_argument("-c", "--cd", type=str,
-                        required=False, help="credential json")
+    parser.add_argument("-i", "--id", type=str, required=False, help="naver id")
+    parser.add_argument("-p", "--pw", type=str, required=False, help="naver password")
+    parser.add_argument("-c", "--cd", type=str, required=False, help="credential json")
     parser.add_argument(
         "--headless",
         type=bool,
@@ -530,8 +576,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument("-v", "--verbose", action="count", default=0)
-    parser.add_argument("--no-verbose", dest="verbose",
-                        action="store_const", const=0)
+    parser.add_argument("--no-verbose", dest="verbose", action="store_const", const=0)
 
     args = parser.parse_args()
     cd_obj = None
@@ -547,9 +592,11 @@ if __name__ == "__main__":
         0: logging.CRITICAL + 1,
     }
 
-    init_logger(console_logging_level=LEVEL[args.verbose],
-                file_logging_level=max(LEVEL[args.verbose], logging.INFO),
-                filename="./log.txt")
+    init_logger(
+        console_logging_level=LEVEL[args.verbose],
+        file_logging_level=max(LEVEL[args.verbose], logging.INFO),
+        filename="./log.txt",
+    )
 
     logger.info("안녕 Verbose Level: %d", args.verbose)
 
@@ -593,7 +640,7 @@ if __name__ == "__main__":
     else:
         print("Campaign Link Collection: ", end="", flush=True)
         campaigns = scrape(lambda: [print(".", end="", flush=True)])
-        sys.stdout.write('\x1b[2K')
+        sys.stdout.write("\x1b[2K")
         print(f"\rCampaign Link Collection: {len(campaigns)} Links")
 
         for idx, account in enumerate(cd_obj):
