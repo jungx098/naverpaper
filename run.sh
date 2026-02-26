@@ -73,6 +73,19 @@ SCRIPT_PATH=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 # Change to script directory
 cd $SCRIPT_PATH
 
+# Activate venv if available; override PYTHON with venv python
+for vdir in .venv venv; do
+    if [ -f "$SCRIPT_PATH/$vdir/bin/activate" ]; then
+        . "$SCRIPT_PATH/$vdir/bin/activate"
+        PYTHON=python
+        break
+    elif [ -f "$SCRIPT_PATH/$vdir/Scripts/activate" ]; then
+        . "$SCRIPT_PATH/$vdir/Scripts/activate"
+        PYTHON=python
+        break
+    fi
+done
+
 # Update src.
 git fetch
 git rebase
@@ -83,13 +96,13 @@ sleep $DURATION
 #==============================================================================
 # Headless
 #==============================================================================
-$PYTHON $SCRIPT --headless -cf account.json -v
-# $PYTHON $SCRIPT --headless -cf account.json
+$PYTHON $SCRIPT --headless -cf accounts.json -v
+# $PYTHON $SCRIPT --headless -cf accounts.json
 
 #==============================================================================
 # Non-Headless
 #==============================================================================
-# $PYTHON $SCRIPT --no-headless -cf account.json
+# $PYTHON $SCRIPT --no-headless -cf accounts.json
 
 # End time stamp
 echo "$(basename $0) End: $(date)"
