@@ -51,6 +51,11 @@ def init(id, pwd, ua, headless, newsave, user_dir):
     if headless is True:
         chrome_options.add_argument("--headless=new")
     chrome_options.add_argument(f"--user-data-dir={user_dir}")
+    # Anti-detection: prevent sites from detecting Selenium automation,
+    # which can cause session invalidation and forced re-login.
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option("useAutomationExtension", False)
     if ua is not None:
         chrome_options.add_argument(f"--user-agent={ua}")
 
