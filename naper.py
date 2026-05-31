@@ -10,7 +10,6 @@ import re
 import sys
 import time
 from enum import Enum
-from pprint import pformat
 
 import apprise
 from selenium.common.exceptions import (
@@ -24,12 +23,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from tqdm import tqdm
 
-import naver_paper_clien as clien
-import naver_paper_damoang as damoang
-import naver_paper_ppomppu as ppomppu
-import naver_paper_ruliweb as ruliweb
+from driver import init
 from logging_config import init_logger
-from run_new import init
 from scrape import Database, scrape
 
 logger = logging.getLogger(__name__)
@@ -39,7 +34,7 @@ QUICK_REWARD_LINK = (
 )
 
 
-class text_to_change(object):
+class text_to_change:
     """Class checking element text change."""
 
     def __init__(self, locator, text):
@@ -55,43 +50,6 @@ class Status(Enum):
     PASS = "1"
     FAIL = "2"
     UNDETERMINED = "3"
-
-
-def grep_campaign_links():
-    """Function making campaign link list."""
-
-    campaign_links = []
-
-    try:
-        campaign_links += clien.find_naver_campaign_links()
-    except Exception as e:
-        logger.exception("clien.find_naver_campaign_links Failed: %s", type(e).__name__)
-
-    try:
-        campaign_links += damoang.find_naver_campaign_links()
-    except Exception as e:
-        logger.exception(
-            "damoang.find_naver_campaign_links Failed: %s", type(e).__name__
-        )
-
-    try:
-        campaign_links += ppomppu.find_naver_campaign_links()
-    except Exception as e:
-        logger.exception(
-            "ppomppu.find_naver_campaign_links Failed: %s", type(e).__name__
-        )
-
-    try:
-        campaign_links += ruliweb.find_naver_campaign_links()
-    except Exception as e:
-        logger.exception(
-            "ruliweb.find_naver_campaign_links Failed: %s", type(e).__name__
-        )
-
-    campaign_links = list(set(campaign_links))
-    logger.info("Unvisited Campaign Link Count: %d", len(campaign_links))
-
-    return campaign_links
 
 
 def get_balance1(driver):
@@ -131,16 +89,16 @@ def get_balance2(driver):
 
     try:
         driver.get("https://new-m.pay.naver.com/pointshistory/list?category=all")
-        class_name = "PointsManage_point__T67hP"
-        element = driver.find_element(By.CLASS_NAME, class_name)
+        # CSS module class hashes (e.g. PointsManage_point__T67hP) change per
+        # Naver build, so match on the stable prefix instead of the full name.
+        xpath = "//*[contains(@class, 'PointsManage_point__')]"
+        element = driver.find_element(By.XPATH, xpath)
         old_text = element.text
         logger.info("get_balance2: %s", old_text)
 
         try:
-            WebDriverWait(driver, 5).until(
-                text_to_change((By.CLASS_NAME, class_name), old_text)
-            )
-            element = driver.find_element(By.CLASS_NAME, class_name)
+            WebDriverWait(driver, 5).until(text_to_change((By.XPATH, xpath), old_text))
+            element = driver.find_element(By.XPATH, xpath)
         except TimeoutException as e:
             logger.info("No Change in Balance Element: %s", type(e).__name__)
 
@@ -174,16 +132,26 @@ def mask_username(username: str):
     return username[0] + "******" + username[-1]
 
 
+DEBUG_DIR = "debug"
+
+
 def dump_page(driver):
     try:
+        os.makedirs(DEBUG_DIR, exist_ok=True)
         url = driver.current_url
         page = driver.page_source
         filename = url.replace("https://", "")
         filename = filename.replace("/", "_")
         filename = filename.replace("?", "_")
-        with open(filename + ".html", "w", encoding="utf-8") as fd:
+        # Long query strings can push the name past the filesystem limit
+        # (255 bytes); truncate and append a short hash to keep it unique.
+        if len(filename) > 100:
+            digest = hashlib.sha1(url.encode("utf-8")).hexdigest()[:10]
+            filename = filename[:100] + "_" + digest
+        path = os.path.join(DEBUG_DIR, filename)
+        with open(path + ".html", "w", encoding="utf-8") as fd:
             fd.write(page)
-        driver.get_screenshot_as_file(filename + ".png")
+        driver.get_screenshot_as_file(path + ".png")
     except Exception as e:
         logger.exception("%s: %s", driver.current_url, type(e).__name__)
 
@@ -234,7 +202,7 @@ def process_dim(driver, link) -> Status:
 
         return Status.UNDETERMINED
 
-    except NoSuchElementException as e:
+    except NoSuchElementException:
         pass
 
     except Exception as e:
@@ -269,9 +237,9 @@ def process_modal(driver):
             # buttons = driver.find_element(By.CLASS_NAME, "submit-button btn-naver")
             buttons = driver.find_element(By.CLASS_NAME, "buttons")
             buttons.click()
-        except:
+        except NoSuchElementException:
             logger.info("No buttons Found")
-    except:
+    except NoSuchElementException:
         logger.info("No modal Found")
 
 
@@ -350,7 +318,7 @@ def process_call_to_action(driver, link) -> Status:
         logger.info("%s: %s (call_to_action)", link, driver.title)
         return Status.UNDETERMINED
 
-    except NoSuchElementException as e:
+    except NoSuchElementException:
         pass
 
     except Exception as e:
@@ -427,7 +395,11 @@ def quick_reward(driver, progress=None):
         driver.get(QUICK_REWARD_LINK)
         time.sleep(3)
         handle = driver.current_window_handle
-        elements = driver.find_elements(By.CLASS_NAME, "mission_item-mission__wcILO")
+        # CSS module class hashes (e.g. mission_item-mission__wcILO) change per
+        # Naver build, so match on the stable prefix instead of the full name.
+        elements = driver.find_elements(
+            By.XPATH, "//*[contains(@class, 'mission_item-mission__')]"
+        )
         logger.info("Quick Reward Cnt: %d", len(elements))
         for e in elements:
             logger.info("Quick Reward: %s", e.text)
@@ -471,7 +443,7 @@ def quick_reward(driver, progress=None):
     return -1
 
 
-def apprise_notify(title, body, urls: list = []):
+def apprise_notify(title, body, urls: list | None = None):
     """Function sending notification to Apprise URLs."""
 
     if urls:
@@ -484,7 +456,7 @@ def apprise_notify(title, body, urls: list = []):
 def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
     time_start = time.time()
 
-    hash = hashlib.sha256(f"{id}_{pwd}_{ua}".encode("utf-8")).hexdigest()
+    hash = hashlib.sha256(f"{id}_{pwd}_{ua}".encode()).hexdigest()
     user_dir = os.getcwd() + "/user_dir/" + hash
 
     # If user_dir is not present then create it.
@@ -548,8 +520,6 @@ if __name__ == "__main__":
     print("Naper @jungx098 fork of @stateofai")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--id", type=str, required=False, help="naver id")
-    parser.add_argument("-p", "--pw", type=str, required=False, help="naver password")
     parser.add_argument("-c", "--cd", type=str, required=False, help="credential json")
     parser.add_argument(
         "--headless",
@@ -600,15 +570,10 @@ if __name__ == "__main__":
 
     logger.info("안녕 Verbose Level: %d", args.verbose)
 
-    if (
-        args.id is None
-        and args.pw is None
-        and args.cd is None
-        and args.credential_file is None
-    ):
+    if args.cd is None and args.credential_file is None:
         id = os.getenv("USERNAME")
         pw = os.getenv("PASSWORD")
-        if pw is None and pw is None:
+        if id is None or pw is None:
             print("not setting USERNAME / PASSWORD")
             exit()
         cd_obj = [{"id": id, "pw": pw}]
@@ -624,16 +589,8 @@ if __name__ == "__main__":
             print("json generate site https://jsoneditoronline.org/")
             exit()
     elif args.credential_file is not None:
-        file_obj = open(args.credential_file, "r", encoding="utf-8")
-        cd_obj = json.load(file_obj)
-    else:
-        if args.id is None:
-            print("use -i or --id argument")
-            exit()
-        if args.pw is None:
-            print("use -p or --pwd argument")
-            exit()
-        cd_obj = [{"id": args.id, "pw": args.pw}]
+        with open(args.credential_file, encoding="utf-8") as file_obj:
+            cd_obj = json.load(file_obj)
 
     if cd_obj is None:
         logger.warning("No Credential Provided!")
@@ -643,7 +600,7 @@ if __name__ == "__main__":
         sys.stdout.write("\x1b[2K")
         print(f"\rCampaign Link Collection: {len(campaigns)} Links")
 
-        for idx, account in enumerate(cd_obj):
+        for account in cd_obj:
             id = account.get("id")
             pw = account.get("pw")
             ua = account.get("ua")
@@ -656,6 +613,16 @@ if __name__ == "__main__":
                 print("PW not found!")
                 continue
 
-            main(campaigns, id, pw, ua, headless, newsave, urls)
+            try:
+                main(campaigns, id, pw, ua, headless, newsave, urls)
+            except Exception as e:
+                # Isolate per-account failures so one account (e.g. a locked DB
+                # from an overlapping run) does not abort the remaining accounts.
+                logger.exception(
+                    "Account run failed for %s: %s",
+                    mask_username(id),
+                    type(e).__name__,
+                )
+                continue
 
     logger.info("Bye!")

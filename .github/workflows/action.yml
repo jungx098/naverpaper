@@ -7,11 +7,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
       with:
-        python-version: "3.11"
+        python-version: "3.12"
         cache: 'pip' # caching pip dependencies
     - name: Install dependencies
       run: |
@@ -23,11 +23,8 @@ jobs:
         pip install -r requirements.txt
     - name: Run
       run: |
-        mkdir -p ~/.naver
-        echo "[default]" > ~/.naver/credentials
-        echo "username = " $USERNAME >> ~/.naver/credentials
-        echo "password = " $PASSWORD >> ~/.naver/credentials
-        python run_new.py
+        python naper.py --headless -v
       env:
         USERNAME: ${{ secrets.USERNAME }} # secret에 저장된 내용을 불러옴
         PASSWORD: ${{ secrets.PASSWORD }}
+        TRY_LOGIN: ${{ secrets.TRY_LOGIN }}

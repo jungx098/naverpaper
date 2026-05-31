@@ -203,6 +203,36 @@ class ScrapeRuliweb(Scrape):
         return list(set(campaign_links))
 
 
+def normalize_link(link):
+    """Normalize a scraped campaign link.
+
+    Strips junk before the scheme, truncates at embedded CRLF, and unwraps a
+    `redirect_uri` query parameter when present. Returns the cleaned link.
+    """
+
+    # Check link validness
+    if not link.startswith("http"):
+        logger.warning("Invalid Link: %s", link)
+        pos = link.find("http")
+        link = link[pos:]
+
+    if "\r\n" in link:
+        logger.warning("Invalid Link: %s", link)
+        pos = link.find("\r\n")
+        link = link[:pos]
+
+    # Parse link and query params
+    parsed_link = urlsplit(link)
+    query_params = parse_qs(parsed_link.query)
+
+    # Unwrap redirect_uri if present
+    if "redirect_uri" in query_params:
+        logger.warning("redirect_uri Found: %s", link)
+        link = query_params.get("redirect_uri", [None])[0]
+
+    return link
+
+
 def scrape(progress=None):
     scrapes = [ScrapeClien(), ScrapePpompu(), ScrapeDamoang(), ScrapeRuliweb()]
 
@@ -220,34 +250,7 @@ def scrape(progress=None):
             continue
 
         for i, link in enumerate(links):
-
-            # Check link validness
-            if not link.startswith("http"):
-                logger.warning("Invalid Link: %s", link)
-                pos = link.find("http")
-                link = link[pos:]
-                links[i] = link
-
-            if "\r\n" in link:
-                logger.warning("Invalid Link: %s", link)
-                pos = link.find("\r\n")
-                link = link[:pos]
-                links[i] = link
-
-            # Parse link
-            parsed_link = urlsplit(link)
-
-            # Parse query param
-            query_params = parse_qs(parsed_link.query)
-
-            # Check if 'redirect_uri' is in the query parameters
-            if "redirect_uri" in query_params:
-                # Extract 'redirect_uri'
-                logger.warning("redirect_uri Found: %s", link)
-                link = query_params.get("redirect_uri", [None])[0]
-
-                # Update links with redirect_uri
-                links[i] = link
+            links[i] = normalize_link(link)
 
         campaign_links.extend(links)
         logger.info("Done for %s: %d", entry.base_url, len(links))
@@ -260,9 +263,14 @@ def scrape(progress=None):
 
 class Database:
     def __init__(self, filename):
-        # Connect to the database file (or create it if it does not exist)
-        self.conn = sqlite3.connect(filename)
+        # Connect to the database file (or create it if it does not exist).
+        # A generous timeout plus WAL mode lets an overlapping run wait out an
+        # active writer instead of failing immediately with "database is locked".
+        self.conn = sqlite3.connect(filename, timeout=30)
         self.conn.row_factory = sqlite3.Row
+        if filename != ":memory:":
+            self.conn.execute("PRAGMA journal_mode=WAL")
+        self.conn.execute("PRAGMA busy_timeout=30000")
 
         # Create a cursor object to execute SQL commands
         self.cur = self.conn.cursor()

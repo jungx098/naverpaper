@@ -76,9 +76,6 @@ $ pip install -r requirements.txt
 # 환경 변수로 USERNAME, PASSWORD 읽이서 실행
 $ python naper.py
 
-# argument 로 id, pw 입력
-$ python naper.py -i YOUR_ID -p YOUR_PW
-
 # argument 로 멀티 계정 입력
 $ python naper.py -c '[{"id":"ID_1","pw":"PW_1"},{"id":"ID_2","pw":"PW_2"}]'
 

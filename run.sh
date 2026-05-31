@@ -63,6 +63,17 @@ fi
 nc -zw1 google.com 443 || \
    { echo "$(basename $0) No network connection: $(date)"; exit; }
 
+# Prevent overlapping cron runs. A run can take longer than the cron interval
+# (random delay + multiple accounts), so skip if another instance holds the lock.
+LOCKFILE="${TMPDIR:-/tmp}/naper.lock"
+if command -v flock >/dev/null 2>&1; then
+    exec 9>"$LOCKFILE"
+    if ! flock -n 9; then
+        echo "$(basename $0) Already running, skipping: $(date)"
+        exit 0
+    fi
+fi
+
 # Start time stamp
 echo "$(basename $0) Start: $(date)"
 
@@ -86,9 +97,12 @@ for vdir in .venv venv; do
     fi
 done
 
-# Update src.
-git fetch
-git rebase
+# Optionally update src before running. Auto-rebasing a live working tree on
+# every cron run is risky (it can fail on local changes or conflicts), so this
+# is opt-in via NAPER_AUTO_UPDATE=1 and never aborts the run on failure.
+if [ "$NAPER_AUTO_UPDATE" = "1" ]; then
+    git fetch && git rebase || echo "$(basename $0) Auto-update skipped (fetch/rebase failed)"
+fi
 
 # Run main script after random delay seconds.
 sleep $DURATION

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "naverpaper"
+version = "0.1.0"
+description = "Naver Pay benefit campaign automation (Selenium)"
+authors = [{ name = "jungx098" }]
+requires-python = ">=3.12"
+dependencies = [
+    "apprise==1.9.5",
+    "beautifulsoup4==4.12.3",
+    "fake-useragent==2.2.0",
+    "requests==2.32.3",
+    "selenium==4.22.0",
+    "tqdm==4.67.1",
+    "webdriver-manager==4.0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+# Flat module layout (scripts at repo root), not a package.
+[tool.setuptools]
+py-modules = ["naper", "scrape", "driver", "logging_config"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+# E/F: pyflakes + pycodestyle, I: import sorting, B: bugbear, UP: pyupgrade
+select = ["E", "F", "I", "B", "UP"]
+ignore = [
+    "E501",  # line length handled by formatter; existing strings exceed it
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

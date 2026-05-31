@@ -1,5 +1,6 @@
-import argparse
-import json
+#!/usr/bin/env python3
+"""Chrome driver setup and Naver login."""
+
 import logging
 import os
 import time
@@ -9,39 +10,23 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
-import naver_paper_clien as clien
-import naver_paper_damoang as damoang
-import naver_paper_ppomppu as ppomppu
-import naver_paper_ruliweb as ruliweb
-
 logger = logging.getLogger(__name__)
 
 
-def grep_campaign_links():
-    campaign_links = []
-    campaign_links += clien.find_naver_campaign_links()
-    campaign_links += damoang.find_naver_campaign_links()
-    campaign_links += ppomppu.find_naver_campaign_links()
-    campaign_links += ruliweb.find_naver_campaign_links()
-
-    if(campaign_links == []):
-        print("모든 링크를 방문했습니다.")
-        exit()
-
-    return set(campaign_links)
-
-
 def log_messages(driver, level):
-
     error_messages = driver.find_elements(By.CLASS_NAME, "error_message")
     for i, e in enumerate(error_messages):
         if e.text:
-            logger.log(level, "error_messages %d: %s", i, e.text.lstrip().rstrip().replace("\n", " "))
+            logger.log(
+                level, "error_messages %d: %s", i, e.text.strip().replace("\n", " ")
+            )
 
     message_text = driver.find_elements(By.CLASS_NAME, "message_text")
     for i, e in enumerate(message_text):
         if e.text:
-            logger.log(level, "message_text %d: %s", i, e.text.lstrip().rstrip().replace("\n", " "))
+            logger.log(
+                level, "message_text %d: %s", i, e.text.strip().replace("\n", " ")
+            )
 
 
 def init(id, pwd, ua, headless, newsave, user_dir):
@@ -61,8 +46,9 @@ def init(id, pwd, ua, headless, newsave, user_dir):
 
     # 새로운 창 생성
     try:
-        driver = webdriver.Chrome(service=Service(
-            ChromeDriverManager().install()), options=chrome_options)
+        driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager().install()), options=chrome_options
+        )
     except Exception as e:
         # Fall back to driver creation without service object.
         logger.exception("Driver Creation Failed: %s", type(e).__name__)
@@ -96,8 +82,8 @@ def init(id, pwd, ua, headless, newsave, user_dir):
     driver.switch_to.window(new_window_handle)
     driver2 = driver
 
-    username = driver2.find_element(By.NAME, 'id')
-    pw = driver2.find_element(By.NAME, 'pw')
+    username = driver2.find_element(By.NAME, "id")
+    pw = driver2.find_element(By.NAME, "pw")
 
     # GitHub Action을 사용하지 않을 경우, 아래와 같이 변경 해주어야 합니다.
     input_id = id
@@ -139,8 +125,9 @@ def init(id, pwd, ua, headless, newsave, user_dir):
         time.sleep(1)
     except Exception as e:
         # Print warning.
-        logger.error("new save or dontsave 오류 at %s: %s",
-                       driver2.title, type(e).__name__)
+        logger.error(
+            "new save or dontsave 오류 at %s: %s", driver2.title, type(e).__name__
+        )
 
         log_messages(driver2, logging.ERROR)
 
@@ -149,7 +136,7 @@ def init(id, pwd, ua, headless, newsave, user_dir):
         if headless is True:
             driver.get("https://nid.naver.com")
 
-    try_login_limit = os.getenv("TRY_LOGIN", 3)
+    try_login_limit = int(os.getenv("TRY_LOGIN", "3"))
     try_login_count = 1
     while True:
         page_title = driver2.title
@@ -168,92 +155,3 @@ def init(id, pwd, ua, headless, newsave, user_dir):
         try_login_count += 1
 
     return driver2
-
-
-def visit(campaign_links, driver2):
-    for link in campaign_links:
-        print(link)  # for debugging
-        try:
-            # Send a request to the base URL
-            driver2.get(link)
-            result = driver2.switch_to.alert
-            print(result.text)
-            result.accept()
-        except:
-            print("알럿창 없음")
-            time.sleep(3)
-            # pageSource = driver2.page_source
-            # print(pageSource)
-        time.sleep(1)
-
-
-def main(campaign_links, id, pwd, ua, headless, newsave):
-    logger.info("Init Driver for %s", id)
-    driver = init(id, pwd, ua, headless, newsave)
-    visit(campaign_links, driver)
-    driver.quit()
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--id', type=str, required=False, help="naver id")
-    parser.add_argument('-p', '--pw', type=str, required=False, help="naver password")
-    parser.add_argument('-c', '--cd', type=str, required=False, help="credential json")
-    parser.add_argument('--headless', type=bool, required=False,
-                        default=True, action=argparse.BooleanOptionalAction,
-                        help="browser headless mode (default: headless)")
-    parser.add_argument('--newsave', type=bool, required=False,
-                        default=False, action=argparse.BooleanOptionalAction,
-                        help="new save or do not")
-    parser.add_argument('-cf', '--credential-file', type=str, required=False,
-                        help="credential json file")
-    args = parser.parse_args()
-    cd_obj = None
-    headless = args.headless
-    newsave = args.newsave
-    if (args.id is None and
-            args.pw is None and
-            args.cd is None and
-            args.credential_file is None):
-        id = os.getenv("USERNAME")
-        pw = os.getenv("PASSWORD")
-        if(pw is None and pw is None):
-            print('not setting USERNAME / PASSWORD')
-            exit()
-        cd_obj = [{"id": id, "pw": pw}]
-    elif(args.cd is not None):
-        try:
-            cd_obj = json.loads(args.cd)
-        except:
-            print('use -c or --cd argument')
-            print('credential json sample [{"id":"id1","pw":"pw1"},{"id":"id2","pw":"pw2"}]')
-            print('json generate site https://jsoneditoronline.org/')
-            exit()
-    elif args.credential_file is not None:
-        file_obj = open(args.credential_file, "r", encoding="utf-8")
-        cd_obj = json.load(file_obj)
-    else:
-        if args.id is None:
-            print('use -i or --id argument')
-            exit()
-        if args.pw is None:
-            print('use -p or --pwd argument')
-            exit()
-        cd_obj = [{"id": args.id, "pw": args.pw}]
-
-    campaign_links = grep_campaign_links()
-    for idx, account in enumerate(cd_obj):
-        id = account.get("id")
-        pw = account.get("pw")
-        ua = account.get("ua")
-
-        print(f">>> {idx+1}번째 계정")
-
-        if id is None:
-            print("ID not found!")
-            continue
-        if pw is None:
-            print("PW not found!")
-            continue
-
-        main(campaign_links, id, pw, ua, headless, newsave)

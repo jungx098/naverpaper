@@ -97,9 +97,9 @@ if __name__ == "__main__":
 
     logging.critical("Initial Logger List: %d",
                      len(logging.Logger.manager.loggerDict))
-    for i, l in enumerate(logging.Logger.manager.loggerDict.values()):
-        assert isinstance(l, logging.Logger)
-        logging.critical("%d: %s", i, l.name)
+    for i, lg in enumerate(logging.Logger.manager.loggerDict.values()):
+        assert isinstance(lg, logging.Logger)
+        logging.critical("%d: %s", i, lg.name)
 
     logging.critical("Instantiate a logger: %s", __name__)
     logger = logging.getLogger(__name__)
@@ -109,9 +109,9 @@ if __name__ == "__main__":
 
     logger.info("Logger List: %d",
                 len(logging.Logger.manager.loggerDict.values()))
-    for i, l in enumerate(logging.Logger.manager.loggerDict.values()):
-        assert isinstance(l, logging.Logger)
-        logger.info("%d: %s", i, l.name)
+    for i, lg in enumerate(logging.Logger.manager.loggerDict.values()):
+        assert isinstance(lg, logging.Logger)
+        logger.info("%d: %s", i, lg.name)
 
     logger.critical("Initial Root Logger Level: %d",
                     logger.getEffectiveLevel())
