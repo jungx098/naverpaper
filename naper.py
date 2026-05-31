@@ -240,16 +240,12 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--cd", type=str, required=False, help="credential json")
     parser.add_argument(
         "--headless",
-        type=bool,
-        required=False,
         default=True,
         action=argparse.BooleanOptionalAction,
         help="browser headless mode (default: headless)",
     )
     parser.add_argument(
         "--newsave",
-        type=bool,
-        required=False,
         default=False,
         action=argparse.BooleanOptionalAction,
         help="new save or do not",
