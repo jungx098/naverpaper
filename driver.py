@@ -8,12 +8,16 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
 from webdriver_manager.chrome import ChromeDriverManager
 
 logger = logging.getLogger(__name__)
 
+# nid.naver.com page titles that indicate a successful, logged-in session.
+LOGGED_IN_TITLES = ("Naver ID", "네이버ID")
 
-def log_messages(driver, level):
+
+def log_messages(driver: WebDriver, level: int) -> None:
     error_messages = driver.find_elements(By.CLASS_NAME, "error_message")
     for i, e in enumerate(error_messages):
         if e.text:
@@ -29,7 +33,13 @@ def log_messages(driver, level):
             )
 
 
-def init(id, pwd, ua, headless, newsave, user_dir):
+def build_driver(ua: str | None, headless: bool, user_dir: str) -> WebDriver:
+    """Create a Chrome WebDriver bound to the per-account profile.
+
+    Applies anti-detection options and a 30s page-load timeout. Falls back to a
+    driver without an explicit Service object if ChromeDriverManager fails.
+    """
+
     # 크롬 드라이버 옵션 설정
     chrome_options = webdriver.ChromeOptions()
 
@@ -55,81 +65,80 @@ def init(id, pwd, ua, headless, newsave, user_dir):
         driver = webdriver.Chrome(options=chrome_options)
 
     driver.set_page_load_timeout(30)
+    return driver
+
+
+def login(
+    driver: WebDriver,
+    naver_id: str,
+    password: str,
+    newsave: bool,
+    headless: bool,
+) -> WebDriver:
+    """Log in to Naver, reusing an existing session when one is present."""
+
     driver.get("https://nid.naver.com")
 
     # Login page (log-in required) title for nid.naver.com
     #   <title>Naver Sign in</title>
     # ID page (successful logged-in) title for nid.naver.com
     #   <title>Naver ID</title>
-    if driver.title == "Naver ID" or driver.title == "네이버ID":
+    if driver.title in LOGGED_IN_TITLES:
         logger.info("Existing log-in session used")
         return driver
 
-    # 현재 열려 있는 창 가져오기
+    # nid may open the login form in a newly created tab; switch to it if one
+    # exists, otherwise stay on the current tab.
     current_window_handle = driver.current_window_handle
-
-    # 새롭게 생성된 탭의 핸들을 찾습니다
-    # 만일 새로운 탭이 없을경우 기존 탭을 사용합니다.
-    new_window_handle = None
     for handle in driver.window_handles:
         if handle != current_window_handle:
-            new_window_handle = handle
+            driver.switch_to.window(handle)
             break
-        else:
-            new_window_handle = handle
 
-    # 새로운 탭을 driver2로 지정합니다
-    driver.switch_to.window(new_window_handle)
-    driver2 = driver
-
-    username = driver2.find_element(By.NAME, "id")
-    pw = driver2.find_element(By.NAME, "pw")
-
-    # GitHub Action을 사용하지 않을 경우, 아래와 같이 변경 해주어야 합니다.
-    input_id = id
-    input_pw = pwd
+    username = driver.find_element(By.NAME, "id")
+    pw = driver.find_element(By.NAME, "pw")
 
     # ID input 클릭
     print("Input ID")
     username.click()
     # js를 사용해서 붙여넣기 발동 <- 왜 일부러 이러냐면 pypyautogui랑 pyperclip를 사용해서 복붙 기능을 했는데 운영체제때문에 안되서 이렇게 한거다.
-    driver2.execute_script("arguments[0].value = arguments[1]", username, input_id)
+    driver.execute_script("arguments[0].value = arguments[1]", username, naver_id)
     time.sleep(1)
 
     print("Input PW")
     pw.click()
-    driver2.execute_script("arguments[0].value = arguments[1]", pw, input_pw)
+    driver.execute_script("arguments[0].value = arguments[1]", pw, password)
     time.sleep(1)
 
     # Enable Stay Signed in
-    if not driver2.find_element(By.CLASS_NAME, "input_keep").is_selected():
-        driver2.find_element(By.CLASS_NAME, "keep_text").click()
+    if not driver.find_element(By.CLASS_NAME, "input_keep").is_selected():
+        driver.find_element(By.CLASS_NAME, "keep_text").click()
         time.sleep(1)
 
     # Enable IP Security
-    if not driver2.find_element(By.CLASS_NAME, "switch_checkbox").is_selected():
-        driver2.find_element(By.CLASS_NAME, "switch_btn").click()
+    if not driver.find_element(By.CLASS_NAME, "switch_checkbox").is_selected():
+        driver.find_element(By.CLASS_NAME, "switch_btn").click()
         time.sleep(1)
 
     # 입력을 완료하면 로그인 버튼 클릭
-    driver2.find_element(By.CLASS_NAME, "btn_login").click()
+    driver.find_element(By.CLASS_NAME, "btn_login").click()
     time.sleep(1)
 
     # new.save 등록
     # new.dontsave 등록 안함
     try:
         if newsave is True:
-            driver2.find_element(By.ID, "new.save").click()
+            driver.find_element(By.ID, "new.save").click()
         else:
-            driver2.find_element(By.ID, "new.dontsave").click()
+            driver.find_element(By.ID, "new.dontsave").click()
         time.sleep(1)
     except Exception as e:
         # Print warning.
         logger.error(
-            "new save or dontsave 오류 at %s: %s", driver2.title, type(e).__name__
+            "new save or dontsave 오류 at %s: %s", driver.title, type(e).__name__
         )
 
-        log_messages(driver2, logging.ERROR)
+        log_messages(driver, logging.ERROR)
 
         # Fallback to the login page only for headless mode, otherwise stay for
         # the user to resolve any login issues on the current page.
@@ -139,8 +148,8 @@ def init(id, pwd, ua, headless, newsave, user_dir):
     try_login_limit = int(os.getenv("TRY_LOGIN", "3"))
     try_login_count = 1
     while True:
-        page_title = driver2.title
-        if page_title == "Naver ID" or page_title == "네이버ID":
+        page_title = driver.title
+        if page_title in LOGGED_IN_TITLES:
             break
         if try_login_count > try_login_limit:
             exit()
@@ -154,4 +163,18 @@ def init(id, pwd, ua, headless, newsave, user_dir):
             time.sleep(30)
         try_login_count += 1
 
-    return driver2
+    return driver
+
+
+def init(
+    naver_id: str,
+    password: str,
+    ua: str | None,
+    headless: bool,
+    newsave: bool,
+    user_dir: str,
+) -> WebDriver:
+    """Build a Chrome driver and log in to Naver (six-arg entry point)."""
+
+    driver = build_driver(ua, headless, user_dir)
+    return login(driver, naver_id, password, newsave, headless)

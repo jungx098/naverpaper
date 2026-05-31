@@ -32,11 +32,11 @@
 - [x] Replace bare `except:` clauses with specific exception types (`process_modal`)
 - [x] Add `ruff` config (`pyproject.toml`) and resolve all lint findings
 - [x] Add unit tests (`tests/`: `is_campaign_link`, `normalize_link`, `Database`)
-- [x] Rename `id` variable to avoid shadowing Python builtin `id()` (`naper.py` → `naver_id`; `driver.py` still pending with the `init()` split)
-- [ ] Remove misleading `driver2 = driver` alias in `driver.py`
-- [x] Standardize parameter naming (`naper.py` now uses `naver_id`/`password`; `driver.py` pending)
+- [x] Rename `id` variable to avoid shadowing Python builtin `id()` (`naper.py` and `driver.py` → `naver_id`)
+- [x] Remove misleading `driver2 = driver` alias in `driver.py` (`init()` split into `build_driver()` + `login()`)
+- [x] Standardize parameter naming (`naper.py` and `driver.py` now use `naver_id`/`password`)
 - [x] Enable `ruff` `N` (pep8-naming); rename `text_to_change` → `TextToChange`; `Status` uses `enum.auto()`
-- [ ] Add type hints to function signatures (partial: pure functions in `naper`/`balance`/`scrape` done; driver-handling functions pending)
+- [ ] Add type hints to function signatures (done: pure functions in `naper`/`balance`/`scrape` and all of `driver.py`; remaining: selenium-driven handlers in `page_actions.py`)
 
 ## Security
 
