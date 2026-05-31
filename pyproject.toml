@@ -26,7 +26,7 @@ dev = [
 
 # Flat module layout (scripts at repo root), not a package.
 [tool.setuptools]
-py-modules = ["naper", "scrape", "driver", "logging_config"]
+py-modules = ["naper", "scrape", "driver", "logging_config", "page_actions", "balance"]
 
 [tool.ruff]
 target-version = "py312"
