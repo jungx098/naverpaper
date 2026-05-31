@@ -243,7 +243,7 @@ def process_modal(driver):
         logger.info("No modal Found")
 
 
-def process_popup_link(driver) -> Status:
+def process_popup_link(driver, link=None) -> Status:
     """
     Function processing popup link elements.
 
@@ -272,7 +272,7 @@ def process_popup_link(driver) -> Status:
     return Status.PASS
 
 
-def process_confirm(driver) -> Status:
+def process_confirm(driver, link=None) -> Status:
     """
     Function processing popup link elements.
 
@@ -327,6 +327,35 @@ def process_call_to_action(driver, link) -> Status:
     return Status.FAIL
 
 
+# Ordered handler chains. Each handler returns a Status; the first non-FAIL
+# result wins and the rest are skipped (see run_handlers).
+VISIT_HANDLERS = (
+    process_alert,
+    process_dim,
+    process_quickreward_link,
+    process_call_to_action,
+    process_popup_link,
+    process_confirm,
+)
+
+QUICK_REWARD_HANDLERS = (
+    process_alert,
+    process_dim,
+    process_call_to_action,
+)
+
+
+def run_handlers(driver, link, handlers) -> Status:
+    """Run handlers in order, stopping at the first non-FAIL result."""
+
+    status = Status.FAIL
+    for handler in handlers:
+        status = handler(driver, link)
+        if status is not Status.FAIL:
+            break
+    return status
+
+
 def visit(account, campaign_links, driver2, db):
     """Function visiting campaign links."""
 
@@ -353,25 +382,7 @@ def visit(account, campaign_links, driver2, db):
         # Reset retry.
         retry = 0
 
-        status = Status.FAIL
-
-        if status is Status.FAIL:
-            status = process_alert(driver2, link)
-
-        if status is Status.FAIL:
-            status = process_dim(driver2, link)
-
-        if status is Status.FAIL:
-            status = process_quickreward_link(driver2, link)
-
-        if status is Status.FAIL:
-            status = process_call_to_action(driver2, link)
-
-        if status is Status.FAIL:
-            status = process_popup_link(driver2)
-
-        if status is Status.FAIL:
-            status = process_confirm(driver2)
+        status = run_handlers(driver2, link, VISIT_HANDLERS)
 
         if status is Status.FAIL:
             process_error(driver2, link)
@@ -415,16 +426,7 @@ def quick_reward(driver, progress=None):
                 if window != handle:
                     driver.switch_to.window(window)
 
-            status = Status.FAIL
-
-            if status is Status.FAIL:
-                status = process_alert(driver, None)
-
-            if status is Status.FAIL:
-                status = process_dim(driver, None)
-
-            if status is Status.FAIL:
-                status = process_call_to_action(driver, None)
+            status = run_handlers(driver, None, QUICK_REWARD_HANDLERS)
 
             if status is Status.FAIL:
                 process_error(driver, None)
