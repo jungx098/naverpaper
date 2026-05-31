@@ -15,11 +15,25 @@ logger = logging.getLogger(__name__)
 
 
 class Scrape:
+    """Base scraper: discovers Naver campaign links from a community board.
+
+    Subclasses only declare board-specific config:
+
+    - ``base_url``: board listing page to fetch.
+    - ``list_selector``: ``(tag, class)`` of the row elements holding post links.
+    - ``link_source``: ``"href"`` reads the campaign link from the anchor's
+      ``href``; ``"text"`` reads it from the anchor's visible text.
+    - ``link_base``: base URL used to resolve relative post links; defaults to
+      ``base_url`` when not set.
+    """
+
+    base_url = ""
+    list_selector: tuple[str, str] = ("span", "list_subject")
+    link_source = "href"
+    link_base: str | None = None
+
     def __init__(self):
         self.headers = {"User-Agent": f"{UserAgent(platforms='pc').random}"}
-
-    def find_naver_campaign_links(self, progress=None):
-        return []
 
     def is_campaign_link(self, link):
         """Check if the link is a valid campaign link."""
@@ -32,39 +46,35 @@ class Scrape:
 
         return False
 
+    def _extract_campaign_link(self, a_tag):
+        if self.link_source == "text":
+            return a_tag.get_text().strip()
+        return a_tag["href"]
 
-class ScrapeClien(Scrape):
-    def __init__(self):
-        super().__init__()
-        self.base_url = "https://www.clien.net/service/board/jirum"
+    def _get_soup(self, url):
+        response = requests.get(url, headers=self.headers, timeout=7)
+        return BeautifulSoup(response.text, "html.parser")
 
     def find_naver_campaign_links(self, progress=None):
-        # Send a request to the base URL
-        response = requests.get(self.base_url, headers=self.headers, timeout=7)
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = self._get_soup(self.base_url)
 
-        # Find all span elements with class 'list_subject' and get 'a' tags
-        list_subject_links = soup.find_all("span", class_="list_subject")
+        tag, class_name = self.list_selector
+        rows = soup.find_all(tag, class_=class_name)
 
         naver_links = []
-        for span in list_subject_links:
-            a_tag = span.find("a", href=True)
+        for row in rows:
+            a_tag = row.find("a", href=True)
             if a_tag and "네이버" in a_tag.text:
                 naver_links.append(a_tag["href"])
 
-        # Initialize a list to store campaign links
+        link_base = self.link_base or self.base_url
+
         campaign_links = []
-
-        # Check each Naver link
         for link in naver_links:
-            full_link = urljoin(self.base_url, link)
+            inner_soup = self._get_soup(urljoin(link_base, link))
 
-            res = requests.get(full_link, headers=self.headers, timeout=7)
-            inner_soup = BeautifulSoup(res.text, "html.parser")
-
-            # Find all links that start with the campaign URL
             for a_tag in inner_soup.find_all("a", href=True):
-                campaign_link = a_tag["href"]
+                campaign_link = self._extract_campaign_link(a_tag)
 
                 if self.is_campaign_link(campaign_link):
                     campaign_links.append(campaign_link)
@@ -73,134 +83,28 @@ class ScrapeClien(Scrape):
                         progress()
 
         return list(set(campaign_links))
+
+
+class ScrapeClien(Scrape):
+    base_url = "https://www.clien.net/service/board/jirum"
+    list_selector = ("span", "list_subject")
 
 
 class ScrapePpompu(Scrape):
-    def __init__(self):
-        super().__init__()
-        self.base_url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=coupon"
-
-    def find_naver_campaign_links(self, progress=None):
-        page_url = "https://www.ppomppu.co.kr/zboard/zboard.php?"
-
-        response = requests.get(self.base_url, headers=self.headers, timeout=7)
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        list_subject_links = soup.find_all("td", class_="baseList-space")
-
-        naver_links = []
-        for span in list_subject_links:
-            a_tag = span.find("a", href=True)
-
-            if a_tag and "네이버" in a_tag.text:
-                naver_links.append(a_tag["href"])
-
-        # Initialize a list to store campaign links
-        campaign_links = []
-
-        # Check each naver_links
-        for link in naver_links:
-            full_link = urljoin(page_url, link)
-
-            res = requests.get(full_link, headers=self.headers, timeout=7)
-            inner_soup = BeautifulSoup(res.text, "html.parser")
-
-            campaign_a_tags = inner_soup.find_all("a", href=True)
-
-            for a_tag in campaign_a_tags:
-                campaign_link = a_tag.get_text().strip()
-
-                if self.is_campaign_link(campaign_link):
-                    campaign_links.append(campaign_link)
-
-                    if progress:
-                        progress()
-
-        return list(set(campaign_links))
+    base_url = "https://www.ppomppu.co.kr/zboard/zboard.php?id=coupon"
+    list_selector = ("td", "baseList-space")
+    link_source = "text"
+    link_base = "https://www.ppomppu.co.kr/zboard/zboard.php?"
 
 
 class ScrapeDamoang(Scrape):
-    def __init__(self):
-        super().__init__()
-        self.base_url = "https://damoang.net/economy"
-
-    def find_naver_campaign_links(self, progress=None):
-        # Send a request to the base URL
-        response = requests.get(self.base_url, headers=self.headers, timeout=7)
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        # Find all span elements with class 'list_subject' and get 'a' tags
-        list_subject_links = soup.find_all("li", class_="list-group-item")
-
-        naver_links = []
-        for span in list_subject_links:
-            a_tag = span.find("a", href=True)
-            if a_tag and "네이버" in a_tag.text:
-                naver_links.append(a_tag["href"])
-
-        # Initialize a list to store campaign links
-        campaign_links = []
-
-        # Check each Naver link
-        for link in naver_links:
-            full_link = urljoin(self.base_url, link)
-
-            res = requests.get(full_link, headers=self.headers, timeout=7)
-            inner_soup = BeautifulSoup(res.text, "html.parser")
-
-            # Find all links that start with the campaign URL
-            for a_tag in inner_soup.find_all("a", href=True):
-                campaign_link = a_tag["href"]
-
-                if self.is_campaign_link(campaign_link):
-                    campaign_links.append(campaign_link)
-
-                    if progress:
-                        progress()
-
-        return list(set(campaign_links))
+    base_url = "https://damoang.net/economy"
+    list_selector = ("li", "list-group-item")
 
 
 class ScrapeRuliweb(Scrape):
-    def __init__(self):
-        super().__init__()
-        self.base_url = "https://bbs.ruliweb.com/market/board/1020"
-
-    def find_naver_campaign_links(self, progress=None):
-        # Send a request to the base URL
-        response = requests.get(self.base_url, headers=self.headers, timeout=7)
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        # Find all span elements with class 'list_subject' and get 'a' tags
-        list_subject_links = soup.find_all("td", class_="subject")
-
-        naver_links = []
-        for span in list_subject_links:
-            a_tag = span.find("a", href=True)
-            if a_tag and "네이버" in a_tag.text:
-                naver_links.append(a_tag["href"])
-
-        # Initialize a list to store campaign links
-        campaign_links = []
-
-        # Check each Naver link
-        for link in naver_links:
-            full_link = link
-
-            res = requests.get(full_link, headers=self.headers, timeout=7)
-            inner_soup = BeautifulSoup(res.text, "html.parser")
-
-            # Find all links that start with the campaign URL
-            for a_tag in inner_soup.find_all("a", href=True):
-                campaign_link = a_tag["href"]
-
-                if self.is_campaign_link(campaign_link):
-                    campaign_links.append(campaign_link)
-
-                    if progress:
-                        progress()
-
-        return list(set(campaign_links))
+    base_url = "https://bbs.ruliweb.com/market/board/1020"
+    list_selector = ("td", "subject")
 
 
 def normalize_link(link):
