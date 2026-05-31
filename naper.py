@@ -8,11 +8,13 @@ import os
 import random
 import sys
 import time
+from collections.abc import Callable
 
 import apprise
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
 from tqdm import tqdm
 
 from balance import get_balance
@@ -54,7 +56,9 @@ def mask_username(username: str) -> str:
     return username[0] + "******" + username[-1]
 
 
-def visit(account, campaign_links, driver2, db):
+def visit(
+    account: str, campaign_links: list[str], driver2: WebDriver, db: Database
+) -> None:
     """Function visiting campaign links."""
 
     idx = 0
@@ -97,7 +101,7 @@ def visit(account, campaign_links, driver2, db):
     pbar.close()
 
 
-def quick_reward(driver, progress=None):
+def quick_reward(driver: WebDriver, progress: Callable | None = None) -> int:
     logger.info("Process Quick Reward")
 
     try:
@@ -143,7 +147,7 @@ def quick_reward(driver, progress=None):
     return -1
 
 
-def apprise_notify(title, body, urls: list | None = None):
+def apprise_notify(title: str, body: str, urls: list | None = None) -> None:
     """Function sending notification to Apprise URLs."""
 
     if urls:
@@ -153,7 +157,15 @@ def apprise_notify(title, body, urls: list | None = None):
         apobj.notify(body=body, title=title)
 
 
-def main(campaigns, naver_id, password, ua, headless, newsave, apprise_urls):
+def main(
+    campaigns: list[str],
+    naver_id: str,
+    password: str,
+    ua: str | None,
+    headless: bool,
+    newsave: bool,
+    apprise_urls: list | None,
+) -> None:
     time_start = time.time()
 
     account_hash = hashlib.sha256(

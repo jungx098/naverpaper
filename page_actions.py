@@ -12,6 +12,7 @@ import hashlib
 import logging
 import os
 import time
+from collections.abc import Callable, Iterable
 from enum import Enum, auto
 
 from selenium.common.exceptions import (
@@ -19,6 +20,7 @@ from selenium.common.exceptions import (
     NoSuchElementException,
 )
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
 
 logger = logging.getLogger(__name__)
 
@@ -32,11 +34,11 @@ DEBUG_DIR = "debug"
 class TextToChange:
     """Expected condition: an element's text differs from a known value."""
 
-    def __init__(self, locator, text):
+    def __init__(self, locator: tuple[str, str], text: str):
         self.locator = locator
         self.text = text
 
-    def __call__(self, driver):
+    def __call__(self, driver: WebDriver) -> bool:
         actual_text = driver.find_element(*self.locator).text
         return actual_text != self.text
 
@@ -47,11 +49,11 @@ class Status(Enum):
     UNDETERMINED = auto()
 
 
-def resolve_link(handler):
+def resolve_link(handler: Callable) -> Callable:
     """Decorator defaulting a missing ``link`` arg to the driver's current URL."""
 
     @functools.wraps(handler)
-    def wrapper(driver, link=None):
+    def wrapper(driver: WebDriver, link: str | None = None):
         if link is None:
             link = driver.current_url
         return handler(driver, link)
@@ -59,7 +61,7 @@ def resolve_link(handler):
     return wrapper
 
 
-def dump_page(driver):
+def dump_page(driver: WebDriver) -> None:
     try:
         os.makedirs(DEBUG_DIR, exist_ok=True)
         url = driver.current_url
@@ -81,7 +83,7 @@ def dump_page(driver):
 
 
 @resolve_link
-def process_error(driver, link):
+def process_error(driver: WebDriver, link: str) -> None:
     dump_page(driver)
     logger.error("Link: %s", link)
     logger.error("Current URL: %s", driver.current_url)
@@ -89,7 +91,7 @@ def process_error(driver, link):
 
 
 @resolve_link
-def process_alert(driver, link) -> Status:
+def process_alert(driver: WebDriver, link: str) -> Status:
     try:
         result = driver.switch_to.alert
         logger.info("%s: %s", link, result.text)
@@ -109,7 +111,7 @@ def process_alert(driver, link) -> Status:
 
 
 @resolve_link
-def process_dim(driver, link) -> Status:
+def process_dim(driver: WebDriver, link: str) -> Status:
     try:
         text = driver.find_element(By.CLASS_NAME, "dim").text
         text = text.replace("\n", " ")
@@ -130,7 +132,7 @@ def process_dim(driver, link) -> Status:
 
 
 @resolve_link
-def process_quickreward_link(driver, link) -> Status:
+def process_quickreward_link(driver: WebDriver, link: str) -> Status:
     try:
         if driver.current_url == QUICK_REWARD_LINK:
             text = "Quick Reward Ignored"
@@ -143,7 +145,7 @@ def process_quickreward_link(driver, link) -> Status:
     return Status.FAIL
 
 
-def process_modal(driver):
+def process_modal(driver: WebDriver) -> None:
     try:
         modal = driver.find_element(By.CLASS_NAME, "modal")
         logger.info("modal: %s", modal.text.replace("\n", " "))
@@ -159,7 +161,7 @@ def process_modal(driver):
         logger.info("No modal Found")
 
 
-def process_popup_link(driver, link=None) -> Status:
+def process_popup_link(driver: WebDriver, link: str | None = None) -> Status:
     """
     Function processing popup link elements.
 
@@ -188,7 +190,7 @@ def process_popup_link(driver, link=None) -> Status:
     return Status.PASS
 
 
-def process_confirm(driver, link=None) -> Status:
+def process_confirm(driver: WebDriver, link: str | None = None) -> Status:
     """
     Function processing popup link elements.
 
@@ -216,7 +218,7 @@ def process_confirm(driver, link=None) -> Status:
 
 
 @resolve_link
-def process_call_to_action(driver, link) -> Status:
+def process_call_to_action(driver: WebDriver, link: str) -> Status:
     try:
         # Wait for the page update.
         time.sleep(3)
@@ -259,7 +261,11 @@ QUICK_REWARD_HANDLERS = (
 )
 
 
-def run_handlers(driver, link, handlers) -> Status:
+def run_handlers(
+    driver: WebDriver,
+    link: str | None,
+    handlers: Iterable[Callable[..., Status]],
+) -> Status:
     """Run handlers in order, stopping at the first non-FAIL result."""
 
     status = Status.FAIL

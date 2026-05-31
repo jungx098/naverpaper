@@ -36,7 +36,7 @@
 - [x] Remove misleading `driver2 = driver` alias in `driver.py` (`init()` split into `build_driver()` + `login()`)
 - [x] Standardize parameter naming (`naper.py` and `driver.py` now use `naver_id`/`password`)
 - [x] Enable `ruff` `N` (pep8-naming); rename `text_to_change` → `TextToChange`; `Status` uses `enum.auto()`
-- [ ] Add type hints to function signatures (done: pure functions in `naper`/`balance`/`scrape` and all of `driver.py`; remaining: selenium-driven handlers in `page_actions.py`)
+- [x] Add type hints to function signatures (`naper`, `balance`, `scrape`, `driver`, `page_actions` — including `WebDriver`-typed handlers)
 
 ## Security
 

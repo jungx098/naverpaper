@@ -6,6 +6,7 @@ import re
 
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 
 from page_actions import TextToChange
@@ -28,7 +29,7 @@ BALANCE_SOURCES = (
 )
 
 
-def read_balance(driver, url: str, xpath: str) -> int:
+def read_balance(driver: WebDriver, url: str, xpath: str) -> int:
     """Read a Naver balance from a single page/element, or -1 on failure."""
 
     balance = -1
@@ -57,7 +58,7 @@ def read_balance(driver, url: str, xpath: str) -> int:
     return balance
 
 
-def get_balance(driver) -> int:
+def get_balance(driver: WebDriver) -> int:
     """Return the first balance readable from BALANCE_SOURCES, else -1."""
 
     balance = -1
