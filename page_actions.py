@@ -7,6 +7,7 @@ and report a :class:`Status`, plus shared helpers (``Status``,
 the orchestration code in ``naper.py``.
 """
 
+import functools
 import hashlib
 import logging
 import os
@@ -46,6 +47,18 @@ class Status(Enum):
     UNDETERMINED = "3"
 
 
+def resolve_link(handler):
+    """Decorator defaulting a missing ``link`` arg to the driver's current URL."""
+
+    @functools.wraps(handler)
+    def wrapper(driver, link=None):
+        if link is None:
+            link = driver.current_url
+        return handler(driver, link)
+
+    return wrapper
+
+
 def dump_page(driver):
     try:
         os.makedirs(DEBUG_DIR, exist_ok=True)
@@ -67,20 +80,16 @@ def dump_page(driver):
         logger.exception("%s: %s", driver.current_url, type(e).__name__)
 
 
+@resolve_link
 def process_error(driver, link):
-    if link is None:
-        link = driver.current_url
-
     dump_page(driver)
     logger.error("Link: %s", link)
     logger.error("Current URL: %s", driver.current_url)
     logger.error("Title: %s", driver.title)
 
 
+@resolve_link
 def process_alert(driver, link) -> Status:
-    if link is None:
-        link = driver.current_url
-
     try:
         result = driver.switch_to.alert
         logger.info("%s: %s", link, result.text)
@@ -99,10 +108,8 @@ def process_alert(driver, link) -> Status:
     return Status.FAIL
 
 
+@resolve_link
 def process_dim(driver, link) -> Status:
-    if link is None:
-        link = driver.current_url
-
     try:
         text = driver.find_element(By.CLASS_NAME, "dim").text
         text = text.replace("\n", " ")
@@ -122,10 +129,8 @@ def process_dim(driver, link) -> Status:
     return Status.FAIL
 
 
+@resolve_link
 def process_quickreward_link(driver, link) -> Status:
-    if link is None:
-        link = driver.current_url
-
     try:
         if driver.current_url == QUICK_REWARD_LINK:
             text = "Quick Reward Ignored"
@@ -210,10 +215,8 @@ def process_confirm(driver, link=None) -> Status:
     return Status.PASS
 
 
+@resolve_link
 def process_call_to_action(driver, link) -> Status:
-    if link is None:
-        link = driver.current_url
-
     try:
         # Wait for the page update.
         time.sleep(3)
