@@ -44,7 +44,7 @@
 - [x] Remove `verify=False` SSL bypass (resolved by removing `main.py`)
 - [x] Stop writing secrets to disk in GitHub Actions workflow (`~/.naver/credentials`)
 - [x] Ensure `accounts.json` / `account.json` cannot be accidentally committed (`.gitignore`)
-- [ ] Strengthen `mask_username()` (first/last char still leaks for short IDs)
+- [x] Strengthen `mask_username()` — short IDs now fully/partially masked; fixed-width hides length (`tests/test_mask.py`)
 
 ## CI / GitHub Actions
 

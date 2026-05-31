@@ -32,8 +32,25 @@ logger = logging.getLogger(__name__)
 
 
 def mask_username(username: str) -> str:
-    """Function masking username."""
+    """Mask a username for logging, revealing as little as possible.
 
+    A fixed-width mask hides the true length. Short usernames are masked more
+    aggressively because revealing both ends would leak most of the value:
+
+    - length 0       -> ""
+    - length 1-2     -> fully masked (no characters revealed)
+    - length 3-4     -> only the first character revealed
+    - length 5+      -> first and last character revealed
+    """
+
+    if not username:
+        return ""
+
+    length = len(username)
+    if length <= 2:
+        return "******"
+    if length <= 4:
+        return username[0] + "******"
     return username[0] + "******" + username[-1]
 
 
