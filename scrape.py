@@ -35,7 +35,7 @@ class Scrape:
     def __init__(self):
         self.headers = {"User-Agent": f"{UserAgent(platforms='pc').random}"}
 
-    def is_campaign_link(self, link):
+    def is_campaign_link(self, link: str) -> bool:
         """Check if the link is a valid campaign link."""
         if (
             "campaign2-api.naver.com" in link
@@ -107,7 +107,7 @@ class ScrapeRuliweb(Scrape):
     list_selector = ("td", "subject")
 
 
-def normalize_link(link):
+def normalize_link(link: str) -> str:
     """Normalize a scraped campaign link.
 
     Strips junk before the scheme, truncates at embedded CRLF, and unwraps a
@@ -137,7 +137,7 @@ def normalize_link(link):
     return link
 
 
-def scrape(progress=None):
+def scrape(progress=None) -> list[str]:
     scrapes = [ScrapeClien(), ScrapePpompu(), ScrapeDamoang(), ScrapeRuliweb()]
 
     campaign_links = []

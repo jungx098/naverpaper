@@ -31,7 +31,7 @@ from scrape import Database, scrape
 logger = logging.getLogger(__name__)
 
 
-def mask_username(username: str):
+def mask_username(username: str) -> str:
     """Function masking username."""
 
     return username[0] + "******" + username[-1]
@@ -136,11 +136,13 @@ def apprise_notify(title, body, urls: list | None = None):
         apobj.notify(body=body, title=title)
 
 
-def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
+def main(campaigns, naver_id, password, ua, headless, newsave, apprise_urls):
     time_start = time.time()
 
-    hash = hashlib.sha256(f"{id}_{pwd}_{ua}".encode()).hexdigest()
-    user_dir = os.getcwd() + "/user_dir/" + hash
+    account_hash = hashlib.sha256(
+        f"{naver_id}_{password}_{ua}".encode()
+    ).hexdigest()
+    user_dir = os.getcwd() + "/user_dir/" + account_hash
 
     # If user_dir is not present then create it.
     if not os.path.exists(user_dir):
@@ -150,21 +152,24 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
     db.update(campaigns)
     campaigns = db.get_campaigns(days=-3, newvisitonly=True)
 
-    driver = init(id, pwd, ua, headless, newsave, user_dir)
-    print(f"{mask_username(id)}: Start Balance: ", end="")
+    driver = init(naver_id, password, ua, headless, newsave, user_dir)
+    print(f"{mask_username(naver_id)}: Start Balance: ", end="")
     start_balance = get_balance(driver)
     print(f"{start_balance}")
 
     # Quick Reward
     quick_reward_cnt = 0
-    print(f"{mask_username(id)}: Quick Reward", end="", flush=True)
+    print(f"{mask_username(naver_id)}: Quick Reward", end="", flush=True)
     quick_reward_cnt = quick_reward(driver, lambda: [print(".", end="", flush=True)])
     sys.stdout.write("\x1b[2K")
-    print(f"\r{mask_username(id)}: Quick Reward: {quick_reward_cnt} Done", flush=True)
+    print(
+        f"\r{mask_username(naver_id)}: Quick Reward: {quick_reward_cnt} Done",
+        flush=True,
+    )
 
     # Campaign visit
     if len(campaigns) > 0:
-        visit(id, campaigns, driver, db)
+        visit(naver_id, campaigns, driver, db)
 
     # Test code for balance check
     end_balance = get_balance(driver)
@@ -178,7 +183,7 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
     logger.info("Duration: %.3f secs", duration)
 
     print(
-        f"{mask_username(id)}: Summary {{ "
+        f"{mask_username(naver_id)}: Summary {{ "
         f"Balance: {end_balance:,}, "
         f"Gain: {gain:,}, "
         f"Time: {duration:.3f} secs }}"
@@ -188,7 +193,7 @@ def main(campaigns, id, pwd, ua, headless, newsave, apprise_urls):
 
     if apprise_urls and gain != 0:
         apprise_notify(
-            f"Naper {mask_username(id)}",
+            f"Naper {mask_username(naver_id)}",
             f"- Quick Reward Count: {quick_reward_cnt}\n"
             f"- Link Count: {len(campaigns)}\n"
             f"- Gain: {(end_balance - start_balance):,} "
@@ -254,12 +259,12 @@ if __name__ == "__main__":
     logger.info("안녕 Verbose Level: %d", args.verbose)
 
     if args.cd is None and args.credential_file is None:
-        id = os.getenv("USERNAME")
-        pw = os.getenv("PASSWORD")
-        if id is None or pw is None:
+        naver_id = os.getenv("USERNAME")
+        password = os.getenv("PASSWORD")
+        if naver_id is None or password is None:
             print("not setting USERNAME / PASSWORD")
             exit()
-        cd_obj = [{"id": id, "pw": pw}]
+        cd_obj = [{"id": naver_id, "pw": password}]
     elif args.cd is not None:
         try:
             cd_obj = json.loads(args.cd)
@@ -284,26 +289,26 @@ if __name__ == "__main__":
         print(f"\rCampaign Link Collection: {len(campaigns)} Links")
 
         for account in cd_obj:
-            id = account.get("id")
-            pw = account.get("pw")
+            naver_id = account.get("id")
+            password = account.get("pw")
             ua = account.get("ua")
             urls = account.get("apprise")
 
-            if id is None:
+            if naver_id is None:
                 print("ID not found!")
                 continue
-            if pw is None:
+            if password is None:
                 print("PW not found!")
                 continue
 
             try:
-                main(campaigns, id, pw, ua, headless, newsave, urls)
+                main(campaigns, naver_id, password, ua, headless, newsave, urls)
             except Exception as e:
                 # Isolate per-account failures so one account (e.g. a locked DB
                 # from an overlapping run) does not abort the remaining accounts.
                 logger.exception(
                     "Account run failed for %s: %s",
-                    mask_username(id),
+                    mask_username(naver_id),
                     type(e).__name__,
                 )
                 continue

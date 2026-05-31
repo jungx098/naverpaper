@@ -32,10 +32,11 @@
 - [x] Replace bare `except:` clauses with specific exception types (`process_modal`)
 - [x] Add `ruff` config (`pyproject.toml`) and resolve all lint findings
 - [x] Add unit tests (`tests/`: `is_campaign_link`, `normalize_link`, `Database`)
-- [ ] Rename `id` variable to avoid shadowing Python builtin `id()`
+- [x] Rename `id` variable to avoid shadowing Python builtin `id()` (`naper.py` → `naver_id`; `driver.py` still pending with the `init()` split)
 - [ ] Remove misleading `driver2 = driver` alias in `driver.py`
-- [ ] Standardize parameter naming (`id`/`pw` vs `id`/`pwd`)
-- [ ] Add type hints to function signatures
+- [x] Standardize parameter naming (`naper.py` now uses `naver_id`/`password`; `driver.py` pending)
+- [x] Enable `ruff` `N` (pep8-naming); rename `text_to_change` → `TextToChange`; `Status` uses `enum.auto()`
+- [ ] Add type hints to function signatures (partial: pure functions in `naper`/`balance`/`scrape` done; driver-handling functions pending)
 
 ## Security
 
@@ -51,7 +52,7 @@
 - [x] Fix CI entry point — now runs `naper.py`
 - [x] Use environment variables directly instead of writing a credentials file
 - [x] Align CI Python version to 3.12
-- [ ] Add a CI lint/test step (`ruff check .` + `pytest`)
+- [x] Add a CI lint/test step (`ruff check .` + `pytest`) — `.github/workflows/ci.yml`
 
 ## Operational
 

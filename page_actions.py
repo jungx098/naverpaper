@@ -12,7 +12,7 @@ import hashlib
 import logging
 import os
 import time
-from enum import Enum
+from enum import Enum, auto
 
 from selenium.common.exceptions import (
     NoAlertPresentException,
@@ -29,8 +29,8 @@ QUICK_REWARD_LINK = (
 DEBUG_DIR = "debug"
 
 
-class text_to_change:
-    """Class checking element text change."""
+class TextToChange:
+    """Expected condition: an element's text differs from a known value."""
 
     def __init__(self, locator, text):
         self.locator = locator
@@ -42,9 +42,9 @@ class text_to_change:
 
 
 class Status(Enum):
-    PASS = "1"
-    FAIL = "2"
-    UNDETERMINED = "3"
+    PASS = auto()
+    FAIL = auto()
+    UNDETERMINED = auto()
 
 
 def resolve_link(handler):

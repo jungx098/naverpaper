@@ -8,7 +8,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
-from page_actions import text_to_change
+from page_actions import TextToChange
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ BALANCE_SOURCES = (
 )
 
 
-def read_balance(driver, url, xpath):
+def read_balance(driver, url: str, xpath: str) -> int:
     """Read a Naver balance from a single page/element, or -1 on failure."""
 
     balance = -1
@@ -41,7 +41,7 @@ def read_balance(driver, url, xpath):
         logger.info("read_balance: %s", old_text)
 
         try:
-            WebDriverWait(driver, 5).until(text_to_change((By.XPATH, xpath), old_text))
+            WebDriverWait(driver, 5).until(TextToChange((By.XPATH, xpath), old_text))
             element = driver.find_element(By.XPATH, xpath)
         except TimeoutException as e:
             logger.info("No Change in Balance Element: %s", type(e).__name__)
@@ -57,7 +57,7 @@ def read_balance(driver, url, xpath):
     return balance
 
 
-def get_balance(driver):
+def get_balance(driver) -> int:
     """Return the first balance readable from BALANCE_SOURCES, else -1."""
 
     balance = -1
