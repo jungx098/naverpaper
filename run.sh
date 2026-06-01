@@ -32,21 +32,59 @@ elif [ "$(expr substr $(uname -s) 1  9)" = "CYGWIN_NT"  ]; then
     # Clear TZ for datetime of Windows Python in Cygwin environment
     unset TZ
 
-    # HOMEPATH is required for the python os module, and LOCALAPPDATA is needed
-    # for the Python executable path. These variables might be missing when
+    # HOMEPATH is required for the python os module. It might be missing when
     # this script is executed by cron.
-    for var in HOMEPATH LOCALAPPDATA; do
-        if [ -z "${!var}" ]; then
-            echo "$var Not Defined"
+    if [ -z "${HOMEPATH:-}" ]; then
+        echo "HOMEPATH Not Defined"
+        exit 1
+    fi
+
+    # Fallback interpreter, used only when the activation block below finds no
+    # in-tree venv. Honor an already-active venv first, otherwise the
+    # LOCALAPPDATA system Python.
+    if [ -n "${VIRTUAL_ENV:-}" ]; then
+        if [ -x "$VIRTUAL_ENV/Scripts/python.exe" ]; then
+            PYTHON="$VIRTUAL_ENV/Scripts/python.exe"
+        elif [ -x "$VIRTUAL_ENV/bin/python" ]; then
+            PYTHON="$VIRTUAL_ENV/bin/python"
+        fi
+    fi
+
+    if [ -z "$PYTHON" ]; then
+        # LOCALAPPDATA is needed to locate a system-wide Python install. It
+        # might be missing when this script is executed by cron.
+        if [ -z "${LOCALAPPDATA:-}" ]; then
+            echo "LOCALAPPDATA Not Defined"
             exit 1
         fi
-    done
-
-    PYTHON=$LOCALAPPDATA/Programs/Python/Python312/python
+        PYTHON=$LOCALAPPDATA/Programs/Python/Python312/python
+    fi
 else
     PYTHON=python
 fi
 
+# Resolve the script directory and switch into it. Needed for venv activation
+# below, and so naper.py and any git auto-update run from the repo root.
+SCRIPT_PATH=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+cd "$SCRIPT_PATH"
+
+# Activate an in-tree venv if present (all platforms). This is the single
+# source of truth for in-tree venv preference: it overrides the platform
+# fallback PYTHON set above and prepends the venv to PATH so any python
+# subprocess naper.py spawns (e.g. webdriver-manager) uses it too.
+for vdir in .venv venv; do
+    if [ -f "$SCRIPT_PATH/$vdir/bin/activate" ]; then
+        . "$SCRIPT_PATH/$vdir/bin/activate"
+        PYTHON=python
+        break
+    elif [ -f "$SCRIPT_PATH/$vdir/Scripts/activate" ]; then
+        . "$SCRIPT_PATH/$vdir/Scripts/activate"
+        PYTHON=python
+        break
+    fi
+done
+
+# Validate the resolved interpreter (after any activation above).
 if ! (command -v $PYTHON &> /dev/null); then
     echo "Command not found: $PYTHON"
     exit 1
@@ -77,26 +115,6 @@ fi
 # Start time stamp
 echo "$(basename $0) Start: $(date)"
 
-# Obtain current working directory and script directory
-OLD_PATH=$(pwd)
-SCRIPT_PATH=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-
-# Change to script directory
-cd $SCRIPT_PATH
-
-# Activate venv if available; override PYTHON with venv python
-for vdir in .venv venv; do
-    if [ -f "$SCRIPT_PATH/$vdir/bin/activate" ]; then
-        . "$SCRIPT_PATH/$vdir/bin/activate"
-        PYTHON=python
-        break
-    elif [ -f "$SCRIPT_PATH/$vdir/Scripts/activate" ]; then
-        . "$SCRIPT_PATH/$vdir/Scripts/activate"
-        PYTHON=python
-        break
-    fi
-done
-
 # Optionally update src before running. Auto-rebasing a live working tree on
 # every cron run is risky (it can fail on local changes or conflicts), so this
 # is opt-in via NAPER_AUTO_UPDATE=1 and never aborts the run on failure.
@@ -116,7 +134,7 @@ $PYTHON $SCRIPT --headless -cf accounts.json -v
 #==============================================================================
 # Non-Headless
 #==============================================================================
-# $PYTHON $SCRIPT --no-headless -cf accounts.json
+# $PYTHON $SCRIPT --no-headless -cf accounts.json -v
 
 # End time stamp
 echo "$(basename $0) End: $(date)"
