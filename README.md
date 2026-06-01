@@ -30,6 +30,12 @@
 Tested for Python 3.12.
 
 ### Install Google Chrome
+
+> Note: This project uses `webdriver-manager`, which downloads a matching
+> ChromeDriver automatically at runtime. You only need Google Chrome installed —
+> the manual ChromeDriver steps below are optional (e.g. for pinning a version
+> or running offline).
+
 ```bash
 $ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 $ sudo apt-get update
@@ -82,9 +88,52 @@ $ python naper.py -c '[{"id":"ID_1","pw":"PW_1"},{"id":"ID_2","pw":"PW_2"}]'
 # 브라우저 표시 --no-headless
 $ python naper.py -c '[{"id":"ID_1","pw":"PW_1"}]' --no-headless
 
-# Using account.json
-$ python naper.py -cf account.json
+# Using accounts.json
+$ python naper.py -cf accounts.json
 ```
+
+### Credential file format
+
+`accounts.json` is a list of account objects:
+
+```json
+[
+  {
+    "id": "naver_id",
+    "pw": "naver_password",
+    "ua": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Mobile Safari/537.36",
+    "apprise": ["tgram://bottoken/chatid"]
+  }
+]
+```
+
+- `id`, `pw` — required.
+- `ua` — optional user agent. A mobile UA (Android/iPhone) automatically enables
+  Chrome mobile emulation so the fingerprint stays internally consistent.
+- `apprise` — optional list of [Apprise](https://github.com/caronc/apprise)
+  notification URLs.
+
+> Never commit `accounts.json` (or `account.json`) — it is git-ignored.
+
+### Persistent login (avoid re-login / captcha)
+
+Scripted ID/PW login can trip Naver's auto-input-prevention captcha. The robust
+approach is to seed a persistent session **once, by hand**, into the per-account
+Chrome profile that `naper.py` reuses:
+
+```bash
+$ python seed_login.py -cf accounts.json
+```
+
+Log in manually and keep "stay signed in" checked. Later `naper.py` runs detect
+the existing session and skip the login form entirely. See
+[TROUBLESHOOTING.md](TROUBLESHOOTING.md#naver-login-re-login-every-run--captcha)
+for the full background.
+
+## Troubleshooting
+
+Known issues and their fixes are documented in
+[TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## References
 * https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/120.0.6099.109/win64/chromedriver-win64.zip
