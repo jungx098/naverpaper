@@ -157,6 +157,27 @@ def apprise_notify(title: str, body: str, urls: list | None = None) -> None:
         apobj.notify(body=body, title=title)
 
 
+def user_dir_for(naver_id: str, password: str, ua: str | None) -> str:
+    """Return the per-account Chrome profile directory, creating it if missing.
+
+    The path is keyed by a hash of id+pw+ua so each account/UA gets an isolated
+    profile. Both a normal run and the profile-seeding tool (seed_login.py)
+    must use this helper so a manually seeded login session maps to the exact
+    profile a normal run reuses.
+    """
+
+    account_hash = hashlib.sha256(
+        f"{naver_id}_{password}_{ua}".encode()
+    ).hexdigest()
+    user_dir = os.getcwd() + "/user_dir/" + account_hash
+
+    # If user_dir is not present then create it.
+    if not os.path.exists(user_dir):
+        os.makedirs(user_dir)
+
+    return user_dir
+
+
 def main(
     campaigns: list[str],
     naver_id: str,
@@ -168,57 +189,56 @@ def main(
 ) -> None:
     time_start = time.time()
 
-    account_hash = hashlib.sha256(
-        f"{naver_id}_{password}_{ua}".encode()
-    ).hexdigest()
-    user_dir = os.getcwd() + "/user_dir/" + account_hash
-
-    # If user_dir is not present then create it.
-    if not os.path.exists(user_dir):
-        os.makedirs(user_dir)
+    user_dir = user_dir_for(naver_id, password, ua)
 
     db = Database(user_dir + "/campaign.db")
     db.update(campaigns)
     campaigns = db.get_campaigns(days=-3, newvisitonly=True)
 
     driver = init(naver_id, password, ua, headless, newsave, user_dir)
-    print(f"{mask_username(naver_id)}: Start Balance: ", end="")
-    start_balance = get_balance(driver)
-    print(f"{start_balance}")
+    try:
+        print(f"{mask_username(naver_id)}: Start Balance: ", end="")
+        start_balance = get_balance(driver)
+        print(f"{start_balance}")
 
-    # Quick Reward
-    quick_reward_cnt = 0
-    print(f"{mask_username(naver_id)}: Quick Reward", end="", flush=True)
-    quick_reward_cnt = quick_reward(driver, lambda: [print(".", end="", flush=True)])
-    sys.stdout.write("\x1b[2K")
-    print(
-        f"\r{mask_username(naver_id)}: Quick Reward: {quick_reward_cnt} Done",
-        flush=True,
-    )
+        # Quick Reward
+        quick_reward_cnt = 0
+        print(f"{mask_username(naver_id)}: Quick Reward", end="", flush=True)
+        quick_reward_cnt = quick_reward(driver, lambda: [print(".", end="", flush=True)])
+        sys.stdout.write("\x1b[2K")
+        print(
+            f"\r{mask_username(naver_id)}: Quick Reward: {quick_reward_cnt} Done",
+            flush=True,
+        )
 
-    # Campaign visit
-    if len(campaigns) > 0:
-        visit(naver_id, campaigns, driver, db)
+        # Campaign visit
+        if len(campaigns) > 0:
+            visit(naver_id, campaigns, driver, db)
 
-    # Test code for balance check
-    end_balance = get_balance(driver)
-    logger.info("End Balance: %d Gain: %d", end_balance, end_balance - start_balance)
+        # Test code for balance check
+        end_balance = get_balance(driver)
+        logger.info(
+            "End Balance: %d Gain: %d", end_balance, end_balance - start_balance
+        )
 
-    gain = end_balance - start_balance
+        gain = end_balance - start_balance
 
-    time_end = time.time()
+        time_end = time.time()
 
-    duration = time_end - time_start
-    logger.info("Duration: %.3f secs", duration)
+        duration = time_end - time_start
+        logger.info("Duration: %.3f secs", duration)
 
-    print(
-        f"{mask_username(naver_id)}: Summary {{ "
-        f"Balance: {end_balance:,}, "
-        f"Gain: {gain:,}, "
-        f"Time: {duration:.3f} secs }}"
-    )
-
-    driver.quit()
+        print(
+            f"{mask_username(naver_id)}: Summary {{ "
+            f"Balance: {end_balance:,}, "
+            f"Gain: {gain:,}, "
+            f"Time: {duration:.3f} secs }}"
+        )
+    finally:
+        # Always close cleanly so Chrome flushes the persistent login cookie
+        # (NID_AUT) to the profile. Skipping quit() on a mid-run error left the
+        # session unsaved, which made "stay signed in" appear broken next run.
+        driver.quit()
 
     if apprise_urls and gain != 0:
         apprise_notify(

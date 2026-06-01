@@ -3,6 +3,7 @@
 
 import logging
 import os
+import re
 import time
 
 from selenium import webdriver
@@ -15,6 +16,24 @@ logger = logging.getLogger(__name__)
 
 # nid.naver.com page titles that indicate a successful, logged-in session.
 LOGGED_IN_TITLES = ("Naver ID", "네이버ID")
+
+# A user agent is treated as mobile when it matches this pattern. Supplying a
+# mobile UA opts the account into Chrome's mobile emulation (see build_driver).
+_MOBILE_UA_RE = re.compile(r"Mobile|Android|iPhone|iPad|iPod", re.IGNORECASE)
+
+# Generic phone viewport used for mobile emulation when a mobile UA is set.
+_MOBILE_DEVICE_METRICS = {
+    "width": 412,
+    "height": 915,
+    "pixelRatio": 3.0,
+    "touch": True,
+}
+
+
+def is_mobile_ua(ua: str | None) -> bool:
+    """Return True when the user agent string looks like a mobile browser."""
+
+    return ua is not None and bool(_MOBILE_UA_RE.search(ua))
 
 
 def log_messages(driver: WebDriver, level: int) -> None:
@@ -51,7 +70,19 @@ def build_driver(ua: str | None, headless: bool, user_dir: str) -> WebDriver:
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
-    if ua is not None:
+    if is_mobile_ua(ua):
+        # Opt-in mobile mode: a bare --user-agent override leaves the rest of
+        # the fingerprint (navigator.platform, touch support, viewport,
+        # window.chrome) looking like desktop, which contradicts a mobile UA
+        # and trips Naver's bot/captcha checks. Chrome's mobile emulation sets
+        # the UA together with a mobile viewport and touch so the identity is
+        # internally consistent.
+        logger.info("Mobile user agent detected; enabling mobile emulation")
+        chrome_options.add_experimental_option(
+            "mobileEmulation",
+            {"deviceMetrics": _MOBILE_DEVICE_METRICS, "userAgent": ua},
+        )
+    elif ua is not None:
         chrome_options.add_argument(f"--user-agent={ua}")
 
     # 새로운 창 생성
@@ -98,25 +129,40 @@ def login(
     username = driver.find_element(By.NAME, "id")
     pw = driver.find_element(By.NAME, "pw")
 
+    # Set the value via JS (clipboard paste is unreliable across OSes), then
+    # dispatch input/change events so Naver's client-side validation registers
+    # the value. Without these events the form may submit empty or Naver may
+    # decline to issue a persistent (stay-signed-in) session cookie.
+    set_value = (
+        "arguments[0].value = arguments[1];"
+        "arguments[0].dispatchEvent(new Event('input', {bubbles: true}));"
+        "arguments[0].dispatchEvent(new Event('change', {bubbles: true}));"
+    )
+
     # ID input 클릭
     print("Input ID")
     username.click()
-    # js를 사용해서 붙여넣기 발동 <- 왜 일부러 이러냐면 pypyautogui랑 pyperclip를 사용해서 복붙 기능을 했는데 운영체제때문에 안되서 이렇게 한거다.
-    driver.execute_script("arguments[0].value = arguments[1]", username, naver_id)
+    driver.execute_script(set_value, username, naver_id)
     time.sleep(1)
 
     print("Input PW")
     pw.click()
-    driver.execute_script("arguments[0].value = arguments[1]", pw, password)
+    driver.execute_script(set_value, pw, password)
     time.sleep(1)
 
-    # Enable Stay Signed in
+    # Enable Stay Signed in (keep-login) so NID_AUT is issued as a persistent
+    # cookie that survives a browser restart. NOTE: this option exists only on
+    # the ID/PW login form; Naver's QR login has no "stay signed in" toggle and
+    # always yields a session-scoped NID_AUT, so a QR login cannot persist
+    # across runs.
     if not driver.find_element(By.CLASS_NAME, "input_keep").is_selected():
         driver.find_element(By.CLASS_NAME, "keep_text").click()
         time.sleep(1)
 
-    # Enable IP Security
-    if not driver.find_element(By.CLASS_NAME, "switch_checkbox").is_selected():
+    # Disable IP security: it binds the session to the current IP, so a
+    # changing IP forces re-login and undermines "stay signed in". Toggle it
+    # off when it is currently enabled.
+    if driver.find_element(By.CLASS_NAME, "switch_checkbox").is_selected():
         driver.find_element(By.CLASS_NAME, "switch_btn").click()
         time.sleep(1)
 
@@ -152,7 +198,12 @@ def login(
         if page_title in LOGGED_IN_TITLES:
             break
         if try_login_count > try_login_limit:
-            exit()
+            # Raise instead of exit() so the caller can close the driver
+            # cleanly (flushing cookies) and continue with other accounts.
+            raise RuntimeError(
+                f"Login failed after {try_login_limit} attempts "
+                f"(last page title: {page_title!r})"
+            )
         print(f"로그인 되지 않음 #{try_login_count}")
         print(f"페이지 타이틀 : {page_title}")
 
@@ -162,6 +213,22 @@ def login(
             # Additional time for the user to address any login issues.
             time.sleep(30)
         try_login_count += 1
+
+    # Diagnose whether "stay signed in" actually took effect. NID_AUT is the
+    # auth token; with keep-login enabled it must be persistent (have an
+    # expiry) to survive a browser restart. A missing or session-scoped
+    # NID_AUT means the next run will prompt for credentials again.
+    nid_auth = driver.get_cookie("NID_AUT")
+    if nid_auth is None:
+        logger.warning("NID_AUT cookie absent after login; session will not persist")
+    elif not nid_auth.get("expiry"):
+        logger.warning(
+            "NID_AUT is session-scoped (no expiry); 'stay signed in' did not apply "
+            "- re-login expected next run. QR login cannot persist (no keep-login "
+            "option); use the ID/PW form to get a persistent session."
+        )
+    else:
+        logger.info("NID_AUT persistent (keep-login active)")
 
     return driver
 
