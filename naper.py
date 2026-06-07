@@ -5,7 +5,6 @@ import hashlib
 import json
 import logging
 import os
-import random
 import sys
 import time
 from collections.abc import Callable
@@ -17,7 +16,6 @@ from selenium.common.exceptions import (
     UnexpectedAlertPresentException,
     WebDriverException,
 )
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from tqdm import tqdm
@@ -26,12 +24,19 @@ from balance import get_balance
 from driver import init, session_alive
 from logging_config import init_logger
 from page_actions import (
-    QUICK_REWARD_HANDLERS,
     QUICK_REWARD_LINK,
     VISIT_HANDLERS,
     Status,
     process_error,
     run_handlers,
+    run_quick_reward_handlers,
+    safe_click,
+)
+from timings import (
+    MAX_VISIT_RETRIES,
+    QUICK_REWARD_LOAD,
+    dwell_after_handler,
+    dwell_after_nav,
 )
 from scrape import Database, scrape
 
@@ -67,6 +72,19 @@ def _abort_on_dead_session(driver: WebDriver, context: str) -> None:
         raise InvalidSessionIdException("browser session ended")
 
 
+def _switch_to_new_tab(driver: WebDriver, main_handle: str) -> None:
+    for window in driver.window_handles:
+        if window != main_handle:
+            driver.switch_to.window(window)
+            return
+
+
+def _close_extra_tab(driver: WebDriver, main_handle: str) -> None:
+    if driver.current_window_handle != main_handle:
+        driver.close()
+        driver.switch_to.window(main_handle)
+
+
 def visit(
     account: str, campaign_links: list[str], driver2: WebDriver, db: Database
 ) -> None:
@@ -88,12 +106,12 @@ def visit(
             raise
         except WebDriverException as e:
             logger.exception("%s (retry: %d): %s", link, retry, type(e).__name__)
-            if retry < 3:
+            if retry < MAX_VISIT_RETRIES:
                 retry += 1
                 continue
             raise
 
-        time.sleep(random.uniform(1, 3))
+        time.sleep(dwell_after_nav())
 
         # Reset retry.
         retry = 0
@@ -109,7 +127,7 @@ def visit(
                 retry,
                 type(e).__name__,
             )
-            if retry < 3:
+            if retry < MAX_VISIT_RETRIES:
                 retry += 1
                 continue
             raise
@@ -120,7 +138,7 @@ def visit(
 
         # The transition time to the target page can be up to 2 seconds without
         # alert, and 3 seconds may be required to stay.
-        time.sleep(random.uniform(6, 10))
+        time.sleep(dwell_after_handler())
 
         if status is Status.PASS:
             db.stamp_campaign(campaign_links[idx])
@@ -138,7 +156,7 @@ def quick_reward(driver: WebDriver, progress: Callable | None = None) -> int:
 
     try:
         driver.get(QUICK_REWARD_LINK)
-        time.sleep(3)
+        time.sleep(QUICK_REWARD_LOAD)
         handle = driver.current_window_handle
         # CSS module class hashes (e.g. mission_item-mission__wcILO) change per
         # Naver build, so match on the stable prefix instead of the full name.
@@ -158,26 +176,21 @@ def quick_reward(driver: WebDriver, progress: Callable | None = None) -> int:
             if progress:
                 progress()
 
-            # Click element using Java Script.
-            ActionChains(driver).move_to_element(e).pause(0.8).click().perform()
+            if not safe_click(driver, e):
+                logger.info("Quick Reward: click failed at index %d", i)
+                continue
 
-            # Switch to new handle if new tab is opened.
-            multi_window = driver.window_handles
-            for window in multi_window:
-                if window != handle:
-                    driver.switch_to.window(window)
+            _switch_to_new_tab(driver, handle)
 
-            status = run_handlers(driver, None, QUICK_REWARD_HANDLERS)
+            status = run_quick_reward_handlers(driver)
 
             if status is Status.FAIL:
                 process_error(driver, None, quiet=True)
                 _abort_on_dead_session(driver, "quick reward")
 
-            time.sleep(random.uniform(6, 10))
+            time.sleep(dwell_after_handler())
 
-            if handle != driver.current_window_handle:
-                driver.close()
-                driver.switch_to.window(handle)
+            _close_extra_tab(driver, handle)
 
         return mission_count
 
