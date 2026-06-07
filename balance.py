@@ -51,8 +51,12 @@ def read_balance(driver: WebDriver, url: str, xpath: str) -> int:
 
         balance = int(re.sub(r"[^0-9]", "", element.text))
     except Exception as e:
+        try:
+            current_url = driver.current_url
+        except Exception:
+            current_url = "<unknown>"
         logger.exception(
-            "Balance Not Available: %s (%s)", type(e).__name__, driver.current_url
+            "Balance Not Available: %s (%s)", type(e).__name__, current_url
         )
 
     return balance

@@ -11,14 +11,19 @@ import time
 from collections.abc import Callable
 
 import apprise
-from selenium.common.exceptions import UnexpectedAlertPresentException
+from selenium.common.exceptions import (
+    InvalidSessionIdException,
+    StaleElementReferenceException,
+    UnexpectedAlertPresentException,
+    WebDriverException,
+)
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from tqdm import tqdm
 
 from balance import get_balance
-from driver import init
+from driver import init, session_alive
 from logging_config import init_logger
 from page_actions import (
     QUICK_REWARD_HANDLERS,
@@ -56,6 +61,12 @@ def mask_username(username: str) -> str:
     return username[0] + "******" + username[-1]
 
 
+def _abort_on_dead_session(driver: WebDriver, context: str) -> None:
+    if not session_alive(driver):
+        logger.error("Browser session ended during %s", context)
+        raise InvalidSessionIdException("browser session ended")
+
+
 def visit(
     account: str, campaign_links: list[str], driver2: WebDriver, db: Database
 ) -> None:
@@ -73,21 +84,39 @@ def visit(
             driver2.get(link)
         except UnexpectedAlertPresentException:
             pass
-        except Exception as e:
+        except InvalidSessionIdException:
+            raise
+        except WebDriverException as e:
             logger.exception("%s (retry: %d): %s", link, retry, type(e).__name__)
             if retry < 3:
                 retry += 1
                 continue
+            raise
 
         time.sleep(random.uniform(1, 3))
 
         # Reset retry.
         retry = 0
 
-        status = run_handlers(driver2, link, VISIT_HANDLERS)
+        try:
+            status = run_handlers(driver2, link, VISIT_HANDLERS)
+        except InvalidSessionIdException:
+            raise
+        except WebDriverException as e:
+            logger.exception(
+                "Visit handler failed for %s (retry: %d): %s",
+                link,
+                retry,
+                type(e).__name__,
+            )
+            if retry < 3:
+                retry += 1
+                continue
+            raise
 
         if status is Status.FAIL:
             process_error(driver2, link)
+            _abort_on_dead_session(driver2, f"visit {idx}/{len(campaign_links)}")
 
         # The transition time to the target page can be up to 2 seconds without
         # alert, and 3 seconds may be required to stay.
@@ -101,6 +130,9 @@ def visit(
     pbar.close()
 
 
+MISSION_XPATH = "//*[contains(@class, 'mission_item-mission__')]"
+
+
 def quick_reward(driver: WebDriver, progress: Callable | None = None) -> int:
     logger.info("Process Quick Reward")
 
@@ -110,12 +142,19 @@ def quick_reward(driver: WebDriver, progress: Callable | None = None) -> int:
         handle = driver.current_window_handle
         # CSS module class hashes (e.g. mission_item-mission__wcILO) change per
         # Naver build, so match on the stable prefix instead of the full name.
-        elements = driver.find_elements(
-            By.XPATH, "//*[contains(@class, 'mission_item-mission__')]"
-        )
-        logger.info("Quick Reward Cnt: %d", len(elements))
-        for e in elements:
-            logger.info("Quick Reward: %s", e.text)
+        mission_count = len(driver.find_elements(By.XPATH, MISSION_XPATH))
+        logger.info("Quick Reward Cnt: %d", mission_count)
+        for i in range(mission_count):
+            elements = driver.find_elements(By.XPATH, MISSION_XPATH)
+            if i >= len(elements):
+                break
+            e = elements[i]
+            try:
+                label = e.text
+            except StaleElementReferenceException:
+                logger.info("Quick Reward: stale element at index %d, skipping", i)
+                continue
+            logger.info("Quick Reward: %s", label)
             if progress:
                 progress()
 
@@ -131,7 +170,8 @@ def quick_reward(driver: WebDriver, progress: Callable | None = None) -> int:
             status = run_handlers(driver, None, QUICK_REWARD_HANDLERS)
 
             if status is Status.FAIL:
-                process_error(driver, None)
+                process_error(driver, None, quiet=True)
+                _abort_on_dead_session(driver, "quick reward")
 
             time.sleep(random.uniform(6, 10))
 
@@ -139,8 +179,10 @@ def quick_reward(driver: WebDriver, progress: Callable | None = None) -> int:
                 driver.close()
                 driver.switch_to.window(handle)
 
-        return len(elements)
+        return mission_count
 
+    except InvalidSessionIdException:
+        raise
     except Exception as e:
         logger.exception("Quick Reward Failed: %s", type(e).__name__)
 

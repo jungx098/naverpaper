@@ -16,6 +16,7 @@ from collections.abc import Callable, Iterable
 from enum import Enum, auto
 
 from selenium.common.exceptions import (
+    InvalidSessionIdException,
     NoAlertPresentException,
     NoSuchElementException,
 )
@@ -29,6 +30,17 @@ QUICK_REWARD_LINK = (
 )
 
 DEBUG_DIR = "debug"
+ELEMENT_WAIT = 5
+
+# Npay Point / Pay home pages opened by Quick Reward missions. These use
+# ButtonBox CTAs, not Adison .call_to_action elements.
+_MISSION_DETAIL_MORE = 'button[data-nlog-click="mssdetail.more"]'
+_MISSION_GREEN_BTN = 'button[class*="ButtonBox-module_color-npayGreen"]'
+_EXPECTED_QUICK_REWARD_URL_PARTS = (
+    "point.pay.naver.com",
+    "pay.naver.com/home",
+    "new-m.pay.naver.com",
+)
 
 
 class TextToChange:
@@ -61,10 +73,68 @@ def resolve_link(handler: Callable) -> Callable:
     return wrapper
 
 
+def _is_expected_quick_reward_url(url: str) -> bool:
+    return any(part in url for part in _EXPECTED_QUICK_REWARD_URL_PARTS)
+
+
+def _wait_for_selector(
+    driver: WebDriver, selector: str, wait: float = ELEMENT_WAIT
+) -> list:
+    """Poll for a CSS selector within a wall-clock budget."""
+
+    deadline = time.monotonic() + wait
+    while time.monotonic() < deadline:
+        try:
+            elements = driver.find_elements(By.CSS_SELECTOR, selector)
+            if elements:
+                return elements
+        except InvalidSessionIdException:
+            raise
+        except Exception:
+            pass
+        time.sleep(0.25)
+    return []
+
+
+def _safe_click(driver: WebDriver, element) -> bool:
+    """Click via JS first; native click is a fallback.
+
+    Native ``WebElement.click()`` can block for a long time on overlays and
+    stamp-campaign popups when Chrome is busy.
+    """
+
+    try:
+        driver.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});"
+            "arguments[0].click();",
+            element,
+        )
+        return True
+    except InvalidSessionIdException:
+        raise
+    except Exception as e:
+        logger.info("JS click failed: %s", type(e).__name__)
+
+    try:
+        element.click()
+        return True
+    except InvalidSessionIdException:
+        raise
+    except Exception as e:
+        logger.info("native click failed: %s", type(e).__name__)
+
+    return False
+
+
 def dump_page(driver: WebDriver) -> None:
     try:
-        os.makedirs(DEBUG_DIR, exist_ok=True)
         url = driver.current_url
+    except Exception as e:
+        logger.warning("dump_page: could not read URL: %s", type(e).__name__)
+        return
+
+    try:
+        os.makedirs(DEBUG_DIR, exist_ok=True)
         page = driver.page_source
         filename = url.replace("https://", "")
         filename = filename.replace("/", "_")
@@ -79,15 +149,34 @@ def dump_page(driver: WebDriver) -> None:
             fd.write(page)
         driver.get_screenshot_as_file(path + ".png")
     except Exception as e:
-        logger.exception("%s: %s", driver.current_url, type(e).__name__)
+        logger.exception("%s: %s", url, type(e).__name__)
 
 
-@resolve_link
-def process_error(driver: WebDriver, link: str) -> None:
+def process_error(
+    driver: WebDriver, link: str | None = None, *, quiet: bool = False
+) -> None:
+    if link is None:
+        try:
+            link = driver.current_url
+        except Exception:
+            link = ""
+
+    try:
+        url = driver.current_url
+    except Exception:
+        url = link or ""
+
+    if quiet or _is_expected_quick_reward_url(url):
+        logger.info("Quick reward page (no dump): %s", url or link)
+        return
+
     dump_page(driver)
     logger.error("Link: %s", link)
-    logger.error("Current URL: %s", driver.current_url)
-    logger.error("Title: %s", driver.title)
+    try:
+        logger.error("Current URL: %s", driver.current_url)
+        logger.error("Title: %s", driver.title)
+    except Exception as e:
+        logger.error("Could not read page state: %s", type(e).__name__)
 
 
 @resolve_link
@@ -176,9 +265,10 @@ def process_popup_link(driver: WebDriver, link: str | None = None) -> Status:
         logger.info("popup_link: %s", modal.text.replace("\n", " "))
 
         try:
-
             buttons = driver.find_element(By.CLASS_NAME, "popup_link")
-            buttons.click()
+            if not _safe_click(driver, buttons):
+                logger.info("popup_link click failed")
+                return Status.FAIL
             time.sleep(5)
         except Exception as e:
             logger.info("No buttons Found: %s", type(e).__name__)
@@ -188,6 +278,29 @@ def process_popup_link(driver: WebDriver, link: str | None = None) -> Status:
         return Status.FAIL
 
     return Status.PASS
+
+
+def _click_link_text(driver: WebDriver, text: str, wait: float = ELEMENT_WAIT) -> bool:
+    """Click the first matching link within a wall-clock budget.
+
+    Uses find_elements polling instead of WebDriverWait so a hung Chrome tab
+    cannot stack many full command-timeout round trips behind one wait.
+    """
+
+    deadline = time.monotonic() + wait
+    while time.monotonic() < deadline:
+        try:
+            elements = driver.find_elements(By.LINK_TEXT, text)
+            if elements:
+                if _safe_click(driver, elements[0]):
+                    time.sleep(5)
+                    return True
+        except InvalidSessionIdException:
+            raise
+        except Exception:
+            pass
+        time.sleep(0.25)
+    return False
 
 
 def process_confirm(driver: WebDriver, link: str | None = None) -> Status:
@@ -208,12 +321,83 @@ def process_confirm(driver: WebDriver, link: str | None = None) -> Status:
     </div>
     """
     try:
-        driver.find_element(By.LINK_TEXT, "확인").click()
-        time.sleep(5)
+        if not _click_link_text(driver, "확인"):
+            logger.info("No Link Found: Timeout")
+            return Status.FAIL
+    except InvalidSessionIdException as e:
+        logger.info("No Link Found: %s", type(e).__name__)
+        raise
     except Exception as e:
         logger.info("No Link Found: %s", type(e).__name__)
         return Status.FAIL
 
+    return Status.PASS
+
+
+@resolve_link
+def process_point_quickreward_main(driver: WebDriver, link: str) -> Status:
+    try:
+        url = driver.current_url
+    except Exception as e:
+        logger.info("quickreward main: %s", type(e).__name__)
+        return Status.FAIL
+
+    if "point.pay.naver.com/main" not in url or "quickreward" not in url:
+        return Status.FAIL
+
+    logger.info("%s: quick reward list page", link)
+    return Status.PASS
+
+
+@resolve_link
+def process_mission_detail(driver: WebDriver, link: str) -> Status:
+    try:
+        url = driver.current_url
+    except Exception as e:
+        logger.info("mission_detail: %s", type(e).__name__)
+        return Status.FAIL
+
+    if "mission-detail" not in url:
+        return Status.FAIL
+
+    time.sleep(1)
+
+    more_buttons = _wait_for_selector(driver, _MISSION_DETAIL_MORE, wait=2)
+    if more_buttons and _safe_click(driver, more_buttons[0]):
+        logger.info("mission_detail click: 더 알아보기")
+        time.sleep(2)
+        return Status.UNDETERMINED
+
+    for button in _wait_for_selector(driver, _MISSION_GREEN_BTN, wait=2)[:3]:
+        try:
+            label = button.text.strip() or "ButtonBox"
+        except Exception:
+            label = "ButtonBox"
+        if _safe_click(driver, button):
+            logger.info("mission_detail click: %s", label)
+            time.sleep(2)
+            return Status.UNDETERMINED
+
+    logger.info("%s: mission detail loaded (no CTA click)", link)
+    return Status.PASS
+
+
+@resolve_link
+def process_pay_home_reward(driver: WebDriver, link: str) -> Status:
+    try:
+        url = driver.current_url
+    except Exception as e:
+        logger.info("pay_home_reward: %s", type(e).__name__)
+        return Status.FAIL
+
+    if "pay.naver.com/home" not in url:
+        return Status.FAIL
+
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight / 2);")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)
+    logger.info("%s: pay home scroll reward", link)
     return Status.PASS
 
 
@@ -224,7 +408,8 @@ def process_call_to_action(driver: WebDriver, link: str) -> Status:
         time.sleep(3)
         element = driver.find_element(By.CLASS_NAME, "call_to_action")
         logger.info("Click %s", element.text)
-        element.click()
+        if not _safe_click(driver, element):
+            return Status.FAIL
 
         # TODO: Process 알림받기
         time.sleep(1)
@@ -257,6 +442,9 @@ VISIT_HANDLERS = (
 QUICK_REWARD_HANDLERS = (
     process_alert,
     process_dim,
+    process_point_quickreward_main,
+    process_mission_detail,
+    process_pay_home_reward,
     process_call_to_action,
 )
 

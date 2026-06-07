@@ -7,10 +7,17 @@ import re
 import time
 
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.remote_connection import RemoteConnection
 from selenium.webdriver.remote.webdriver import WebDriver
 from webdriver_manager.chrome import ChromeDriverManager
+
+# Cap each chromedriver HTTP round-trip so a hung Chrome tab cannot block
+# indefinitely (default socket timeout is effectively unlimited).
+DRIVER_COMMAND_TIMEOUT = int(os.getenv("DRIVER_COMMAND_TIMEOUT", "30"))
+PAGE_LOAD_TIMEOUT = int(os.getenv("PAGE_LOAD_TIMEOUT", "30"))
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +35,16 @@ _MOBILE_DEVICE_METRICS = {
     "pixelRatio": 3.0,
     "touch": True,
 }
+
+
+def session_alive(driver: WebDriver) -> bool:
+    """Return False when the chromedriver session is gone."""
+
+    try:
+        _ = driver.window_handles
+        return True
+    except WebDriverException:
+        return False
 
 
 def is_mobile_ua(ua: str | None) -> bool:
@@ -95,7 +112,10 @@ def build_driver(ua: str | None, headless: bool, user_dir: str) -> WebDriver:
         logger.exception("Driver Creation Failed: %s", type(e).__name__)
         driver = webdriver.Chrome(options=chrome_options)
 
-    driver.set_page_load_timeout(30)
+    RemoteConnection.set_timeout(DRIVER_COMMAND_TIMEOUT)
+    driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
+    driver.set_script_timeout(PAGE_LOAD_TIMEOUT)
+    driver.implicitly_wait(0)
     return driver
 
 
