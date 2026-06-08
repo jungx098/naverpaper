@@ -144,15 +144,18 @@ python npaper.py -cf accounts.json --no-headless -v
 
 ### Local wrapper (`run.sh`)
 
-Optional shell script for cron or manual runs. It activates an in-tree venv if present,
-checks `accounts.json`, prevents overlapping runs, then invokes:
+Optional shell script for cron or manual runs. It uses `.venv/bin/python` or
+`venv/bin/python` when present, checks `accounts.json`, prevents overlapping runs,
+then invokes:
 
 ```bash
-python npaper.py [--headless|--no-headless] -cf accounts.json -v [extra args]
+python npaper.py [--headless|--no-headless] -cf accounts.json [extra args]
 ```
 
-Default is `--headless`; use `./run.sh --no-headless` or `python npaper.py --no-headless`
-for a visible browser.
+Default is `--headless` and a quiet console (same as `npaper.py`). Pass `-v` or
+`-vv` via `run.sh` when you want console output (e.g. `./run.sh -v`). File log
+(`log.txt`) is always INFO or higher. Use `./run.sh --no-headless` or
+`python npaper.py --no-headless` for a visible browser.
 
 ```bash
 ./run.sh --help    # usage, env vars, and options
@@ -166,7 +169,7 @@ for a visible browser.
 | `-h`, `--help` | Show `run.sh` help |
 
 `--headless` / `--no-headless` are handled by `run.sh` (only one is passed to
-`npaper.py`). Other arguments are forwarded (e.g. `./run.sh -vv`,
+`npaper.py`). All other arguments are forwarded (e.g. `./run.sh -v`,
 `./run.sh --no-headless -vv`).
 
 | Environment variable | Default | Description |

@@ -43,7 +43,9 @@ Environment:
   NPAPER_NETWORK_PORT      probe port (default: 443)
 
 Default npaper.py invocation:
-  python npaper.py --headless -cf <credential-file> -v [extra args]
+  python npaper.py --headless -cf <credential-file> [extra args]
+
+Pass -v / -vv to npaper.py for console output (e.g. $SCRIPT_NAME -v).
 
 Options:
   -h, --help        Show this help
@@ -84,6 +86,23 @@ random_duration() {
     "$PYTHON" -c "import random; print(random.randint(int('$min'), int('$max')))"
 }
 
+find_venv_python() {
+    repo_root=$1
+
+    for vdir in .venv venv; do
+        if [ -x "$repo_root/$vdir/bin/python" ]; then
+            printf '%s\n' "$repo_root/$vdir/bin/python"
+            return 0
+        fi
+        if [ -x "$repo_root/$vdir/Scripts/python.exe" ]; then
+            printf '%s\n' "$repo_root/$vdir/Scripts/python.exe"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 acquire_lock() {
     LOCKFILE="${TMPDIR:-/tmp}/npaper.lock"
     LOCKDIR="${LOCKFILE}.d"
@@ -106,7 +125,7 @@ acquire_lock() {
 }
 
 #------------------------------------------------------------------------------
-# Platform fallbacks (overridden by in-tree venv activation below)
+# Platform fallbacks (overridden by in-tree venv python below)
 #------------------------------------------------------------------------------
 
 PYTHON=
@@ -165,44 +184,34 @@ case $(uname -s) in
 esac
 
 #------------------------------------------------------------------------------
-# Repo root + venv
+# Repo root + venv python
 #------------------------------------------------------------------------------
 
 SCRIPT_PATH=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 cd "$SCRIPT_PATH"
 
-for vdir in .venv venv; do
-    if [ -f "$SCRIPT_PATH/$vdir/bin/activate" ]; then
-        # shellcheck disable=SC1090
-        . "$SCRIPT_PATH/$vdir/bin/activate"
-        PYTHON=python
-        break
-    elif [ -f "$SCRIPT_PATH/$vdir/Scripts/activate" ]; then
-        # shellcheck disable=SC1090
-        . "$SCRIPT_PATH/$vdir/Scripts/activate"
-        PYTHON=python
-        break
+if venv_python=$(find_venv_python "$SCRIPT_PATH"); then
+    PYTHON=$venv_python
+else
+    if [ -z "$PYTHON" ]; then
+        PYTHON=python3
     fi
-done
 
-if [ -z "$PYTHON" ]; then
-    PYTHON=python3
-fi
-
-# macOS: prefer PATH python3 over a missing MacPorts binary
-if [ "$(uname -s)" = "Darwin" ] && ! command -v "$PYTHON" >/dev/null 2>&1; then
-    if [ -x /opt/local/bin/python3 ]; then
-        PYTHON=/opt/local/bin/python3
+    # macOS: fall back to MacPorts if python3 is not on PATH
+    if [ "$(uname -s)" = "Darwin" ] && ! command -v "$PYTHON" >/dev/null 2>&1; then
+        if [ -x /opt/local/bin/python3 ]; then
+            PYTHON=/opt/local/bin/python3
+        fi
     fi
 fi
 
-if ! command -v "$PYTHON" >/dev/null 2>&1 && [ ! -x "$PYTHON" ]; then
+if [ -x "$PYTHON" ]; then
+    :
+elif command -v "$PYTHON" >/dev/null 2>&1; then
+    PYTHON=$(command -v "$PYTHON")
+else
     echo "$SCRIPT_NAME: Python not found: $PYTHON"
     exit 1
-fi
-
-if command -v "$PYTHON" >/dev/null 2>&1; then
-    PYTHON=$(command -v "$PYTHON")
 fi
 
 echo "$SCRIPT_NAME: Using $("$PYTHON" --version 2>&1) ($PYTHON)"
@@ -284,7 +293,7 @@ fi
 
 set +e
 # shellcheck disable=SC2086
-"$PYTHON" "$SCRIPT" $HEADLESS_FLAG -cf "$NPAPER_CREDENTIAL_FILE" -v $NPAPER_EXTRA_ARGS
+"$PYTHON" "$SCRIPT" $HEADLESS_FLAG -cf "$NPAPER_CREDENTIAL_FILE" $NPAPER_EXTRA_ARGS
 STATUS=$?
 set -e
 
