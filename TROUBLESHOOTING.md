@@ -71,7 +71,7 @@ Secondary issues found and fixed along the way:
   - Repeated-failure path raises `RuntimeError` instead of `exit()`.
   - Post-login diagnostic logs whether `NID_AUT` is persistent / session-scoped
     / absent.
-- **`naper.py`**
+- **`npaper.py`**
   - `driver.quit()` moved into a `finally` so cookies always flush.
   - Profile-path logic extracted to shared `user_dir_for()`.
 - **`seed_login.py`** (new) — one-time interactive seeding tool.
@@ -99,7 +99,7 @@ which automated runs reuse it and never face the captcha:
 3. Run normally and confirm the short-circuit:
 
    ```bash
-   python naper.py -cf accounts.json --no-headless -v
+   python npaper.py -cf accounts.json --no-headless -v
    ```
 
    Look for `Existing log-in session used` and `NID_AUT persistent`.

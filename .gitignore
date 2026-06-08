@@ -33,3 +33,7 @@ visited_urls_*.txt
 # Credentials (never commit)
 account.json
 accounts.json
+
+# Local agent docs (not for the repo)
+AGENTS.md
+SKILLS.md

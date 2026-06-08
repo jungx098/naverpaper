@@ -297,7 +297,7 @@ def main(
 
     if apprise_urls and gain != 0:
         apprise_notify(
-            f"Naper {mask_username(naver_id)}",
+            f"Npaper {mask_username(naver_id)}",
             f"- Quick Reward Count: {quick_reward_cnt}\n"
             f"- Link Count: {len(campaigns)}\n"
             f"- Gain: {(end_balance - start_balance):,} "
@@ -309,7 +309,7 @@ def main(
 
 if __name__ == "__main__":
 
-    print("Naper @jungx098 fork of @stateofai")
+    print("Npaper @jungx098")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--cd", type=str, required=False, help="credential json")

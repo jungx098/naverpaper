@@ -1,100 +1,127 @@
 [![Npaper Python GitHub Actions](https://github.com/jungx098/naver-paper/actions/workflows/action.yml/badge.svg)](https://github.com/jungx098/naver-paper/actions/workflows/action.yml)
 
 ```ascii
- _  _
-| \| |__ _ _ __  ___ _ _
-| .` / _` | '_ \/ -_) '_|
-|_|\_\__,_| .__/\___|_|
-          |_|   @jungx098
-       Fork of @stateofai
+ _  _                          
+| \| |_ __  __ _ _ __  ___ _ _ 
+| .` | '_ \/ _` | '_ \/ -_) '_|
+|_|\_| .__/\__,_| .__/\___|_|  
+     |_|        |_|   @jungx098
 ```
 
-> 기존 requests 모듈을 이용한 로그인이 작동하지 않아 selenium을 사용하도록 변경되었습니다. (Thanks to @bagng)
-> chromedriver 설치 후 코드를 실행해주세요.
-> 리눅스(Ubuntu 22.04) 및 맥(macOS Sonoma)에서 작동 되는 것을 확인했습니다.
-> 윈도우는 확인해보지 못했으나, 혹시 실행되신 분이 있으면 알려주세요.
->
-> \- @stateofai
+Selenium automation for Naver Pay benefit campaigns.
 
-### GitHub Actions 사용
-1. 이 repo를 fork
-2. secrets에 ID, PASSWORD 항목에 네이버 ID 및 패스워드 입력. ID라는 이름으로 네이버 ID를 넣고 PASSWORD라는 항목에 패스워드 입력
-   (Settings -> Secrets and variable -> Actions -> New repository secret)
-3. 30분마다 주기적으로 실행되는 것을 확인
-4. secrets TRY_LOGIN 항목에 로그인 재시도 횟수 입력, 기본값은 3번
+## What it does
+
+Each run, per account:
+
+1. **Scrapes** stamp-campaign links from Naver community sources (`scrape.py`).
+2. **Reads** starting Naver Pay / Point balance.
+3. **Completes Quick Reward** missions on the Npay Point benefit page.
+4. **Visits** stamp campaigns not yet recorded in the local SQLite DB (last 3 days).
+5. **Reports** balance gain and duration; optionally sends an [Apprise](https://github.com/caronc/apprise)
+   notification when gain is non-zero.
+
+Persistent Chrome profiles (`user_dir/`) let you log in once by hand and reuse the
+session on later runs — see [First-time setup](#first-time-setup).
 
 ## Prerequisites
 
-### Python
+- **Python 3.12**
+- **Google Chrome** — ChromeDriver is downloaded automatically at runtime by
+  [`webdriver-manager`](https://github.com/SergeyPirogov/webdriver_manager); you only
+  need Chrome installed.
 
-Tested for Python 3.12.
-
-### Install Google Chrome
-
-> Note: This project uses `webdriver-manager`, which downloads a matching
-> ChromeDriver automatically at runtime. You only need Google Chrome installed —
-> the manual ChromeDriver steps below are optional (e.g. for pinning a version
-> or running offline).
+### Linux
 
 ```bash
-$ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-$ sudo apt-get update
-$ sudo apt-get install -y gdebi-core
-$ sudo gdebi google-chrome-stable_current_amd64.deb
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt-get update
+sudo apt-get install -y gdebi-core
+sudo gdebi google-chrome-stable_current_amd64.deb
+google-chrome --version
 ```
-> Verifying Google Chrome Installation
+
+### macOS
+
 ```bash
-$ google-chrome --version
-Google Chrome 120.0.6099.224
+brew install --cask google-chrome
+# or download from https://www.google.com/chrome/
 ```
-> Install ChromeDriver
-- Go to [https://googlechromelabs.github.io/chrome-for-testing/]
-- Download ChromeDriver same as Google Chrome Version
-- Unzip and Copy chromedriver binary file to /usr/bin/chromedriver
-> This is example
+
+## Install
+
 ```bash
-$ google-chrome --version
-Google Chrome 120.0.6099.109
-$ wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/120.0.6099.109/linux64/chromedriver-linux64.zip
- --2024-01-17 10:01:07--  https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/120.0.6099.109/linux64/chromedriver-linux64.zip
-Resolving edgedl.me.gvt1.com (edgedl.me.gvt1.com)... 34.104.35.123, 2600:1900:4110:86f::
-Connecting to edgedl.me.gvt1.com (edgedl.me.gvt1.com)|34.104.35.123|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 8624482 (8.2M) [application/octet-stream]
-Saving to: ‘chromedriver-linux64.zip’
-chromedriver-linux64.zip   100%[=======================================>]   8.22M  5.21MB/s    in 1.6s
-2024-01-17 10:01:10 (5.21 MB/s) - ‘chromedriver-linux64.zip’ saved [8624482/8624482]
-$ unzip chromedriver-linux64.zip
-Archive:  chromedriver-linux64-120.0.6099.109.zip
-inflating: chromedriver-linux64/LICENSE.chromedriver
-inflating: chromedriver-linux64/chromedriver
-$ sudo cp chromedriver-linux64/chromedriver /usr/local/bin
-$ sudo chmod a+x /usr/local/bin/chromedriver
-$ /usr/local/bin/chromedriver --version
-ChromeDriver 120.0.6099.109 (3419140ab665596f21b385ce136419fde0924272-refs/branch-heads/6099@{#1483})
+git clone https://github.com/jungx098/naver-paper.git
+cd naver-paper
+pip install -r requirements.txt
+# or: pip install -e .
 ```
+
+## First-time setup
+
+Scripted ID/PW login can trigger Naver's captcha. The reliable approach is to seed
+a persistent session once in a visible browser:
+
+```bash
+# 1. Create accounts.json (see below) — never commit this file.
+
+# 2. Log in manually; keep "stay signed in" checked.
+python seed_login.py -cf accounts.json
+
+# 3. Normal runs reuse the saved profile.
+python npaper.py -cf accounts.json -v
+```
+
+Set a fixed `ua` per account in `accounts.json` so seeding and headless runs share
+the same browser fingerprint. See
+[TROUBLESHOOTING.md](TROUBLESHOOTING.md#naver-login-re-login-every-run--captcha)
+for background.
+
+> **GitHub Actions** runs on ephemeral VMs with no persistent `user_dir/`. It uses
+> `USERNAME` / `PASSWORD` secrets and scripted login every time, so captcha risk
+> remains higher than on a locally seeded profile.
+
 ## Usage
+
+```bash
+# Single account via environment variables
+export USERNAME=your_naver_id
+export PASSWORD=your_password
+python npaper.py -v
+
+# Multiple accounts via inline JSON
+python npaper.py -c '[{"id":"ID_1","pw":"PW_1"},{"id":"ID_2","pw":"PW_2"}]' -v
+
+# Credential file (recommended for local runs)
+python npaper.py -cf accounts.json -v
+
+# Visible browser (debugging)
+python npaper.py -cf accounts.json --no-headless -v
 ```
-$ git clone https://github.com/stateofai/naver-paper.git
-$ cd naver-paper
-$ pip install -r requirements.txt
 
-# 환경 변수로 USERNAME, PASSWORD 읽이서 실행
-$ python naper.py
+### CLI flags
 
-# argument 로 멀티 계정 입력
-$ python naper.py -c '[{"id":"ID_1","pw":"PW_1"},{"id":"ID_2","pw":"PW_2"}]'
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-cf`, `--credential-file` | — | Path to `accounts.json` |
+| `-c`, `--cd` | — | Inline credential JSON string |
+| `--headless` / `--no-headless` | headless | Browser visibility |
+| `-v`, `--verbose` | quiet console | Repeat for more console detail (`-vv` …) |
+| `--newsave` / `--no-newsave` | off | Force the fresh-login code path |
 
-# 브라우저 표시 --no-headless
-$ python naper.py -c '[{"id":"ID_1","pw":"PW_1"}]' --no-headless
+### Environment variables
 
-# Using accounts.json
-$ python naper.py -cf accounts.json
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `USERNAME` | — | Naver ID (single-account mode) |
+| `PASSWORD` | — | Naver password (single-account mode) |
+| `TRY_LOGIN` | `3` | Login retry limit |
+| `DRIVER_COMMAND_TIMEOUT` | `30` | Chromedriver HTTP timeout (seconds) |
+| `PAGE_LOAD_TIMEOUT` | `30` | Page-load and script timeout (seconds) |
 
 ### Credential file format
 
-`accounts.json` is a list of account objects:
+`accounts.json` is a JSON list of account objects:
 
 ```json
 [
@@ -107,35 +134,59 @@ $ python naper.py -cf accounts.json
 ]
 ```
 
-- `id`, `pw` — required.
-- `ua` — optional user agent. A mobile UA (Android/iPhone) automatically enables
-  Chrome mobile emulation so the fingerprint stays internally consistent.
-- `apprise` — optional list of [Apprise](https://github.com/caronc/apprise)
-  notification URLs.
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id`, `pw` | yes | Naver credentials |
+| `ua` | no | User agent; mobile UA strings enable Chrome mobile emulation |
+| `apprise` | no | Apprise notification URLs; sent only when **gain ≠ 0** |
 
-> Never commit `accounts.json` (or `account.json`) — it is git-ignored.
+> **Never commit** `accounts.json` or `account.json` — they are git-ignored.
 
-### Persistent login (avoid re-login / captcha)
+### Local wrapper (`run.sh`)
 
-Scripted ID/PW login can trip Naver's auto-input-prevention captcha. The robust
-approach is to seed a persistent session **once, by hand**, into the per-account
-Chrome profile that `naper.py` reuses:
+Optional shell script: activates venv, applies a random startup delay, then runs
+`npaper.py --headless -cf accounts.json -v`. On macOS it expects MacPorts Python at
+`/opt/local/bin/python3`; adjust paths for your environment.
 
-```bash
-$ python seed_login.py -cf accounts.json
+## GitHub Actions
+
+1. Fork this repo.
+2. Add repository secrets: `USERNAME`, `PASSWORD` (and optionally `TRY_LOGIN`, default 3).
+   (Settings → Secrets and variables → Actions → New repository secret)
+3. The workflow runs every 30 minutes (`cron: '*/30 * * * *'`) and can be triggered manually.
+
+Because CI has no persistent Chrome profile, treat Actions as a convenience for
+accounts that tolerate scripted login — not a replacement for local `seed_login.py`.
+
+## Logging and debug
+
+| Output | Location | Notes |
+|--------|----------|-------|
+| Run log | `./log.txt` | Always written at INFO or higher |
+| Console | stdout | Level controlled by `-v` |
+| Error dumps | `./debug/` | HTML + PNG on stamp-campaign handler failures |
+
+These paths are git-ignored along with `user_dir/` and `*.db`.
+
+## Project layout
+
 ```
-
-Log in manually and keep "stay signed in" checked. Later `naper.py` runs detect
-the existing session and skip the login form entirely. See
-[TROUBLESHOOTING.md](TROUBLESHOOTING.md#naver-login-re-login-every-run--captcha)
-for the full background.
+npaper.py           Main entry — balance, quick reward, campaign visits
+seed_login.py      One-time interactive login to seed a Chrome profile
+driver.py          Chrome setup, timeouts, Naver login
+balance.py         Read Naver Pay / Point balances
+scrape.py          Campaign link scraping + SQLite stamp DB
+timings.py         Shared sleep and retry constants
+page_actions/      Selenium page handlers (campaign + quick reward)
+run.sh             Optional local cron wrapper
+```
 
 ## Troubleshooting
 
-Known issues and their fixes are documented in
-[TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+Known issues and fixes: [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## References
-* https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/120.0.6099.109/win64/chromedriver-win64.zip
-* https://help.naver.com/service/5640/contents/10219?lang=ko
-* https://help.naver.com/service/5640/contents/8584?lang=ko
+
+- [Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/) — optional manual driver pinning
+- [Naver Pay benefit help (KO)](https://help.naver.com/service/5640/contents/10219?lang=ko)
+- [Naver Pay point help (KO)](https://help.naver.com/service/5640/contents/8584?lang=ko)

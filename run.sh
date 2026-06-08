@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-SCRIPT=naper.py
+SCRIPT=npaper.py
 
 #==============================================================================
 # Config for different platforms
@@ -64,14 +64,14 @@ else
 fi
 
 # Resolve the script directory and switch into it. Needed for venv activation
-# below, and so naper.py and any git auto-update run from the repo root.
+# below, and so npaper.py and any git auto-update run from the repo root.
 SCRIPT_PATH=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 cd "$SCRIPT_PATH"
 
 # Activate an in-tree venv if present (all platforms). This is the single
 # source of truth for in-tree venv preference: it overrides the platform
 # fallback PYTHON set above and prepends the venv to PATH so any python
-# subprocess naper.py spawns (e.g. webdriver-manager) uses it too.
+# subprocess npaper.py spawns (e.g. webdriver-manager) uses it too.
 for vdir in .venv venv; do
     if [ -f "$SCRIPT_PATH/$vdir/bin/activate" ]; then
         . "$SCRIPT_PATH/$vdir/bin/activate"
@@ -103,7 +103,7 @@ nc -zw1 google.com 443 || \
 
 # Prevent overlapping cron runs. A run can take longer than the cron interval
 # (random delay + multiple accounts), so skip if another instance holds the lock.
-LOCKFILE="${TMPDIR:-/tmp}/naper.lock"
+LOCKFILE="${TMPDIR:-/tmp}/npaper.lock"
 if command -v flock >/dev/null 2>&1; then
     exec 9>"$LOCKFILE"
     if ! flock -n 9; then
@@ -117,8 +117,8 @@ echo "$(basename $0) Start: $(date)"
 
 # Optionally update src before running. Auto-rebasing a live working tree on
 # every cron run is risky (it can fail on local changes or conflicts), so this
-# is opt-in via NAPER_AUTO_UPDATE=1 and never aborts the run on failure.
-if [ "$NAPER_AUTO_UPDATE" = "1" ]; then
+# is opt-in via NPAPER_AUTO_UPDATE=1 and never aborts the run on failure.
+if [ "$NPAPER_AUTO_UPDATE" = "1" ]; then
     git fetch && git rebase || echo "$(basename $0) Auto-update skipped (fetch/rebase failed)"
 fi
 

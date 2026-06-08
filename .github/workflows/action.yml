@@ -23,7 +23,7 @@ jobs:
         pip install -r requirements.txt
     - name: Run
       run: |
-        python naper.py --headless -v
+        python npaper.py --headless -v
       env:
         USERNAME: ${{ secrets.USERNAME }} # secret에 저장된 내용을 불러옴
         PASSWORD: ${{ secrets.PASSWORD }}

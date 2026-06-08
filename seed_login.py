@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""One-time interactive profile seeding for naper.
+"""One-time interactive profile seeding for npaper.
 
-Opens Chrome on the SAME per-account profile that naper.py uses (keyed by
+Opens Chrome on the SAME per-account profile that npaper.py uses (keyed by
 id+pw+ua) and navigates to the Naver login page. You log in BY HAND -- typing
 the ID/PW, solving any captcha, and keeping "stay signed in" (로그인 상태 유지)
 checked. The tool then confirms whether a persistent NID_AUT cookie was stored,
-so later `naper.py` runs reuse the session via login()'s existing-session
+so later `npaper.py` runs reuse the session via login()'s existing-session
 short-circuit instead of re-entering credentials (and tripping the captcha).
 
 Usage:
@@ -14,10 +14,10 @@ Usage:
     USERNAME=... PASSWORD=... python seed_login.py
 
 Note on headless runs: a Naver keep-login session can be tied to the browser's
-user agent. If naper.py runs headless (UA contains "HeadlessChrome") while this
+user agent. If npaper.py runs headless (UA contains "HeadlessChrome") while this
 seeder runs visible (UA "Chrome"), the UAs differ and Naver may invalidate the
 session. To keep them consistent, set a fixed "ua" per account in accounts.json
-(applied to both seeding and runs), or run naper.py with --no-headless.
+(applied to both seeding and runs), or run npaper.py with --no-headless.
 """
 import argparse
 import datetime
@@ -25,11 +25,11 @@ import json
 import os
 
 from driver import LOGGED_IN_TITLES, build_driver
-from naper import user_dir_for
+from npaper import user_dir_for
 
 
 def load_accounts(args: argparse.Namespace) -> list[dict]:
-    """Load credentials the same way naper.py accepts them."""
+    """Load credentials the same way npaper.py accepts them."""
 
     if args.credential_file:
         with open(args.credential_file, encoding="utf-8") as file_obj:
@@ -86,7 +86,7 @@ def seed(naver_id: str, password: str, ua: str | None) -> None:
         describe_cookie(driver.get_cookie("NID_SES"), "NID_SES")
 
         if persistent:
-            print("OK: naper.py should now reuse this session and skip login.")
+            print("OK: npaper.py should now reuse this session and skip login.")
         else:
             print(
                 "WARNING: no persistent NID_AUT. Re-run and ensure 'stay signed "
@@ -98,7 +98,7 @@ def seed(naver_id: str, password: str, ua: str | None) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Seed naper Chrome profiles via a one-time manual login."
+        description="Seed npaper Chrome profiles via a one-time manual login."
     )
     parser.add_argument("-cf", "--credential-file", help="credential json file")
     parser.add_argument("-c", "--cd", help="credential json string")

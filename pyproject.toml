@@ -26,7 +26,7 @@ dev = [
 
 # Flat module layout (scripts at repo root), not a package.
 [tool.setuptools]
-py-modules = ["naper", "scrape", "driver", "logging_config", "balance", "timings"]
+py-modules = ["npaper", "scrape", "driver", "logging_config", "balance", "timings"]
 packages = ["page_actions"]
 
 [tool.ruff]
