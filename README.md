@@ -144,9 +144,66 @@ python npaper.py -cf accounts.json --no-headless -v
 
 ### Local wrapper (`run.sh`)
 
-Optional shell script: activates venv, applies a random startup delay, then runs
-`npaper.py --headless -cf accounts.json -v`. On macOS it expects MacPorts Python at
-`/opt/local/bin/python3`; adjust paths for your environment.
+Optional shell script for cron or manual runs. It activates an in-tree venv if present,
+checks `accounts.json`, prevents overlapping runs, then invokes:
+
+```bash
+python npaper.py [--headless|--no-headless] -cf accounts.json -v [extra args]
+```
+
+Default is `--headless`; use `./run.sh --no-headless` or `python npaper.py --no-headless`
+for a visible browser.
+
+```bash
+./run.sh --help    # usage, env vars, and options
+```
+
+| Option | Description |
+|--------|-------------|
+| `--random-delay` | Sleep a random `0..NPAPER_MAX_DELAY` seconds before run (default: no delay) |
+| `--headless` | Headless browser (default) |
+| `--no-headless` | Visible browser |
+| `-h`, `--help` | Show `run.sh` help |
+
+`--headless` / `--no-headless` are handled by `run.sh` (only one is passed to
+`npaper.py`). Other arguments are forwarded (e.g. `./run.sh -vv`,
+`./run.sh --no-headless -vv`).
+
+| Environment variable | Default | Description |
+|---------------------|---------|-------------|
+| `NPAPER_CREDENTIAL_FILE` | `accounts.json` | Credential file path |
+| `NPAPER_MAX_DELAY` | `1200` | Upper bound for `--random-delay` (seconds) |
+| `NPAPER_AUTO_UPDATE` | off | `1` = `git fetch && git rebase` before run |
+| `NPAPER_SKIP_NETWORK` | off | `1` = skip connectivity probe |
+| `NPAPER_NETWORK_HOST` | `google.com` | Host for pre-run connectivity check |
+| `NPAPER_NETWORK_PORT` | `443` | Port for pre-run connectivity check |
+
+#### Cron examples
+
+Edit paths for your install directory and log location.
+
+```cron
+# Every 2 hours — run immediately when cron fires
+0 */2 * * * cd /path/to/naver-paper && ./run.sh >> /path/to/logs/npaper-cron.log 2>&1
+
+# Random jitter 0–1200s before each run (spread load)
+15 */2 * * * cd /path/to/naver-paper && ./run.sh --random-delay >> /path/to/logs/npaper-cron.log 2>&1
+
+# Shorter jitter window (0–300s) + extra verbose output
+30 */2 * * * cd /path/to/naver-paper && NPAPER_MAX_DELAY=300 ./run.sh --random-delay -vv >> /path/to/logs/npaper-cron.log 2>&1
+
+# Timestamp each run in the log
+0 */2 * * * cd /path/to/naver-paper && { echo "=== $(date) ==="; ./run.sh -vv; echo; } >> /path/to/logs/npaper-cron.log 2>&1
+
+# Separate stdout and stderr
+0 */2 * * * cd /path/to/naver-paper && ./run.sh -vv >> /path/to/logs/npaper.out.log 2>> /path/to/logs/npaper.err.log
+
+# Debug: visible browser (not for routine cron)
+0 9 * * * cd /path/to/naver-paper && ./run.sh --no-headless -vv >> /path/to/logs/npaper-debug.log 2>&1
+```
+
+`run.sh` logs start/end timestamps and the `npaper.py` exit code. The app also
+writes `./log.txt` in the repo directory (independent of cron redirection).
 
 ## GitHub Actions
 
