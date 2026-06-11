@@ -1,6 +1,6 @@
-"""Tests for username masking in naper.py."""
+"""Tests for username masking in npaper.py."""
 
-from naper import mask_username
+from npaper import mask_username
 
 
 def test_empty_returns_empty():
