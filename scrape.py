@@ -8,6 +8,8 @@ from urllib.parse import parse_qs, urljoin, urlsplit
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from logging_config import init_logger
 
@@ -34,6 +36,18 @@ class Scrape:
 
     def __init__(self):
         self.headers = {"User-Agent": f"{UserAgent(platforms='pc').random}"}
+        self.session = requests.Session()
+        retries = Retry(
+            total=2,
+            connect=2,
+            read=2,
+            backoff_factor=0.5,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=("GET",),
+        )
+        adapter = HTTPAdapter(max_retries=retries)
+        self.session.mount("http://", adapter)
+        self.session.mount("https://", adapter)
 
     def is_campaign_link(self, link: str) -> bool:
         """Check if the link is a valid campaign link."""
@@ -52,7 +66,14 @@ class Scrape:
         return a_tag["href"]
 
     def _get_soup(self, url):
-        response = requests.get(url, headers=self.headers, timeout=7)
+        try:
+            response = self.session.get(url, headers=self.headers, timeout=7)
+        except requests.exceptions.SSLError as e:
+            logger.warning("TLS failed for %s: %s", url, type(e).__name__)
+            return BeautifulSoup("", "html.parser")
+        except requests.exceptions.RequestException as e:
+            logger.warning("Request failed for %s: %s", url, type(e).__name__)
+            return BeautifulSoup("", "html.parser")
         return BeautifulSoup(response.text, "html.parser")
 
     def find_naver_campaign_links(self, progress=None):

@@ -3,10 +3,15 @@
 
 import logging
 import re
+import time
 
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    TimeoutException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from page_actions import TextToChange
@@ -20,30 +25,78 @@ logger = logging.getLogger(__name__)
 BALANCE_SOURCES = (
     (
         "https://new-m.pay.naver.com/pointshistory/list?category=all",
-        "//*[contains(@class, 'PointsManage_point__')]",
+        (
+            "//*[contains(@class, 'PointsManage_point__')]",
+            "//*[contains(@class, 'AssetCommonItem_balance__')]",
+        ),
     ),
     (
         "https://new-m.pay.naver.com/mydata/home",
-        "//*[contains(@class, 'AssetCommonItem_balance__')]",
+        (
+            "//*[contains(@class, 'AssetCommonItem_balance__')]",
+            "//*[contains(@class, 'PointsManage_point__')]",
+        ),
     ),
 )
 
 
-def read_balance(driver: WebDriver, url: str, xpath: str) -> int:
+def _find_balance_element(driver: WebDriver, xpaths: tuple[str, ...], timeout: int = 8):
+    end_time = time.time() + timeout
+    last_error: Exception | None = None
+
+    while time.time() < end_time:
+        for xpath in xpaths:
+            try:
+                return WebDriverWait(driver, 1).until(
+                    EC.presence_of_element_located((By.XPATH, xpath))
+                )
+            except TimeoutException as e:
+                last_error = e
+            except NoSuchElementException as e:
+                last_error = e
+        time.sleep(0.2)
+
+    if last_error:
+        raise last_error
+    raise TimeoutException("Balance element not found")
+
+
+def read_balance(driver: WebDriver, url: str, xpaths: tuple[str, ...]) -> int:
     """Read a Naver balance from a single page/element, or -1 on failure."""
 
     balance = -1
 
     try:
-        driver.get(url)
-        element = driver.find_element(By.XPATH, xpath)
+        for attempt in range(2):
+            try:
+                driver.get(url)
+                break
+            except TimeoutException as e:
+                logger.warning(
+                    "Balance source load timeout (%s, attempt %d/2)",
+                    url,
+                    attempt + 1,
+                )
+                if attempt == 1:
+                    raise e
+
+        element = _find_balance_element(driver, xpaths)
 
         old_text = element.text
         logger.info("read_balance: %s", old_text)
 
+        def text_changed(d: WebDriver) -> bool:
+            for xpath in xpaths:
+                try:
+                    if TextToChange((By.XPATH, xpath), old_text)(d):
+                        return True
+                except Exception:
+                    continue
+            return False
+
         try:
-            WebDriverWait(driver, 5).until(TextToChange((By.XPATH, xpath), old_text))
-            element = driver.find_element(By.XPATH, xpath)
+            WebDriverWait(driver, 5).until(text_changed)
+            element = _find_balance_element(driver, xpaths, timeout=2)
         except TimeoutException as e:
             logger.info("No Change in Balance Element: %s", type(e).__name__)
 

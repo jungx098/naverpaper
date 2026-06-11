@@ -21,7 +21,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from tqdm import tqdm
 
 from balance import get_balance
-from driver import init, session_alive
+from driver import init, is_alive, recover, session_alive
 from logging_config import init_logger
 from page_actions import (
     QUICK_REWARD_LINK,
@@ -269,6 +269,15 @@ def main(
         # Campaign visit
         if len(campaigns) > 0:
             visit(naver_id, campaigns, driver, db)
+
+        # The campaign visit phase can wedge Chrome's renderer (a specific
+        # campaign page reliably hangs it), which then poisons the final
+        # balance read. Restart the driver if it stopped responding so the end
+        # balance is read on a healthy browser.
+        if not is_alive(driver):
+            driver = recover(
+                driver, naver_id, password, ua, headless, newsave, user_dir
+            )
 
         # Test code for balance check
         end_balance = get_balance(driver)

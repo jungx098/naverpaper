@@ -265,3 +265,50 @@ def init(
 
     driver = build_driver(ua, headless, user_dir)
     return login(driver, naver_id, password, newsave, headless)
+
+
+def is_alive(driver: WebDriver, timeout: int = 5) -> bool:
+    """Return True if the browser/renderer still responds to commands.
+
+    A specific campaign page can wedge Chrome's renderer ("Timed out receiving
+    message from renderer"), after which every subsequent command hangs. A
+    trivial script round-trip with a short script timeout is enough to tell a
+    live renderer from a dead one without waiting the full page-load timeout.
+    """
+
+    try:
+        driver.set_script_timeout(timeout)
+        driver.execute_script("return 1")
+        return True
+    except Exception as e:
+        logger.warning("Renderer health check failed: %s", type(e).__name__)
+        return False
+    finally:
+        try:
+            driver.set_script_timeout(30)
+        except Exception:
+            pass
+
+
+def recover(
+    driver: WebDriver,
+    naver_id: str,
+    password: str,
+    ua: str | None,
+    headless: bool,
+    newsave: bool,
+    user_dir: str,
+) -> WebDriver:
+    """Quit a wedged driver and return a fresh, logged-in one.
+
+    The persistent profile means the rebuilt driver reuses the existing login
+    session, so recovery is cheap (no credential re-entry in the common case).
+    """
+
+    logger.warning("Restarting Chrome driver after renderer failure")
+    try:
+        driver.quit()
+    except Exception as e:
+        logger.warning("Old driver quit failed: %s", type(e).__name__)
+
+    return init(naver_id, password, ua, headless, newsave, user_dir)
