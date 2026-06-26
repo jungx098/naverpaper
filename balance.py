@@ -19,22 +19,23 @@ from page_actions import TextToChange
 logger = logging.getLogger(__name__)
 
 # Balance sources, tried in order. The faster points-history page is preferred;
-# the slower mydata home is the fallback. CSS module class hashes (e.g.
-# PointsManage_point__T67hP) change per Naver build, so each xpath matches on the
-# stable class prefix instead of the full name.
+# the slower pay home is the fallback. Naver now redirects the old
+# new-m.pay.naver.com URLs to these canonical domains, so request them directly.
+# CSS module class hashes change per Naver build, so each xpath matches on the
+# stable class-name prefix instead of the full hashed name.
 BALANCE_SOURCES = (
     (
-        "https://new-m.pay.naver.com/pointshistory/list?category=all",
+        "https://point.pay.naver.com/pointshistory/list?category=all",
         (
-            "//*[contains(@class, 'PointsManage_point__')]",
-            "//*[contains(@class, 'AssetCommonItem_balance__')]",
+            "//*[contains(@class, '_area-point_')]",
+            "//*[contains(@class, 'my-point_number__')]",
         ),
     ),
     (
-        "https://new-m.pay.naver.com/mydata/home",
+        "https://home.pay.naver.com/",
         (
-            "//*[contains(@class, 'AssetCommonItem_balance__')]",
-            "//*[contains(@class, 'PointsManage_point__')]",
+            "//*[contains(@class, 'my-point_number__')]",
+            "//*[contains(@class, 'my-point_amount__')]",
         ),
     ),
 )
